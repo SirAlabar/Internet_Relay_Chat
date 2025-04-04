@@ -22,9 +22,9 @@ This project involves implementing an IRC (Internet Relay Chat) server in C++98,
 
 ## 🛠️ Technologies Used
 
-- C++98
+- `C++98`
 - TCP/IP Sockets
-- Poll (for non-blocking I/O operations)
+- `poll()` (for non-blocking I/O operations)
 - Makefile
 
 ## 🏗️ Build and Execution
@@ -76,17 +76,17 @@ make
 
 ## 📊 Project Progress
 
-- [x] Initial project setup
-- [x] Basic server implementation
-- [x] Client connection management
-- [x] User authentication
-- [x] Channel implementation
-- [x] Basic IRC commands
-- [x] Operator commands
-- [x] Testing and debugging
+- [ ] Initial project setup
+- [ ] Basic server implementation
+- [ ] Client connection management
+- [ ] User authentication
+- [ ] Channel implementation
+- [ ] Basic IRC commands
+- [ ] Operator commands
+- [ ] Testing and debugging
 
 ---
 
-*This project was developed as part of the 42 curriculum.*
+**This project was developed as part of the 42 curriculum.**
 
 💻 Happy coding! 💻
