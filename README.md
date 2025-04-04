@@ -48,7 +48,7 @@ make
 
 | Member | GitHub |
 |--------|--------|
-| Alábar | [SirAlabar](https://github.com/SirAlabar) |
+| Alabar | [SirAlabar](https://github.com/SirAlabar) |
 | MrSloth | [MrSloth-dev](https://github.com/MrSloth-dev) |
 | isilva-t | [isilva-t](https://github.com/isilva-t) |
 
