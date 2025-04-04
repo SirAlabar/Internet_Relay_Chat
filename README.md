@@ -46,11 +46,28 @@ make
 
 ## 👨‍💻 Team
 
-| Member | GitHub |
-|--------|--------|
-| Alabar | [SirAlabar](https://github.com/SirAlabar) |
-| MrSloth | [MrSloth-dev](https://github.com/MrSloth-dev) |
-| isilva-t | [isilva-t](https://github.com/isilva-t) |
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/SirAlabar">
+        <img src="https://github.com/SirAlabar.png" width="70" height="70" style="border-radius: 50%;" alt="SirAlabar"><br>
+        <sub><b>SirAlabar</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/MrSloth-dev">
+        <img src="https://github.com/MrSloth-dev.png" width="70" height="70" style="border-radius: 50%;" alt="MrSloth-dev"><br>
+        <sub><b>MrSloth-dev</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/isilva-t">
+        <img src="https://github.com/isilva-t.png" width="70" height="70" style="border-radius: 50%;" alt="isilva-t"><br>
+        <sub><b>isilva-t</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
 ## 📚 References
 
