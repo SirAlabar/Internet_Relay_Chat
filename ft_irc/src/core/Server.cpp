@@ -13,12 +13,13 @@ Server::~Server()
     stop();
 }
 
-bool setupServer(int port, const std::string& password)
+// Setup server with port and password
+bool Server::setupServer(int port, const std::string& password)
 {
     _password = password;
 
     //Create the server socket
-    if (!_serverSocket.create(AF_INET, SOCK_STEAM, 0))
+    if (!_serverSocket.create(AF_INET, SOCK_STREAM, 0))
     {
         std::cerr << "Error creating socket: " << _serverSocket.getLastError() << std::endl;
         return (false);
@@ -53,40 +54,219 @@ bool setupServer(int port, const std::string& password)
     return (true);
 }
 
+// Start the server on specified port with password
+bool Server::start(int port, const std::string& password)
+{
+    if (!setupServer(port, password))
+    {
+        return (false);
+    }
+
+    pollfd serverPollFd;
+    serverPollFd.fd = _serverSocket.getFd();
+    serverPollFd.events = POLLIN;
+    serverPollFd.revents = 0;
+
+    _pollFds.push_back(serverPollFd);
+    _running = true;
+
+    return (true);
+}
+
+// Main server loop - handles events using poll()
+void Server::run()
+{
+    while (_running)
+    {
+        // Execute poll() to check for events
+        int ready = poll(_pollFds.data(), _pollFds.size(), -1);
+        if (ready < 0)
+        {
+            if (errno == EINTR)
+                continue;
+            
+            std::cerr << "Error in poll: " << strerror(errno) << std::endl;
+            break;
+        }
+        // Process all fds with events
+        for (size_t i = 0; i < _pollFds.size() && ready > 0; ++i) 
+        {
+            if (_pollFds[i].revents == 0)
+                continue;
+            ready--;
+            // Check if we have a new connection on the server socket
+            if (_pollFds[i].fd == _serverSocket.getFd() && (_pollFds[i].revents & POLLIN)) 
+            {
+                processNewConnection();
+            }
+            // Process messages from existing clients
+            else if (_pollFds[i].revents & POLLIN)
+            {
+                processClientMessage(_pollFds[i].fd);
+            }
+            // Handle disconnections
+            else if (_pollFds[i].revents & (POLLHUP | POLLERR | POLLNVAL)) {
+                removeClient(_pollFds[i].fd);
+            }
+        }
+    }
+}
 
 
+// Stop the server and clean up resources
+void Server::stop()
+{
+    _running = false;
+
+    // Clean up clients
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    {
+        close(it->first);
+        delete it->second;
+    }
+    _clients.clear();
+    // Clean up channels
+    for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it) 
+    {
+        delete it->second;
+    }
+    _channels.clear();
+    // Clean up poll fds
+    _pollFds.clear();
+    // Close server socket
+    _serverSocket.close();
+    std::cout << "IRC Server shutdown" << std::endl;
+}
+
+// Process a new client connection
+void Server::processNewConnection()
+{
+    Socket clientSocket = _serverSocket.accept();
+    if (!clientSocket.isValid()) 
+    {
+        if (!_serverSocket.wouldBlock())
+        {
+            std::cerr << "Error accepting connection: " << _serverSocket.getLastError() << std::endl;
+        }
+        return ;
+    }
+    // Set client socket as non-blocking
+    clientSocket.setNonBlocking();
+    int clientFd = clientSocket.getFd();
+    // Add to poll
+    pollfd clientPollFd;
+    clientPollFd.fd = clientFd;
+    clientPollFd.events = POLLIN;  // Monitor for read
+    clientPollFd.revents = 0;
+    _pollFds.push_back(clientPollFd);
+
+    // Create Client object and add to map
+    // implement clients functions
+   
+    std::cout << "New connection accepted. FD: " << clientFd << std::endl;
+}
+
+void Server::processClientMessage(int clientFd)
+{
+    //implement after cliente
+}
+
+// Get server password
+const std::string& Server::getPassword() const
+{
+    return (_password);
+}
+
+// Get all channels
+std::map<std::string, Channel*>& Server::getChannels() 
+{
+    return (_channels);
+}
+
+// Get channel by name
+Channel* Server::getChannel(const std::string& name) 
+{
+    std::map<std::string, Channel*>::iterator it = _channels.find(name);
+    if (it != _channels.end())
+    {
+        return (it->second);
+    }
+    return (NULL);
+}
+
+// Get client by file descriptor
+Client* Server::getClient(int fd) 
+{
+    std::map<int, Client*>::iterator it = _clients.find(fd);
+    if (it != _clients.end())
+    {
+        return (it->second);
+    }
+    return (NULL);
+}
+
+// Get client by nickname
+Client* Server::getClientByNick(const std::string& nickname) 
+{
+    //implement after channel
+}
+
+// Remove channel by name
+void Server::removeChannel(const std::string& name) 
+{
+    std::map<std::string, Channel*>::iterator it = _channels.find(name);
+    if (it != _channels.end()) 
+    {
+        delete it->second;
+        _channels.erase(it);
+    }
+}
+
+// Remove client and cleanup associated resources
+void Server::removeClient(int clientFd) 
+{
+    // Remove from poll
+    for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) 
+    {
+        if (it->fd == clientFd) 
+        {
+            _pollFds.erase(it);
+            break;
+        }
+    }
+    // Clear buffer
+    _clientBuffers.erase(clientFd);
+    // Remove client
+    if (_clients.find(clientFd) != _clients.end()) 
+    {
+        // implement after channel <<<<<<<<<<<<
+        delete _clients[clientFd];
+        _clients.erase(clientFd);
+    }
+    
+    close(clientFd);
+    std::cout << "Client disconnected. FD: " << clientFd << std::endl;
+}
+
+// Broadcast message to all clients except excludeFd
+void Server::broadcast(const std::string& message, int excludeFd)
+{
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) 
+    {
+        if (it->first != excludeFd) 
+        {
+            // implement after message
+        }
+    }
+}
 
 
+Channel* Server::createChannel(const std::string& name, Client* creator) 
+{
+    //implement channel return (channel)
+}
 
-
-
-
-void processNewConnection();
-void processClientMessage(int clientFd);
-void removeClient(int clientFd);
-
-Server(const Server& other); // private to prevent copies
-Server& operator=(const Server& other);
-
-
-
-
-// Initialization and execution
-bool start(int port, const std::string& password);
-void run();
-void stop();
-
-// Client management
-Client* getClient(int fd);
-Client* getClientByNick(const std::string& nickname);
-void broadcast(const std::string& message, int excludeFd = -1);
-
-// Channel management
-Channel* getChannel(const std::string& name);
-Channel* createChannel(const std::string& name, Client* creator);
-void removeChannel(const std::string& name);
-std::map<std::string, Channel*>& getChannels();
-
-// Other helper methods
-const std::string& getPassword() const;
-void executeCommand(Client* client, const Message& message);
+void Server::executeCommand(Client* client, const Message& message)
+{
+    //implement after commandfactory
+}

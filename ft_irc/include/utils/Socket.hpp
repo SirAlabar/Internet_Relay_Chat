@@ -1,5 +1,5 @@
-#ifndef SOCKET.HPP
-#define SOCKET.HPP
+#ifndef SOCKET_HPP
+#define SOCKET_HPP
 
 # include <sys/socket.h> // (socker,bind, listen, accept, connect)
 # include <netinet/in.h> // (sockaddr_in)

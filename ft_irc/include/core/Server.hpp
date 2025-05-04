@@ -1,5 +1,5 @@
-#ifndef SERVER.HPP
-#define SERVER.HPP
+#ifndef SERVER_HPP
+#define SERVER_HPP
 
 #include "Socket.hpp"
 #include <vector>
@@ -7,7 +7,7 @@
 #include <string>
 #include <poll.h>
 
-//Forwaord declarations
+//Forward declarations
 class Client;
 class Channel;
 class Command;
