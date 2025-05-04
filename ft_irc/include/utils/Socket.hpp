@@ -1,4 +1,5 @@
-pragma once
+#ifndef SOCKET.HPP
+#define SOCKET.HPP
 
 # include <sys/socket.h> // (socker,bind, listen, accept, connect)
 # include <netinet/in.h> // (sockaddr_in)
@@ -50,6 +51,7 @@ public:
     std::string getLastError() const;
 };
 
+#endif
 
 
 
