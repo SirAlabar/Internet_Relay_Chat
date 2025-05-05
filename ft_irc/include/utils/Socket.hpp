@@ -43,7 +43,6 @@ public:
 
     ssize_t send(const std::string& data, int flags = 0);
     ssize_t recv(char *buffer, size_t buffersize, int flags = 0);
-    bool wouldBlock() const;
 
     int getFd() const;
     bool isValid() const;

@@ -237,12 +237,6 @@ ssize_t Socket::recv(char *buffer, size_t buffersize, int flags)
     return (result);
 }
 
-// Check if the last operation would block
-bool Socket::wouldBlock() const
-{
-    return (_lastError == EAGAIN || _lastError == EWOULDBLOCK);
-}
-
 // Get socket file descriptor
 int Socket::getFd() const
 {

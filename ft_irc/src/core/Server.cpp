@@ -144,10 +144,7 @@ void Server::processNewConnection()
     Socket clientSocket = _serverSocket.accept();
     if (!clientSocket.isValid()) 
     {
-        if (!_serverSocket.wouldBlock())
-        {
-            std::cerr << "Error accepting connection: " << _serverSocket.getLastError() << std::endl;
-        }
+        std::cerr << "Error accepting connection: " << _serverSocket.getLastError() << std::endl;
         return ;
     }
     // Set client socket as non-blocking
