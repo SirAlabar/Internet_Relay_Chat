@@ -33,8 +33,9 @@ VALGRINDFLAGS          = --tool=memcheck -q --leak-check=full \
 #                                 PROGRAM'S SRCS                               #
 ################################################################################
 
-vpath %.h includes
+vpath %.h include
 vpath %.cpp src
+
 MAIN = src/main.cpp
 SRCS = $(shell find src -name '*.cpp' | sed 's/^/.\//')
 INCLUDES = $(INCLUDE_HEADERS)
@@ -53,9 +54,6 @@ $(OBJ_DIR)/%.o: %.cpp
 
 .PHONY: all
 all: $(NAME)
-
-.PHONY: mandatory
-mandatory: $(NAME)
 
 $(NAME): $(OBJS) --header
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)libft$(CLR_RMV)...\n"
