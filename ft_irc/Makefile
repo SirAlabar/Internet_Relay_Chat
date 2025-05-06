@@ -55,7 +55,7 @@ $(OBJ_DIR)/%.o: %.cpp
 .PHONY: all
 all: $(NAME)
 
-$(NAME): --header $(OBJS)
+$(NAME): $(OBJS) --header
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)libft$(CLR_RMV)...\n"
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
 	@$(CC) $(CFLAGS) $(EFLAGS) $(OBJS) $(INCLUDES) -o $(NAME)
