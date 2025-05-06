@@ -34,15 +34,15 @@ VALGRINDFLAGS          = --tool=memcheck -q --leak-check=full \
 ################################################################################
 
 vpath %.h includes
-vpath %.c src
+vpath %.cpp src
 MAIN = src/main.cpp
 SRCS = $(shell find src -name '*.cpp' | sed 's/^/.\//')
 INCLUDES = $(INCLUDE_HEADERS)
 
 OBJ_DIR = obj
-OBJS = $(patsubst %.c, $(OBJ_DIR)/%.o, $(SRCS))
+OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-$(OBJ_DIR)/%.o: %.c
+$(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(EFLAGS) -D DEBUG=$(DEBUG) -c $< -o $@
 
@@ -62,8 +62,6 @@ $(NAME): $(OBJS) --header
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
 	@$(CC) $(CFLAGS) $(EFLAGS) $(OBJS) $(INCLUDES) -o $(NAME)
 	@printf "$(GREEN)$(NAME) binary created$(CLR_RMV) ✅\n"
-
-
 
 .PHONY: va
 va : fclean $(OBJS) $(HEADER)
