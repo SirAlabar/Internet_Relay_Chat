@@ -1,7 +1,7 @@
-#include "ACommand.hpp"
-#include "Server.hpp"
-#include "Client.hpp"
-#include "Message.hpp"
+#include "commands/ACommand.hpp"
+#include "core/Server.hpp"
+#include "core/Client.hpp"
+#include "core/Message.hpp"
 #include <sstream>
 #include <algorithm>
 
@@ -94,6 +94,7 @@ bool ACommand::isValidNickname(const std::string& nickname)
 // Send a reply message to a client
 void ACommand::sendReply(Client* client, const std::string& reply)
 {
+    (void)reply;
     if (client)
     {
         // depend on client class
@@ -106,7 +107,8 @@ void ACommand::sendNumericReply(Client* client, int numeric, const std::string& 
     if (client)
     {
         std::ostringstream oss;
-        oss << ":server " << numeric << " " << client->getNickname() << " " << message << "\r\n";
+        (void)numeric, (void)message; // Uncomment when client in done;
+        // oss << ":server " << numeric << " " << client->getNickname() << " " << message << "\r\n";
         sendReply(client, oss.str());
     }
 }
