@@ -1,8 +1,8 @@
-#include "CommandFactory.hpp"
-#include "Command.hpp"
-#include "Client.hpp"
-#include "Server.hpp"
-#include "Message.hpp"
+#include "commands/CommandFactory.hpp"
+// #include "commands/Command.hpp"
+#include "core/Client.hpp"
+#include "core/Server.hpp"
+#include "core/Message.hpp"
 #include <iostream>
 
 // Initialize static members
@@ -75,19 +75,20 @@ Command* CommandFactory::createCommand(const std::string& commandName, Server* s
 // Execute the appropriate command based on the message
 void CommandFactory::executeCommand(Client* client, Server* server, const Message& message)
 {
-    std::string commandName = message.getCommand();
-
-    Command* command = createCommand(commandName, server);
-    
-    if (command)
-    {
-        command->execute(client, message);
-        delete command;
-    }
-    else
-    {
-        // Send error to client about unknown command
-    }
+    (void) server, (void) client,(void)message;
+    // std::string commandName = message.getCommand();
+    //
+    // Command* command = createCommand(commandName, server);
+    // 
+    // if (command)
+    // {
+    //     command->execute(client, message);
+    //     delete command;
+    // }
+    // else
+    // {
+    //     // Send error to client about unknown command
+    // }
 }
 
 // Register a new command creator

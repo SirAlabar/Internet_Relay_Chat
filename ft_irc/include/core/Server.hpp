@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "Socket.hpp"
+#include "utils/Socket.hpp"
 #include <vector>
 #include <map>
 #include <string>
