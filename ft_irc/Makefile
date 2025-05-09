@@ -33,7 +33,6 @@ VALGRINDFLAGS          = --tool=memcheck -q --leak-check=full \
 #                                 PROGRAM'S SRCS                               #
 ################################################################################
 
-# vpath %.h include
 vpath %.cpp src
 
 MAIN = src/main.cpp
@@ -46,6 +45,7 @@ OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(INCLUDE_HEADERS) $(EFLAGS) -D DEBUG=$(DEBUG) -c $< -o $@
+
 
 
 ################################################################################
