@@ -4,9 +4,9 @@
 
 NAME = ircserv
 CC = c++
-INCLUDE_HEADERS = $(shell find include -name '*.hpp' | sed 's/^/-I.\//')
+INCLUDE_HEADERS = -Iinclude
 CFLAGS =  -g
-EFLAGS = -Wall -Wextra -Werror -Weffc++
+EFLAGS = -Wall
 MFLAGS = -fsanitize=undefined -fno-omit-frame-pointer -fsanitize=memory
 DEBUG ?= 0
 
@@ -33,7 +33,6 @@ VALGRINDFLAGS          = --tool=memcheck -q --leak-check=full \
 #                                 PROGRAM'S SRCS                               #
 ################################################################################
 
-vpath %.h include
 vpath %.cpp src
 
 MAIN = src/main.cpp
@@ -45,7 +44,8 @@ OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) $(EFLAGS) -D DEBUG=$(DEBUG) -c $< -o $@
+	@$(CC) $(CFLAGS) $(INCLUDE_HEADERS) $(EFLAGS) -D DEBUG=$(DEBUG) -c $< -o $@
+
 
 
 ################################################################################
@@ -55,7 +55,7 @@ $(OBJ_DIR)/%.o: %.cpp
 .PHONY: all
 all: $(NAME)
 
-$(NAME): $(OBJS) --header
+$(NAME): --header $(OBJS)
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)libft$(CLR_RMV)...\n"
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
 	@$(CC) $(CFLAGS) $(EFLAGS) $(OBJS) $(INCLUDES) -o $(NAME)
@@ -83,12 +83,12 @@ re : fclean all
 .PHONY: header
 
 --header :
-	@ echo "$(RED)░▒▓██████████████▓▒░  $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░   ░▒▓██████▓▒░  $(CLR_RMV)"
-	@ echo "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)"
-	@ echo "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)"
-	@ echo "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░  ░▒▓█▓▒░        $(CLR_RMV)"
-	@ echo "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)"
-	@ echo "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)"
-	@ echo "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░  ░▒▓██████▓▒░  $(CLR_RMV)"
-	@ echo "             $(YELLOW)(developed by hluiz-ma && isilva-t && joao-pol)$(CLR_RMV)"
+	@ printf "$(RED)░▒▓██████████████▓▒░  $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░   ░▒▓██████▓▒░  $(CLR_RMV)\n"
+	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
+	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
+	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░  ░▒▓█▓▒░        $(CLR_RMV)\n"
+	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
+	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
+	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░  ░▒▓██████▓▒░  $(CLR_RMV)\n"
+	@ printf "             $(YELLOW)(developed by hluiz-ma && isilva-t && joao-pol)$(CLR_RMV)\n"
 .SILENT: re all clean fclean
