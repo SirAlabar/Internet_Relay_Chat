@@ -4,10 +4,9 @@
 
 NAME = ircserv
 CC = c++
-INCLUDE_HEADERS = -Iinclude
-CFLAGS =  -g
-EFLAGS = -Wall
-MFLAGS = -fsanitize=undefined -fno-omit-frame-pointer -fsanitize=memory
+INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iinclude/dcc -Iinclude/utils
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -Wno-delete-incomplete -Wno-unused-parameter
+DEBUG_FLAGS = -g
 DEBUG ?= 0
 
 CLR_RMV = \033[0m
@@ -27,26 +26,22 @@ VALGRINDFLAGS          = --tool=memcheck -q --leak-check=full \
                          --show-leak-kinds=all --track-origins=yes \
                          --track-fds=yes --show-below-main=no \
 
-
-
 ################################################################################
 #                                 PROGRAM'S SRCS                               #
 ################################################################################
 
-vpath %.cpp src
+# Main source files
+SRC_DIR = src
+SRCS = $(SRC_DIR)/main.cpp \
+       $(SRC_DIR)/core/Server.cpp \
+       $(SRC_DIR)/core/Client.cpp \
+       $(SRC_DIR)/core/Message.cpp \
+       $(SRC_DIR)/utils/Socket.cpp \
+       $(SRC_DIR)/core/Channel.cpp
 
-MAIN = src/main.cpp
-SRCS = $(shell find src -name '*.cpp' | sed 's/^/.\//')
-INCLUDES = $(INCLUDE_HEADERS)
-
+# Object files
 OBJ_DIR = obj
-OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
-
-$(OBJ_DIR)/%.o: %.cpp
-	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) $(INCLUDE_HEADERS) $(EFLAGS) -D DEBUG=$(DEBUG) -c $< -o $@
-
-
+OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 
 ################################################################################
 #                                  Makefile  rules                             #
@@ -55,40 +50,52 @@ $(OBJ_DIR)/%.o: %.cpp
 .PHONY: all
 all: $(NAME)
 
-$(NAME): --header $(OBJS)
-	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)libft$(CLR_RMV)...\n"
+$(NAME): --header $(OBJ_DIR) $(OBJS)
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
-	@$(CC) $(CFLAGS) $(EFLAGS) $(OBJS) $(INCLUDES) -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) -o $(NAME)
 	@printf "$(GREEN)$(NAME) binary created$(CLR_RMV) ✅\n"
 
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)/core
+	@mkdir -p $(OBJ_DIR)/commands
+	@mkdir -p $(OBJ_DIR)/utils
+	@mkdir -p $(OBJ_DIR)/bot
+	@mkdir -p $(OBJ_DIR)/dcc
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) $(INCLUDE_HEADERS) -c $< -o $@
+
 .PHONY: va
-va : fclean $(OBJS) $(HEADER)
+va: fclean $(OBJS) 
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
-	@$(CC) $(CFLAGS) $(EFLAGS) $(OBJS) $(INCLUDES) -o $(NAME) 
-	@echo -n valgrind $(VALGRINDFLAGS) ./$(NAME) scenes/ ; read args; valgrind $(VALGRINDFLAGS) ./$(NAME) scenes/$$args
+	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) -o $(NAME) 
+	@echo -n "valgrind $(VALGRINDFLAGS) ./$(NAME) " ; read args; valgrind $(VALGRINDFLAGS) ./$(NAME) $$args
 
 .PHONY: clean
 clean:
-	@ $(RM) -f $(OBJS)
-	@ printf "$(RED)Deleting $(CYAN)$(NAME) $(CLR_RMV)objs ✅\n"
+	@$(RM) $(OBJ_DIR)
+	@printf "$(RED)Deleting $(CYAN)$(NAME) $(CLR_RMV)objs ✅\n"
 
 .PHONY: fclean
 fclean: clean
-	@ $(RM) $(OBJ_DIR) $(NAME)
+	@$(RM) $(NAME)
 	@printf "$(RED)Deleting $(CYAN)$(NAME) $(CLR_RMV)binary ✅\n"
 
 .PHONY: re
-re : fclean all
+re: fclean all
 
-.PHONY: header
+.PHONY: debug
+debug: CFLAGS += $(DEBUG_FLAGS)
+debug: re
 
---header :
-	@ printf "$(RED)░▒▓██████████████▓▒░  $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░   ░▒▓██████▓▒░  $(CLR_RMV)\n"
-	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
-	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
-	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░  ░▒▓█▓▒░        $(CLR_RMV)\n"
-	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
-	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
-	@ printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░  ░▒▓██████▓▒░  $(CLR_RMV)\n"
-	@ printf "             $(YELLOW)(developed by hluiz-ma && isilva-t && joao-pol)$(CLR_RMV)\n"
-.SILENT: re all clean fclean
+.PHONY: --header
+--header:
+	@printf "$(RED)░▒▓██████████████▓▒░  $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░   ░▒▓██████▓▒░  $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░  ░▒▓█▓▒░        $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░  ░▒▓██████▓▒░  $(CLR_RMV)\n"
+	@printf "             $(YELLOW)(developed by hluiz, isilva-t & joao-pol)$(CLR_RMV)\n"
