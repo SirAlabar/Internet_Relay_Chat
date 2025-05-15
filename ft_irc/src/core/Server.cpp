@@ -1,8 +1,9 @@
-#include "core/Server.hpp"
+#include "Server.hpp"
 #include <iostream>
 #include <cerrno>
 #include <cstring>
 #include <unistd.h>
+#include "Client.hpp"
 
 
 Server::Server() : _running(false)
@@ -119,17 +120,17 @@ void Server::stop()
     _running = false;
 
     // Clean up clients
-    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-    {
-        close(it->first);
-        delete it->second;
-    }
-    _clients.clear();
-    // Clean up channels
-    for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it) 
-    {
-        delete it->second;
-    }
+    // for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    // {
+    //     close(it->first);
+    //     delete it->second;
+    // }
+    // _clients.clear();
+    // // Clean up channels
+    // for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it) 
+    // {
+    //     delete it->second;
+    // }
     _channels.clear();
     // Clean up poll fds
     _pollFds.clear();
@@ -158,15 +159,66 @@ void Server::processNewConnection()
     _pollFds.push_back(clientPollFd);
 
     // Create Client object and add to map
+    Client* client = new Client(clientFd);
+    _clients[clientFd] = client;
     // implement clients functions
    
     std::cout << "New connection accepted. FD: " << clientFd << std::endl;
 }
 
+// void Server::processClientMessage(int clientFd)
+// {
+//     //implement after cliente
+// }
+
 void Server::processClientMessage(int clientFd)
 {
-    //implement after cliente
+    Client* client = getClient(clientFd);
+    if (!client)
+    {
+        std::cerr << "Error: Client not found for FD: " << clientFd << std::endl;
+        return;
+    }
+    
+    // Buffer for receiving data
+    char buffer[1024];
+    ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+    
+    if (bytesRead <= 0)
+    {
+        if (bytesRead == 0 || errno != EAGAIN)
+        {
+            // Connection closed or error
+            removeClient(clientFd);
+        }
+        return;
+    }
+    
+    // Null-terminate the received data
+    buffer[bytesRead] = '\0';
+    
+    // Append to client buffer
+    _clientBuffers[clientFd] += buffer;
+    
+    // Process complete messages (ending with \r\n)
+    std::string& clientBuffer = _clientBuffers[clientFd];
+    size_t pos;
+    
+    while ((pos = clientBuffer.find("\r\n")) != std::string::npos)
+    {
+        // Extract one complete message
+        std::string rawMessage = clientBuffer.substr(0, pos);
+        clientBuffer.erase(0, pos + 2);  // Remove processed message
+        
+        // For debugging: print received message
+        std::cout << "Received from client " << clientFd << ": " << rawMessage << std::endl;
+        
+        // Basic echo response for testing
+        std::string response = ":" + std::string("server") + " NOTICE * :Echo: " + rawMessage + "\r\n";
+        client->sendMessage(response);
+    }
 }
+
 
 // Get server password
 const std::string& Server::getPassword() const
@@ -202,11 +254,24 @@ Client* Server::getClient(int fd)
     return (NULL);
 }
 
-// Get client by nickname
-Client* Server::getClientByNick(const std::string& nickname) 
+// // Get client by nickname
+// Client* Server::getClientByNick(const std::string& nickname) 
+// {
+//     //implement after channel
+// }
+
+Client* Server::getClientByNick(const std::string& nickname)
 {
-    //implement after channel
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    {
+        if (it->second->getNickname() == nickname)
+        {
+            return it->second;
+        }
+    }
+    return NULL;
 }
+
 
 // Remove channel by name
 void Server::removeChannel(const std::string& name) 
@@ -258,9 +323,17 @@ void Server::broadcast(const std::string& message, int excludeFd)
 }
 
 
-Channel* Server::createChannel(const std::string& name, Client* creator) 
+// Channel* Server::createChannel(const std::string& name, Client* creator) 
+// {
+//     //implement channel return (channel)
+// }
+
+Channel* Server::createChannel(const std::string& name, Client* creator)
 {
-    //implement channel return (channel)
+    // For initial testing, we'll just implement a stub
+    // Return NULL for now (you can implement Channel class later)
+    std::cout << "Channel creation requested: " << name << std::endl;
+    return NULL;
 }
 
 void Server::executeCommand(Client* client, const Message& message)
