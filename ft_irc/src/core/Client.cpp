@@ -49,11 +49,30 @@ void Client::setAuthenticated(bool auth)
     _authenticated = auth;
 }
 
-void Client::sendMessage(const std::string& message)
+// No arquivo Client.cpp
+bool Client::sendMessage(const std::string& message)
 {
-    // Simple implementation that sends a message to the client
-    if (send(_fd, message.c_str(), message.length(), 0) < 0)
+    std::cout << "DEBUG: Attempting to send to client FD: " << _fd << std::endl;
+    std::cout << "DEBUG: Message: " << message << std::endl;
+    
+    // Usar MSG_NOSIGNAL para evitar SIGPIPE que poderia derrubar o servidor
+    ssize_t sentBytes = send(_fd, message.c_str(), message.length(), MSG_NOSIGNAL);
+    
+    if (sentBytes < 0)
     {
-        std::cerr << "Error sending message to client: " << strerror(errno) << std::endl;
+        std::cerr << "ERROR sending message: " << strerror(errno) 
+                  << " (errno: " << errno << ")" << std::endl;
+        return false;
+    }
+    else if (sentBytes < (ssize_t)message.length())
+    {
+        std::cout << "WARNING: Partial send - only " << sentBytes 
+                  << " of " << message.length() << " bytes sent" << std::endl;
+        return false;
+    }
+    else
+    {
+        std::cout << "DEBUG: Successfully sent " << sentBytes << " bytes" << std::endl;
+        return true;
     }
 }

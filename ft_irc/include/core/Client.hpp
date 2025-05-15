@@ -23,7 +23,7 @@ public:
     bool isAuthenticated() const;
     void setAuthenticated(bool auth);
     
-    void sendMessage(const std::string& message);
+    bool sendMessage(const std::string& message);
 };
 
 #endif
