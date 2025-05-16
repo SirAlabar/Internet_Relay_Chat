@@ -19,7 +19,7 @@ private:
 
     // Private to prevent instantiation and copy
     CommandFactory();
-    CommandFactory(const CommandFactory& other); 
+    CommandFactory(const CommandFactory& other);
     CommandFactory& operator=(const CommandFactory& other);
     ~CommandFactory();
 
@@ -36,6 +36,5 @@ public:
     // Check if a command exists
     static bool commandExists(const std::string& commandName);
 };
-
 
 #endif

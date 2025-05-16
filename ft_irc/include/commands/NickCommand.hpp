@@ -17,12 +17,13 @@ private:
 public:
     NickCommand(Server* server);
     virtual ~NickCommand();
-    
+
     // Execute the NICK command
     virtual void execute(Client* client, const Message& message);
-    
+
     // Static creator for factory
-    // static Command* create(Server* server); uncomment this when Command Class is made.
+    // static Command* create(Server* server); uncomment this when Command Class
+    // is made.
 };
 
 #endif
