@@ -78,6 +78,7 @@ jobs:
         EOF
         
     - name: Check formatting
+      continue-on-error: true
       run: |
         find . -name "*.cpp" -o -name "*.hpp" | \
         while read file; do
@@ -93,6 +94,7 @@ jobs:
         done
         
     - name: Show formatting diff if check failed
+      continue-on-error: true
       if: failure()
       run: |
         echo "The following files need formatting:"

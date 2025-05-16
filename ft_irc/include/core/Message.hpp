@@ -13,11 +13,11 @@ private:
 public:
     Message(const std::string& rawMessage);
     ~Message();
-    
+
     const std::string& getPrefix() const;
     const std::string& getCommand() const;
     const std::string& getParams() const;
-    
+
     static Message parse(const std::string& rawMessage);
 };
 

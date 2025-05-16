@@ -1,22 +1,19 @@
-#include "commands/NickCommand.hpp"
-#include "core/Server.hpp"
-#include "core/Client.hpp"
-#include "core/Message.hpp"
 #include <iostream>
 
+#include "commands/NickCommand.hpp"
+#include "core/Client.hpp"
+#include "core/Message.hpp"
+#include "core/Server.hpp"
 
-NickCommand::NickCommand(Server* server) : ACommand(server)
-{}
+NickCommand::NickCommand(Server* server) : ACommand(server) {}
 
-NickCommand::~NickCommand()
-{}
+NickCommand::~NickCommand() {}
 
 // private, not used
-NickCommand::NickCommand(const NickCommand& other) : ACommand(other._server)
-{}
+NickCommand::NickCommand(const NickCommand& other) : ACommand(other._server) {}
 
 // private, not used // CAN'T BE PRIVATE
-// NickCommand& NickCommand::operator=(const NickCommand& other) 
+// NickCommand& NickCommand::operator=(const NickCommand& other)
 // {
 //     if (this != &other)
 //     {
@@ -34,7 +31,7 @@ NickCommand::NickCommand(const NickCommand& other) : ACommand(other._server)
 // Execute the NICK command
 void NickCommand::execute(Client* client, const Message& message)
 {
-    (void)client, (void)message; // uncomment when message is done
+    (void)client, (void)message;  // uncomment when message is done
     // if (!client)
     // {
     //     return ;
@@ -67,23 +64,24 @@ void NickCommand::execute(Client* client, const Message& message)
     // Client* existingClient = _server->getClientByNick(nickname);
     // if (existingClient && existingClient != client)
     // {
-    //     sendErrorReply(client, 433, nickname + " :Nickname is already in use");
-    //     return;
+    //     sendErrorReply(client, 433, nickname + " :Nickname is already in
+    //     use"); return;
     // }
     // // Previous nickname (if any)
     // std::string oldNick = client->getNickname();
     // // Set the new nickname
     // client->setNickname(nickname);
-    // // If the client was already registered, inform others about the nick change
-    // if (client->isRegistered())
+    // // If the client was already registered, inform others about the nick
+    // change if (client->isRegistered())
     // {
-    //     std::string nickChangeNotice = ":" + oldNick + " NICK :" + nickname + "\r\n";
+    //     std::string nickChangeNotice = ":" + oldNick + " NICK :" + nickname +
+    //     "\r\n";
     //     // Send to all channels the client is in
     //     client->broadcastToChannels(nickChangeNotice);
     // }
     // else
     // {
-    //     // Check if the client has completed registration (has both nickname and username)
-    //     client->checkRegistration();
+    //     // Check if the client has completed registration (has both nickname
+    //     and username) client->checkRegistration();
     // }
 }
