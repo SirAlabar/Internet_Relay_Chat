@@ -6,7 +6,6 @@
 #include "UtilsFun.hpp"
 
 class Print;
-
 class Client
 {
 private:
@@ -21,6 +20,7 @@ public:
 
     int getFd() const;
     std::string getFdString() const;
+
     const std::string& getNickname() const;
     void setNickname(const std::string& nickname);
     const std::string& getUsername() const;

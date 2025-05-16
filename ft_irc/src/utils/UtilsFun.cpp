@@ -22,3 +22,4 @@ void Print::Stream(std::ofstream& os, const std::string& str) { os << str << std
 
 // Private constructor definition (optional, but good practice)
 Print::Print() {}
+

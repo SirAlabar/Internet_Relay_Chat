@@ -3,7 +3,7 @@
 #include <cerrno>
 #include <cstring>
 #include <iostream>
-#include <sstream>
+
 
 #include "Client.hpp"
 #include "Server.hpp"
@@ -23,6 +23,7 @@ bool Server::setupServer(int port, const std::string& password)
 	Print::StdErr("Error creating socket: " + toString(_serverSocket.getLastError()));
 	// std::cerr << "Error creating socket: " << _serverSocket.getLastError()
 	// 	  << std::endl;
+
 	return (false);
     }
     // Configure socket options
@@ -33,6 +34,7 @@ bool Server::setupServer(int port, const std::string& password)
 		      toString(_serverSocket.getLastError()));
 	// std::cerr << "Error setting socket options: " << _serverSocket.getLastError()
 	// 	  << std::endl;
+
 	return (false);
     }
     // Set as non-blocking
@@ -42,18 +44,22 @@ bool Server::setupServer(int port, const std::string& password)
 		      toString(_serverSocket.getLastError()));
 	// std::cerr << "Error setting socket to non-blocking: "
 	// 	  << _serverSocket.getLastError() << std::endl;
+
 	return (false);
     }
     // Bind the socket to the port
     if (!_serverSocket.bind(port))
     {
+
 	Print::StdErr("Error binding: " + toString(_serverSocket.getLastError()));
 	// std::cerr << "Error binding: " << _serverSocket.getLastError() << std::endl;
+
 	return (false);
     }
     // Listen for connections
     if (!_serverSocket.listen(10))
     {
+
 	Print::StdErr("Error listening: " + toString(_serverSocket.getLastError()));
 	// std::cerr << "Error listening: " << _serverSocket.getLastError() << std::endl;
 	return (false);
@@ -61,6 +67,7 @@ bool Server::setupServer(int port, const std::string& password)
 
     Print::StdOut("IRC Server started on port " + toString(port));
     // std::cout << "IRC Server started on port " << port << std::endl;
+
     return (true);
 }
 
@@ -86,12 +93,15 @@ bool Server::start(int port, const std::string& password)
 // Main server loop - handles events using poll()
 void Server::run()
 {
+
     Print::Debug("DEBUG: Server entering main event loop");
     // std::cout << "DEBUG: Server entering main event loop" << std::endl;
+
 
     while (_running)
     {
 	// Execute poll() to check for events
+
 	Print::Debug("Calling poll() with " + toString(_pollFds.size()) +
 		     " file descriptors");
 	// std::cout << "DEBUG: Calling poll() with " << _pollFds.size()
@@ -112,6 +122,7 @@ void Server::run()
 		Print::Debug("poll() interrupted by signal, continuing");
 		// std::cout << "DEBUG: poll() interrupted by signal, continuing"
 		// 	  << std::endl;
+
 		continue;
 	    }
 	    break;
@@ -120,6 +131,7 @@ void Server::run()
 	// Process all fds with events
 	for (size_t i = 0; i < _pollFds.size() && ready > 0; ++i)
 	{
+
 	    std::stringstream ss;
 	    ss << "Checking FD: " << _pollFds[i].fd
 	       << " events: " << (_pollFds[i].revents & POLLIN ? "POLLIN " : "")
@@ -142,6 +154,7 @@ void Server::run()
 		// std::cout << "DEBUG: No events for FD: " << _pollFds[i].fd << ",
 		// skipping"
 		// 	  << std::endl;
+
 		continue;
 	    }
 
@@ -150,44 +163,54 @@ void Server::run()
 	    // Check if we have a new connection on the server socket
 	    if (_pollFds[i].fd == _serverSocket.getFd() && (_pollFds[i].revents & POLLIN))
 	    {
+
 		Print::Debug("New connection event on server socket");
 		// std::cout << "DEBUG: New connection event on server socket" <<
 		// std::endl;
+
 		processNewConnection();
 	    }
 	    // Process messages from existing clients
 	    else if (_pollFds[i].revents & POLLIN)
 	    {
+
 		Print::Debug("Data available on client FD: " + toString(_pollFds[i].fd));
 		// std::cout << "DEBUG: Data available on client FD: " << _pollFds[i].fd
 		// 	  << std::endl;
+
 		processClientMessage(_pollFds[i].fd);
 	    }
 	    // Handle errors
 	    else if (_pollFds[i].revents & (POLLERR | POLLNVAL))
 	    {
+
 		Print::StdErr("ERROR condition on FD: " + toString(_pollFds[i].fd));
 		// std::cout << "ERROR condition on FD: " << _pollFds[i].fd << std::endl;
+
 		removeClient(_pollFds[i].fd);
 	    }
 	    // Handle hangup WITH data available
 	    else if ((_pollFds[i].revents & POLLHUP) && (_pollFds[i].revents & POLLIN))
 	    {
+
 		Print::Debug("POLLHUP+POLLIN received for FD: " +
 			     toString(_pollFds[i].fd) + " - processing remaining data");
 		// std::cout << "DEBUG: POLLHUP+POLLIN received for FD: " <<
 		// _pollFds[i].fd
 		// 	  << " - processing remaining data" << std::endl;
+
 		processClientMessage(_pollFds[i].fd);
 	    }
 	    // Handle hangup WITHOUT data available - DON'T disconnect yet
 	    else if (_pollFds[i].revents & POLLHUP)
 	    {
+
 		Print::Debug("POLLHUP (only) received for FD: " +
 			     toString(_pollFds[i].fd) + " - keeping connection");
 		// std::cout << "DEBUG: POLLHUP (only) received for FD: " <<
 		// _pollFds[i].fd
 		// 	  << " - keeping connection" << std::endl;
+
 	    }
 	}
     }
@@ -210,7 +233,7 @@ void Server::stop()
     }
     _clients.clear();
 
-    // Close client sockets
+    // Cloese client sockets
     std::cout << "Cleaning up " << _clientSockets.size() << " client sockets..."
 	      << std::endl;
     for (std::map<int, Socket*>::iterator it = _clientSockets.begin();
