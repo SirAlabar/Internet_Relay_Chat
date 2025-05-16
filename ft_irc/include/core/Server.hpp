@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "utils/Socket.hpp"
+#include "Socket.hpp"
 #include <vector>
 #include <map>
 #include <string>
@@ -17,6 +17,7 @@ class Server
 {
 private:
     Socket _serverSocket;                       //main server socket
+    std::map<int, Socket*> _clientSockets;
     std::vector<pollfd> _pollFds;               // Array of pollfd structures for poll() 
     std::map<int, Client*> _clients;            // Map of fds to client objects
     std::map<std::string, Channel*> _channels;  // Map of name to Channel objects

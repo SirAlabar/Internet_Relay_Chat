@@ -49,6 +49,7 @@ Socket::~Socket()
     if (isValid())
     {
         ::close(_fd);
+        _fd = -1;
     }
 }
 
@@ -80,18 +81,21 @@ bool Socket::setOption(int level, int optname, const void* optval, socklen_t opt
     return (result == 0);
 }
 
-// Set socket to non-blocking mode
 bool Socket::setNonBlocking()
 {
     if (!isValid())
     {
+        std::cerr << "ERROR: Cannot set non-blocking mode on invalid socket" << std::endl;
         return (false);
     }
 
+    std::cout << "DEBUG: Setting socket " << _fd << " to non-blocking mode" << std::endl;
+    
     int flags = fcntl(_fd, F_GETFL, 0); //get socket fd flags
     if (flags == -1)
     {
         _lastError = errno;
+        std::cerr << "ERROR: fcntl(F_GETFL) failed: " << strerror(_lastError) << std::endl;
         return (false);
     }
 
@@ -101,8 +105,11 @@ bool Socket::setNonBlocking()
 
     if (result == -1)
     {
+        std::cerr << "ERROR: fcntl(F_SETFL) failed: " << strerror(_lastError) << std::endl;
         return (false);
     }
+    
+    std::cout << "DEBUG: Successfully set socket " << _fd << " to non-blocking mode" << std::endl;
     _blocking = false;
     return (true);
 }
