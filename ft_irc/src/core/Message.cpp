@@ -39,7 +39,4 @@ const std::string& Message::getCommand() const { return _command; }
 
 const std::string& Message::getParams() const { return _params; }
 
-Message Message::parse(const std::string& rawMessage)
-{
-    return Message(rawMessage);
-}
+Message Message::parse(const std::string& rawMessage) { return Message(rawMessage); }

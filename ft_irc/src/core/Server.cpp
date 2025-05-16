@@ -27,8 +27,8 @@ bool Server::setupServer(int port, const std::string& password)
     int opt = 1;
     if (!_serverSocket.setOption(SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
     {
-	std::cerr << "Error setting socket options: "
-		  << _serverSocket.getLastError() << std::endl;
+	std::cerr << "Error setting socket options: " << _serverSocket.getLastError()
+		  << std::endl;
 	return (false);
     }
     // Set as non-blocking
@@ -41,15 +41,13 @@ bool Server::setupServer(int port, const std::string& password)
     // Bind the socket to the port
     if (!_serverSocket.bind(port))
     {
-	std::cerr << "Error binding: " << _serverSocket.getLastError()
-		  << std::endl;
+	std::cerr << "Error binding: " << _serverSocket.getLastError() << std::endl;
 	return (false);
     }
     // Listen for connections
     if (!_serverSocket.listen(10))
     {
-	std::cerr << "Error listening: " << _serverSocket.getLastError()
-		  << std::endl;
+	std::cerr << "Error listening: " << _serverSocket.getLastError() << std::endl;
 	return (false);
     }
 
@@ -88,13 +86,12 @@ void Server::run()
 		  << " file descriptors" << std::endl;
 	int ready = poll(_pollFds.data(), _pollFds.size(), -1);
 
-	std::cout << "DEBUG: poll() returned with " << ready << " events"
-		  << std::endl;
+	std::cout << "DEBUG: poll() returned with " << ready << " events" << std::endl;
 
 	if (ready < 0)
 	{
-	    std::cerr << "ERROR in poll(): " << strerror(errno)
-		      << " (errno: " << errno << ")" << std::endl;
+	    std::cerr << "ERROR in poll(): " << strerror(errno) << " (errno: " << errno
+		      << ")" << std::endl;
 	    if (errno == EINTR)
 	    {
 		std::cout << "DEBUG: poll() interrupted by signal, continuing"
@@ -107,60 +104,53 @@ void Server::run()
 	// Process all fds with events
 	for (size_t i = 0; i < _pollFds.size() && ready > 0; ++i)
 	{
-	    std::cout << "DEBUG: Checking FD: " << _pollFds[i].fd << " events: "
-		      << (_pollFds[i].revents & POLLIN ? "POLLIN " : "")
+	    std::cout << "DEBUG: Checking FD: " << _pollFds[i].fd
+		      << " events: " << (_pollFds[i].revents & POLLIN ? "POLLIN " : "")
 		      << (_pollFds[i].revents & POLLOUT ? "POLLOUT " : "")
 		      << (_pollFds[i].revents & POLLHUP ? "POLLHUP " : "")
 		      << (_pollFds[i].revents & POLLERR ? "POLLERR " : "")
-		      << (_pollFds[i].revents & POLLNVAL ? "POLLNVAL " : "")
-		      << std::endl;
+		      << (_pollFds[i].revents & POLLNVAL ? "POLLNVAL " : "") << std::endl;
 
 	    if (_pollFds[i].revents == 0)
 	    {
-		std::cout << "DEBUG: No events for FD: " << _pollFds[i].fd
-			  << ", skipping" << std::endl;
+		std::cout << "DEBUG: No events for FD: " << _pollFds[i].fd << ", skipping"
+			  << std::endl;
 		continue;
 	    }
 
 	    ready--;
 
 	    // Check if we have a new connection on the server socket
-	    if (_pollFds[i].fd == _serverSocket.getFd() &&
-		(_pollFds[i].revents & POLLIN))
+	    if (_pollFds[i].fd == _serverSocket.getFd() && (_pollFds[i].revents & POLLIN))
 	    {
-		std::cout << "DEBUG: New connection event on server socket"
-			  << std::endl;
+		std::cout << "DEBUG: New connection event on server socket" << std::endl;
 		processNewConnection();
 	    }
 	    // Process messages from existing clients
 	    else if (_pollFds[i].revents & POLLIN)
 	    {
-		std::cout << "DEBUG: Data available on client FD: "
-			  << _pollFds[i].fd << std::endl;
+		std::cout << "DEBUG: Data available on client FD: " << _pollFds[i].fd
+			  << std::endl;
 		processClientMessage(_pollFds[i].fd);
 	    }
 	    // Handle errors
 	    else if (_pollFds[i].revents & (POLLERR | POLLNVAL))
 	    {
-		std::cout << "ERROR condition on FD: " << _pollFds[i].fd
-			  << std::endl;
+		std::cout << "ERROR condition on FD: " << _pollFds[i].fd << std::endl;
 		removeClient(_pollFds[i].fd);
 	    }
 	    // Handle hangup WITH data available
-	    else if ((_pollFds[i].revents & POLLHUP) &&
-		     (_pollFds[i].revents & POLLIN))
+	    else if ((_pollFds[i].revents & POLLHUP) && (_pollFds[i].revents & POLLIN))
 	    {
-		std::cout << "DEBUG: POLLHUP+POLLIN received for FD: "
-			  << _pollFds[i].fd << " - processing remaining data"
-			  << std::endl;
+		std::cout << "DEBUG: POLLHUP+POLLIN received for FD: " << _pollFds[i].fd
+			  << " - processing remaining data" << std::endl;
 		processClientMessage(_pollFds[i].fd);
 	    }
 	    // Handle hangup WITHOUT data available - DON'T disconnect yet
 	    else if (_pollFds[i].revents & POLLHUP)
 	    {
-		std::cout << "DEBUG: POLLHUP (only) received for FD: "
-			  << _pollFds[i].fd << " - keeping connection"
-			  << std::endl;
+		std::cout << "DEBUG: POLLHUP (only) received for FD: " << _pollFds[i].fd
+			  << " - keeping connection" << std::endl;
 	    }
 	}
     }
@@ -175,10 +165,9 @@ void Server::stop()
     _running = false;
 
     // Close Clients
-    std::cout << "Cleaning up " << _clients.size() << " clients..."
-	      << std::endl;
-    for (std::map<int, Client*>::iterator it = _clients.begin();
-	 it != _clients.end(); ++it)
+    std::cout << "Cleaning up " << _clients.size() << " clients..." << std::endl;
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();
+	 ++it)
     {
 	delete it->second;
     }
@@ -202,8 +191,7 @@ void Server::stop()
     ;
 
     // Close channels
-    std::cout << "Cleaning up " << _channels.size() << " channels..."
-	      << std::endl;
+    std::cout << "Cleaning up " << _channels.size() << " channels..." << std::endl;
     for (std::map<std::string, Channel*>::iterator it = _channels.begin();
 	 it != _channels.end(); ++it)
     {
@@ -230,8 +218,8 @@ void Server::processNewConnection()
     Socket* clientSocket = new Socket(_serverSocket.accept());
     if (!clientSocket->isValid())
     {
-	std::cerr << "Error accepting connection: "
-		  << _serverSocket.getLastError() << std::endl;
+	std::cerr << "Error accepting connection: " << _serverSocket.getLastError()
+		  << std::endl;
 	return;
     }
 
@@ -267,8 +255,7 @@ void Server::processClientMessage(int clientFd)
     Client* client = getClient(clientFd);
     if (!client)
     {
-	std::cerr << "Error: Client not found for FD: " << clientFd
-		  << std::endl;
+	std::cerr << "Error: Client not found for FD: " << clientFd << std::endl;
 	return;
     }
 
@@ -276,15 +263,14 @@ void Server::processClientMessage(int clientFd)
     char buffer[1024];
     ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 
-    std::cout << "Received " << bytesRead
-	      << " bytes from client FD: " << clientFd << std::endl;
+    std::cout << "Received " << bytesRead << " bytes from client FD: " << clientFd
+	      << std::endl;
 
     if (bytesRead < 0)
     {
 	if (errno == EAGAIN || errno == EWOULDBLOCK)
 	{
-	    std::cout << "No data available, but connection is still open"
-		      << std::endl;
+	    std::cout << "No data available, but connection is still open" << std::endl;
 	    return;
 	}
 
@@ -345,8 +331,8 @@ Client* Server::getClient(int fd)
 // Get client by nickname
 Client* Server::getClientByNick(const std::string& nickname)
 {
-    for (std::map<int, Client*>::iterator it = _clients.begin();
-	 it != _clients.end(); ++it)
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();
+	 ++it)
     {
 	if (it->second->getNickname() == nickname)
 	{
@@ -373,8 +359,7 @@ void Server::removeClient(int clientFd)
     std::cout << "Removing client FD: " << clientFd << std::endl;
 
     // Remove from poll
-    for (std::vector<pollfd>::iterator it = _pollFds.begin();
-	 it != _pollFds.end(); ++it)
+    for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); ++it)
     {
 	if (it->fd == clientFd)
 	{
@@ -405,8 +390,8 @@ void Server::removeClient(int clientFd)
 // Broadcast message to all clients except excludeFd
 void Server::broadcast(const std::string& message, int excludeFd)
 {
-    for (std::map<int, Client*>::iterator it = _clients.begin();
-	 it != _clients.end(); ++it)
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();
+	 ++it)
     {
 	if (it->first != excludeFd)
 	{

@@ -31,15 +31,12 @@ public:
     ~Socket();
 
     bool create(int domain, int type, int protocol);
-    bool setOption(int level, int optname, const void* optval,
-		   socklen_t optlen);
+    bool setOption(int level, int optname, const void* optval, socklen_t optlen);
     bool setNonBlocking();
     bool bind(int port, const std::string& address = "");
     bool listen(int backlog);
     bool connect(const std::string& host, int port);
-
     Socket accept();
-
     ssize_t send(const std::string& data, int flags = 0);
     ssize_t recv(char* buffer, size_t buffersize, int flags = 0);
 

@@ -23,8 +23,7 @@ ACommand& ACommand::operator=(const ACommand& other)
 }
 
 // Split arguments into a vector of strings
-std::vector<std::string> ACommand::splitArguments(const std::string& args,
-						  char delimiter)
+std::vector<std::string> ACommand::splitArguments(const std::string& args, char delimiter)
 {
     std::vector<std::string> result;
     std::istringstream iss(args);
@@ -53,8 +52,7 @@ bool ACommand::isValidChannelName(const std::string& channelName)
     for (size_t i = 0; i < channelName.size(); ++i)
     {
 	// Spaces, control chars, commas, colons are not allowed
-	if (channelName[i] <= 32 || channelName[i] == ',' ||
-	    channelName[i] == ':')
+	if (channelName[i] <= 32 || channelName[i] == ',' || channelName[i] == ':')
 	{
 	    return (false);
 	}
@@ -101,8 +99,7 @@ void ACommand::sendReply(Client* client, const std::string& reply)
 }
 
 // Send a numeric reply (according to IRC protocol) to a client
-void ACommand::sendNumericReply(Client* client, int numeric,
-				const std::string& message)
+void ACommand::sendNumericReply(Client* client, int numeric, const std::string& message)
 {
     if (client)
     {
@@ -115,8 +112,7 @@ void ACommand::sendNumericReply(Client* client, int numeric,
 }
 
 // Send an error reply to a client
-void ACommand::sendErrorReply(Client* client, int numeric,
-			      const std::string& message)
+void ACommand::sendErrorReply(Client* client, int numeric, const std::string& message)
 {
     sendNumericReply(client, numeric, message);
 }

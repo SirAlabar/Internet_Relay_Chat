@@ -7,8 +7,7 @@
 #include "core/Server.hpp"
 
 // Initialize static members
-std::map<std::string, CommandFactory::CommandCreator>
-    CommandFactory::_commandCreators;
+std::map<std::string, CommandFactory::CommandCreator> CommandFactory::_commandCreators;
 bool CommandFactory::_initialized = false;
 
 // Registers all available commands
@@ -47,8 +46,7 @@ void CommandFactory::initializeCommands()
 }
 
 // Creates a command based on command name
-Command* CommandFactory::createCommand(const std::string& commandName,
-				       Server* server)
+Command* CommandFactory::createCommand(const std::string& commandName, Server* server)
 {
     if (!_initialized)
     {
