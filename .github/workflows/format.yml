@@ -41,7 +41,7 @@ jobs:
         BreakBeforeBraces: Allman
         IndentWidth: 4
         UseTab: Never
-        ColumnLimit: 80
+        ColumnLimit: 90
         AccessModifierOffset: -4
         AlignAfterOpenBracket: Align
         AllowShortFunctionsOnASingleLine: Empty
