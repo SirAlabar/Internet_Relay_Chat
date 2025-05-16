@@ -20,15 +20,13 @@ class Server
 private:
     Socket _serverSocket;  // main server socket
     std::map<int, Socket*> _clientSockets;
-    std::vector<pollfd> _pollFds;     // Array of pollfd structures for poll()
-    std::map<int, Client*> _clients;  // Map of fds to client objects
-    std::map<std::string, Channel*>
-	_channels;	    // Map of name to Channel objects
-    std::string _password;  // Server password
+    std::vector<pollfd> _pollFds;		// Array of pollfd structures for poll()
+    std::map<int, Client*> _clients;		// Map of fds to client objects
+    std::map<std::string, Channel*> _channels;	// Map of name to Channel objects
+    std::string _password;			// Server password
     bool _running;
 
-    std::map<int, std::string>
-	_clientBuffers;	 // Buffer to store partial messagens by fd
+    std::map<int, std::string> _clientBuffers;	// Buffer to store partial messagens by fd
 
     bool setupServer(int port, const std::string& password);
     void processNewConnection();

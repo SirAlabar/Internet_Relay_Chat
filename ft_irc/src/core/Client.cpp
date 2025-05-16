@@ -32,13 +32,12 @@ bool Client::sendMessage(const std::string& message)
     std::cout << "DEBUG: Message: " << message << std::endl;
 
     // Usar MSG_NOSIGNAL para evitar SIGPIPE que poderia derrubar o servidor
-    ssize_t sentBytes =
-	send(_fd, message.c_str(), message.length(), MSG_NOSIGNAL);
+    ssize_t sentBytes = send(_fd, message.c_str(), message.length(), MSG_NOSIGNAL);
 
     if (sentBytes < 0)
     {
-	std::cerr << "ERROR sending message: " << strerror(errno)
-		  << " (errno: " << errno << ")" << std::endl;
+	std::cerr << "ERROR sending message: " << strerror(errno) << " (errno: " << errno
+		  << ")" << std::endl;
 	return false;
     }
     else if (sentBytes < (ssize_t)message.length())
@@ -49,8 +48,7 @@ bool Client::sendMessage(const std::string& message)
     }
     else
     {
-	std::cout << "DEBUG: Successfully sent " << sentBytes << " bytes"
-		  << std::endl;
+	std::cout << "DEBUG: Successfully sent " << sentBytes << " bytes" << std::endl;
 	return true;
     }
 }

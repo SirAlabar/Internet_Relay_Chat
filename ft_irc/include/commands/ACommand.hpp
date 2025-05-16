@@ -33,10 +33,8 @@ public:
 
     // Send replies to clients
     void sendReply(Client* client, const std::string& reply);
-    void sendNumericReply(Client* client, int numeric,
-			  const std::string& message);
-    void sendErrorReply(Client* client, int numeric,
-			const std::string& message);
+    void sendNumericReply(Client* client, int numeric, const std::string& message);
+    void sendErrorReply(Client* client, int numeric, const std::string& message);
 };
 
 #endif
