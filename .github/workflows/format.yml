@@ -74,7 +74,7 @@ jobs:
         SpacesInContainerLiterals: true
         SpacesInParentheses: false
         SpacesInSquareBrackets: false
-        Standard: Cpp98
+        Standard: Cpp11
         EOF
         
     - name: Check formatting
