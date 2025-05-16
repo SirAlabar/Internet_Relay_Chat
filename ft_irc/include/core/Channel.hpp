@@ -1,12 +1,13 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
-#include <string>
 #include <map>
+#include <string>
 
 class Client;
 
-class Channel {
+class Channel
+{
 private:
     std::string _name;
     std::string _topic;
@@ -16,11 +17,11 @@ private:
 public:
     Channel(const std::string& name);
     ~Channel();
-    
+
     const std::string& getName() const;
     const std::string& getTopic() const;
     void setTopic(const std::string& topic);
-    
+
     void addClient(Client* client);
     void removeClient(Client* client);
     bool isOperator(Client* client) const;

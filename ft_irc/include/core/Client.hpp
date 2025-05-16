@@ -14,7 +14,7 @@ private:
 public:
     Client(int fd);
     ~Client();
-    
+
     int getFd() const;
     const std::string& getNickname() const;
     void setNickname(const std::string& nickname);
@@ -22,7 +22,7 @@ public:
     void setUsername(const std::string& username);
     bool isAuthenticated() const;
     void setAuthenticated(bool auth);
-    
+
     bool sendMessage(const std::string& message);
 };
 
