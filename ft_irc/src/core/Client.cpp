@@ -4,6 +4,8 @@
 #include <cerrno>
 #include <cstring>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 #include "Client.hpp"
 
@@ -12,6 +14,13 @@ Client::Client(int fd) : _fd(fd), _authenticated(false) {}
 Client::~Client() {}
 
 int Client::getFd() const { return _fd; }
+
+std::string Client::getFdString() const
+{
+    std::stringstream ss;
+    ss << _fd;
+    return ss.str();
+}
 
 const std::string& Client::getNickname() const { return _nickname; }
 
@@ -28,27 +37,33 @@ void Client::setAuthenticated(bool auth) { _authenticated = auth; }
 // No arquivo Client.cpp
 bool Client::sendMessage(const std::string& message)
 {
-    std::cout << "DEBUG: Attempting to send to client FD: " << _fd << std::endl;
-    std::cout << "DEBUG: Message: " << message << std::endl;
+    Print::Debug("Attempting to send to client FD: " + getFdString());
+    Print::Debug(message);
 
     // Usar MSG_NOSIGNAL para evitar SIGPIPE que poderia derrubar o servidor
     ssize_t sentBytes = send(_fd, message.c_str(), message.length(), MSG_NOSIGNAL);
 
     if (sentBytes < 0)
     {
-	std::cerr << "ERROR sending message: " << strerror(errno) << " (errno: " << errno
-		  << ")" << std::endl;
+	Print::StdErr("sending message: " + toString(strerror(errno)) +
+		      " (errno: " + toString(errno));
+	// std::cerr << "ERROR sending message: " << strerror(errno) << " (errno: " <<
+	// errno
+	// 	  << ")" << std::endl;
 	return false;
     }
     else if (sentBytes < (ssize_t)message.length())
     {
-	std::cout << "WARNING: Partial send - only " << sentBytes << " of "
-		  << message.length() << " bytes sent" << std::endl;
+	Print::Log("WARNING: Partial send - only " + toString(sentBytes) + " of " +
+		   toString(message.length()) + " bytes sent");
+	// std::cout << "WARNING: Partial send - only " << sentBytes << " of "
+	// 	  << message.length() << " bytes sent" << std::endl;
 	return false;
     }
     else
     {
-	std::cout << "DEBUG: Successfully sent " << sentBytes << " bytes" << std::endl;
+	Print::Debug("Successfully sent " + toString(sentBytes) + " bytes");
+	// std::cout << "DEBUG: Successfully sent " << sentBytes << " bytes" << std::endl;
 	return true;
     }
 }

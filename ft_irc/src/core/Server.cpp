@@ -3,6 +3,7 @@
 #include <cerrno>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 
 #include "Client.hpp"
 #include "Server.hpp"
@@ -19,39 +20,47 @@ bool Server::setupServer(int port, const std::string& password)
     // Create the server socket
     if (!_serverSocket.create(AF_INET, SOCK_STREAM, 0))
     {
-	std::cerr << "Error creating socket: " << _serverSocket.getLastError()
-		  << std::endl;
+	Print::StdErr("Error creating socket: " + toString(_serverSocket.getLastError()));
+	// std::cerr << "Error creating socket: " << _serverSocket.getLastError()
+	// 	  << std::endl;
 	return (false);
     }
     // Configure socket options
     int opt = 1;
     if (!_serverSocket.setOption(SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
     {
-	std::cerr << "Error setting socket options: " << _serverSocket.getLastError()
-		  << std::endl;
+	Print::StdErr("Error setting socket options: " +
+		      toString(_serverSocket.getLastError()));
+	// std::cerr << "Error setting socket options: " << _serverSocket.getLastError()
+	// 	  << std::endl;
 	return (false);
     }
     // Set as non-blocking
     if (!_serverSocket.setNonBlocking())
     {
-	std::cerr << "Error setting socket to non-blocking: "
-		  << _serverSocket.getLastError() << std::endl;
+	Print::StdErr("Error setting socket to non-blocking: " +
+		      toString(_serverSocket.getLastError()));
+	// std::cerr << "Error setting socket to non-blocking: "
+	// 	  << _serverSocket.getLastError() << std::endl;
 	return (false);
     }
     // Bind the socket to the port
     if (!_serverSocket.bind(port))
     {
-	std::cerr << "Error binding: " << _serverSocket.getLastError() << std::endl;
+	Print::StdErr("Error binding: " + toString(_serverSocket.getLastError()));
+	// std::cerr << "Error binding: " << _serverSocket.getLastError() << std::endl;
 	return (false);
     }
     // Listen for connections
     if (!_serverSocket.listen(10))
     {
-	std::cerr << "Error listening: " << _serverSocket.getLastError() << std::endl;
+	Print::StdErr("Error listening: " + toString(_serverSocket.getLastError()));
+	// std::cerr << "Error listening: " << _serverSocket.getLastError() << std::endl;
 	return (false);
     }
 
-    std::cout << "IRC Server started on port " << port << std::endl;
+    Print::StdOut("IRC Server started on port " + toString(port));
+    // std::cout << "IRC Server started on port " << port << std::endl;
     return (true);
 }
 
@@ -77,25 +86,32 @@ bool Server::start(int port, const std::string& password)
 // Main server loop - handles events using poll()
 void Server::run()
 {
-    std::cout << "DEBUG: Server entering main event loop" << std::endl;
+    Print::Debug("DEBUG: Server entering main event loop");
+    // std::cout << "DEBUG: Server entering main event loop" << std::endl;
 
     while (_running)
     {
 	// Execute poll() to check for events
-	std::cout << "DEBUG: Calling poll() with " << _pollFds.size()
-		  << " file descriptors" << std::endl;
+	Print::Debug("Calling poll() with " + toString(_pollFds.size()) +
+		     " file descriptors");
+	// std::cout << "DEBUG: Calling poll() with " << _pollFds.size()
+	// 	  << " file descriptors" << std::endl;
 	int ready = poll(_pollFds.data(), _pollFds.size(), -1);
 
-	std::cout << "DEBUG: poll() returned with " << ready << " events" << std::endl;
+	Print::Debug("poll() returned with " + toString(ready) + " events");
+	// std::cout << "DEBUG: poll() returned with " << ready << " events" << std::endl;
 
 	if (ready < 0)
 	{
-	    std::cerr << "ERROR in poll(): " << strerror(errno) << " (errno: " << errno
-		      << ")" << std::endl;
+	    Print::StdErr("Error in Poll(): " + toString(strerror(errno)) +
+			  " (errno: " + toString(errno));
+	    // std::cerr << "ERROR in poll(): " << strerror(errno) << " (errno: " << errno
+	    //    << ")" << std::endl;
 	    if (errno == EINTR)
 	    {
-		std::cout << "DEBUG: poll() interrupted by signal, continuing"
-			  << std::endl;
+		Print::Debug("poll() interrupted by signal, continuing");
+		// std::cout << "DEBUG: poll() interrupted by signal, continuing"
+		// 	  << std::endl;
 		continue;
 	    }
 	    break;
@@ -104,17 +120,28 @@ void Server::run()
 	// Process all fds with events
 	for (size_t i = 0; i < _pollFds.size() && ready > 0; ++i)
 	{
-	    std::cout << "DEBUG: Checking FD: " << _pollFds[i].fd
-		      << " events: " << (_pollFds[i].revents & POLLIN ? "POLLIN " : "")
-		      << (_pollFds[i].revents & POLLOUT ? "POLLOUT " : "")
-		      << (_pollFds[i].revents & POLLHUP ? "POLLHUP " : "")
-		      << (_pollFds[i].revents & POLLERR ? "POLLERR " : "")
-		      << (_pollFds[i].revents & POLLNVAL ? "POLLNVAL " : "") << std::endl;
+	    std::stringstream ss;
+	    ss << "Checking FD: " << _pollFds[i].fd
+	       << " events: " << (_pollFds[i].revents & POLLIN ? "POLLIN " : "")
+	       << (_pollFds[i].revents & POLLOUT ? "POLLOUT " : "")
+	       << (_pollFds[i].revents & POLLHUP ? "POLLHUP " : "")
+	       << (_pollFds[i].revents & POLLERR ? "POLLERR " : "")
+	       << (_pollFds[i].revents & POLLNVAL ? "POLLNVAL " : "");
+	    Print::Debug(ss.str());
+	    // std::cout << "DEBUG: Checking FD: " << _pollFds[i].fd
+	    //    << " events: " << (_pollFds[i].revents & POLLIN ? "POLLIN " : "")
+	    //    << (_pollFds[i].revents & POLLOUT ? "POLLOUT " : "")
+	    //    << (_pollFds[i].revents & POLLHUP ? "POLLHUP " : "")
+	    //    << (_pollFds[i].revents & POLLERR ? "POLLERR " : "")
+	    //    << (_pollFds[i].revents & POLLNVAL ? "POLLNVAL " : "") << std::endl;
 
 	    if (_pollFds[i].revents == 0)
 	    {
-		std::cout << "DEBUG: No events for FD: " << _pollFds[i].fd << ", skipping"
-			  << std::endl;
+		Print::Debug("No events for FD: " + toString(_pollFds[i].fd) +
+			     ", skipping");
+		// std::cout << "DEBUG: No events for FD: " << _pollFds[i].fd << ",
+		// skipping"
+		// 	  << std::endl;
 		continue;
 	    }
 
@@ -123,34 +150,44 @@ void Server::run()
 	    // Check if we have a new connection on the server socket
 	    if (_pollFds[i].fd == _serverSocket.getFd() && (_pollFds[i].revents & POLLIN))
 	    {
-		std::cout << "DEBUG: New connection event on server socket" << std::endl;
+		Print::Debug("New connection event on server socket");
+		// std::cout << "DEBUG: New connection event on server socket" <<
+		// std::endl;
 		processNewConnection();
 	    }
 	    // Process messages from existing clients
 	    else if (_pollFds[i].revents & POLLIN)
 	    {
-		std::cout << "DEBUG: Data available on client FD: " << _pollFds[i].fd
-			  << std::endl;
+		Print::Debug("Data available on client FD: " + toString(_pollFds[i].fd));
+		// std::cout << "DEBUG: Data available on client FD: " << _pollFds[i].fd
+		// 	  << std::endl;
 		processClientMessage(_pollFds[i].fd);
 	    }
 	    // Handle errors
 	    else if (_pollFds[i].revents & (POLLERR | POLLNVAL))
 	    {
-		std::cout << "ERROR condition on FD: " << _pollFds[i].fd << std::endl;
+		Print::StdErr("ERROR condition on FD: " + toString(_pollFds[i].fd));
+		// std::cout << "ERROR condition on FD: " << _pollFds[i].fd << std::endl;
 		removeClient(_pollFds[i].fd);
 	    }
 	    // Handle hangup WITH data available
 	    else if ((_pollFds[i].revents & POLLHUP) && (_pollFds[i].revents & POLLIN))
 	    {
-		std::cout << "DEBUG: POLLHUP+POLLIN received for FD: " << _pollFds[i].fd
-			  << " - processing remaining data" << std::endl;
+		Print::Debug("POLLHUP+POLLIN received for FD: " +
+			     toString(_pollFds[i].fd) + " - processing remaining data");
+		// std::cout << "DEBUG: POLLHUP+POLLIN received for FD: " <<
+		// _pollFds[i].fd
+		// 	  << " - processing remaining data" << std::endl;
 		processClientMessage(_pollFds[i].fd);
 	    }
 	    // Handle hangup WITHOUT data available - DON'T disconnect yet
 	    else if (_pollFds[i].revents & POLLHUP)
 	    {
-		std::cout << "DEBUG: POLLHUP (only) received for FD: " << _pollFds[i].fd
-			  << " - keeping connection" << std::endl;
+		Print::Debug("POLLHUP (only) received for FD: " +
+			     toString(_pollFds[i].fd) + " - keeping connection");
+		// std::cout << "DEBUG: POLLHUP (only) received for FD: " <<
+		// _pollFds[i].fd
+		// 	  << " - keeping connection" << std::endl;
 	    }
 	}
     }
