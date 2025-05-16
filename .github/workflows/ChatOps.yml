@@ -1,0 +1,126 @@
+name: ChatOps - Format Code
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  format-on-comment:
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/format')
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: React to comment
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.reactions.createForIssueComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            comment_id: context.payload.comment.id,
+            content: 'rocket'
+          })
+    
+    - name: Get PR details
+      id: pr
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const pr = await github.rest.pulls.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number
+          })
+          return {
+            ref: pr.data.head.ref,
+            sha: pr.data.head.sha
+          }
+
+    - name: Checkout PR branch
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.IRC_TOKEN }}
+        ref: ${{ fromJson(steps.pr.outputs.result).ref }}
+
+    - name: Install clang-format
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format-14
+        sudo ln -sf /usr/bin/clang-format-14 /usr/bin/clang-format
+
+    - name: Create .clang-format file
+      run: |
+        cat > .clang-format << 'EOF'
+        BasedOnStyle: Google
+        BreakBeforeBraces: Allman
+        IndentWidth: 4
+        UseTab: Never
+        ColumnLimit: 90
+        AccessModifierOffset: -4
+        AlignAfterOpenBracket: Align
+        AllowShortFunctionsOnASingleLine: Empty
+        BinPackArguments: false
+        BinPackParameters: false
+        BreakBeforeBinaryOperators: NonAssignment
+        BreakConstructorInitializers: BeforeColon
+        BreakInheritanceList: BeforeColon
+        ConstructorInitializerIndentWidth: 4
+        ContinuationIndentWidth: 4
+        Cpp11BracedListStyle: true
+        IndentCaseLabels: true
+        IndentPPDirectives: BeforeHash
+        KeepEmptyLinesAtTheStartOfBlocks: false
+        NamespaceIndentation: None
+        PointerAlignment: Left
+        SpaceAfterCStyleCast: false
+        SpaceAfterLogicalNot: false
+        SpaceAfterTemplateKeyword: true
+        SpaceBeforeAssignmentOperators: true
+        SpaceBeforeCpp11BracedList: false
+        SpaceBeforeCtorInitializerColon: true
+        SpaceBeforeInheritanceColon: true
+        SpaceBeforeParens: ControlStatements
+        SpaceBeforeRangeBasedForLoopColon: true
+        SpaceInEmptyParentheses: false
+        SpacesBeforeTrailingComments: 2
+        SpacesInAngles: false
+        SpacesInCStyleCastParentheses: false
+        SpacesInContainerLiterals: true
+        SpacesInParentheses: false
+        SpacesInSquareBrackets: false
+        Standard: Cpp98
+        EOF
+
+    - name: Format C++ files
+      run: |
+        echo "Formatting C++ files..."
+        find . -name "*.cpp" -o -name "*.hpp" | \
+        xargs clang-format -i
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+        if [ -n "$(git status --porcelain)" ]; then
+          git add .
+          git commit -m "Auto-format C++ code via ChatOps"
+
+Triggered by: ${{ github.event.comment.user.login }}
+Comment: ${{ github.event.comment.html_url }}
+          git push
+          echo "Code formatted and pushed!"
+        else
+          echo "No changes needed - code is already formatted!"
+        fi
+
+    - name: Comment on success
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '✅ C++ code has been auto-formatted and committed!'
+          })
