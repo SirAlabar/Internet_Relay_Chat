@@ -112,13 +112,16 @@ bool Socket::setNonBlocking()
 
     if (result == -1)
     {
-	std::cerr << "ERROR: fcntl(F_SETFL) failed: " << strerror(_lastError)
-		  << std::endl;
+	Print::StdErr("ERROR: fcntl(F_SETFL) failed: " + toString(strerror(_lastError)));
+	// std::cerr << "ERROR: fcntl(F_SETFL) failed: " << strerror(_lastError)
+	// 	  << std::endl;
 	return (false);
     }
 
-    std::cout << "DEBUG: Successfully set socket " << _fd << " to non-blocking mode"
-	      << std::endl;
+    Print::Debug("DEBUG: Successfully set socket " + toString(_fd) +
+		 " to non-blocking mode");
+    // std::cout << "DEBUG: Successfully set socket " << _fd << " to non-blocking mode"
+    //    << std::endl;
     _blocking = false;
     return (true);
 }
