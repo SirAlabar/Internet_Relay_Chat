@@ -93,37 +93,20 @@ ACommand* CommandFactory::createCommand(const std::string& commandName, Server* 
 void CommandFactory::executeCommand(Client* client, Server* server,
                                     const Message& message)
 {
-    std::string commandName = message.getCommand();
-    Print::Debug("Attempting to execute command: " + commandName);
-    
-    ACommand* command = createCommand(commandName, server);
-    
-    if (command)
-    {
-        Print::Debug("Command created successfully, executing...");
-        command->execute(client, message);
-        Print::Debug("Command executed, cleaning up...");
-        delete command;
-    }
-    else
-    {
-        Print::Debug("Command not found, sending error");
-        // Send error to client about unknown command
-        if (client)
-        {
-            std::string errorMsg = ":server 421 ";
-            if (!client->getNickname().empty())
-            {
-                errorMsg += client->getNickname();
-            }
-            else
-            {
-                errorMsg += "*";
-            }
-            errorMsg += " " + commandName + " :Unknown command\r\n";
-            client->sendMessage(errorMsg);
-        }
-    }
+    (void)server, (void)client, (void)message;
+    // std::string commandName = message.getCommand();
+    //
+    // Command* command = createCommand(commandName, server);
+    //
+    // if (command)
+    // {
+    //     command->execute(client, message);
+    //     delete command;
+    // }
+    // else
+    // {
+    //     // Send error to client about unknown command
+    // }
 }
 
     Command* command = createCommand(commandName, server);
