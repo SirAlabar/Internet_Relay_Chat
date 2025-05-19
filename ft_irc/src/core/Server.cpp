@@ -206,7 +206,6 @@ void Server::run()
                 // 	  << " - keeping connection" << std::endl;
             }
         }
-        print_clients();
     }
 
     std::cout << "DEBUG: Exiting server main event loop" << std::endl;
