@@ -6,9 +6,6 @@
 #include <sstream>
 #include <string>
 
-#define RED "\033[31m"
-#define RESET "\033[0m"
-
 class Print
 {
 public:

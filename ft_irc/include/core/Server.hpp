@@ -59,6 +59,9 @@ public:
     // Other helper methods
     const std::string& getPassword() const;
     void executeCommand(Client* client, const Message& message);
+
+    //utils for print data structures - only for understand what's in
+    void print_clients();
 };
 
 #endif
