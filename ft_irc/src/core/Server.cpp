@@ -4,9 +4,11 @@
 #include <cstring>
 #include <iostream>
 
-#include "general.hpp"
 #include "Client.hpp"
+#include "CommandFactory.hpp"
+#include "Message.hpp"
 #include "Server.hpp"
+#include "general.hpp"
 
 Server::Server() : _running(false) {}
 
@@ -310,7 +312,7 @@ void Server::processClientMessage(int clientFd)
     }
 
     // Buffer for receiving data
-    char buffer[1024];
+    char buffer[1024] = {0};
     ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 
     std::cout << "Received " << bytesRead << " bytes from client FD: " << clientFd
@@ -336,11 +338,11 @@ void Server::processClientMessage(int clientFd)
         return;
     }
 
-    // Null-terminate the received data
-    buffer[bytesRead] = '\0';
-
+    Message msg(buffer);
+    CommandFactory::executeCommand(client, this, msg);
     // Append to client buffer
     _clientBuffers[clientFd] += buffer;
+    Server::executeCommand(client, msg);
 
     // TEST
     std::string welcome =
@@ -466,19 +468,18 @@ void Server::executeCommand(Client* client, const Message& message)
 void Server::print_clients()
 {
     if (DEBUG)
-    {	
+    {
         std::map<int, Client*>::iterator it = _clients.begin();
         std::map<int, Client*>::iterator ite = _clients.end();
 
         for (; it != ite; it++)
         {
-            Print::Debug(Color::YELLOW + 
-                         "\n\tClient fd on server map: " + toString(it->first) + 
-                         "\n\tfd on Client class: " + it->second->getFdString() + 
-                         "\n\tnickname: " + it->second->getNickname() + 
-                         "\n\tusername: " + it->second->getUsername() + 
-                         "\n\tautenticated? == " + toString(it->second->isAuthenticated())
-            );
+            Print::Debug(
+                Color::YELLOW + "\n\tClient fd on server map: " + toString(it->first) +
+                "\n\tfd on Client class: " + it->second->getFdString() +
+                "\n\tnickname: " + it->second->getNickname() +
+                "\n\tusername: " + it->second->getUsername() +
+                "\n\tautenticated? == " + toString(it->second->isAuthenticated()));
         }
     }
 }

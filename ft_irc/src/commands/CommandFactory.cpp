@@ -15,7 +15,7 @@ void CommandFactory::initializeCommands()
 {
     if (_initialized)
     {
-	return;
+        return;
     }
 
     // // Channel commands
@@ -45,64 +45,66 @@ void CommandFactory::initializeCommands()
     _initialized = true;
 }
 
+// Register a new command creator
+void CommandFactory::registerCommand(const std::string& commandName,
+                                     CommandCreator creator)
+{
+    std::string upperCommandName = commandName;
+    for (size_t i = 0; i < upperCommandName.size(); ++i)
+    {
+        upperCommandName[i] = toupper(upperCommandName[i]);
+    }
+    _commandCreators[upperCommandName] = creator;
+}
+
 // Creates a command based on command name
 Command* CommandFactory::createCommand(const std::string& commandName, Server* server)
 {
     if (!_initialized)
     {
-	initializeCommands();
+        initializeCommands();
     }
 
     // Convert command to uppercase for case-insensitive comparison
     std::string upperCommandName = commandName;
     for (size_t i = 0; i < upperCommandName.size(); ++i)
     {
-	upperCommandName[i] = toupper(upperCommandName[i]);
+        upperCommandName[i] = toupper(upperCommandName[i]);
     }
 
     // Look up the command in the map
     std::map<std::string, CommandCreator>::iterator it =
-	_commandCreators.find(upperCommandName);
+        _commandCreators.find(upperCommandName);
 
     // If found, create and return the command
     if (it != _commandCreators.end())
     {
-	return (it->second(server));  // return command creator
+        return (it->second(server));  // return command creator
     }
-    std::cout << "Unknown command: " << commandName << std::endl;
+    Print::Log("Unknown command: " + commandName);
     return (NULL);
 }
 
 // Execute the appropriate command based on the message
 void CommandFactory::executeCommand(Client* client, Server* server,
-				    const Message& message)
+                                    const Message& message)
 {
     (void)server, (void)client, (void)message;
-    // std::string commandName = message.getCommand();
-    //
-    // Command* command = createCommand(commandName, server);
-    //
-    // if (command)
-    // {
-    //     command->execute(client, message);
-    //     delete command;
-    // }
-    // else
-    // {
-    //     // Send error to client about unknown command
-    // }
-}
+    std::string commandName = message.getCommand();
 
-// Register a new command creator
-void CommandFactory::registerCommand(const std::string& commandName,
-				     CommandCreator creator)
-{
-    std::string upperCommandName = commandName;
-    for (size_t i = 0; i < upperCommandName.size(); ++i)
+    Command* command = createCommand(commandName, server);
+
+    if (command)
     {
-	upperCommandName[i] = toupper(upperCommandName[i]);
+        Print::Log("Executing :" + message.getCommand() + "for client" +
+                   client->getFdString());
+        // command->execute(client, message);
+        // delete command;
     }
-    _commandCreators[upperCommandName] = creator;
+    else
+    {
+        Print::StdErr("Command not found: " + message.getCommand());
+    }
 }
 
 // Check if a command exists
@@ -110,12 +112,12 @@ bool CommandFactory::commandExists(const std::string& commandName)
 {
     if (!_initialized)
     {
-	initializeCommands();
+        initializeCommands();
     }
     std::string upperCommandName = commandName;
     for (size_t i = 0; i < upperCommandName.size(); ++i)
     {
-	upperCommandName[i] = toupper(upperCommandName[i]);
+        upperCommandName[i] = toupper(upperCommandName[i]);
     }
 
     return (_commandCreators.find(upperCommandName) != _commandCreators.end());

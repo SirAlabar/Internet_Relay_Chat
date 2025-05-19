@@ -16,7 +16,6 @@ Message::Message(const std::string& rawMessage)
     }
     Print::Debug("Command: " + _command);
     Print::Debug("Params: " + _params);
-    CommandFactory::createCommand(_command, )
 }
 
 Message::~Message() {}

@@ -27,12 +27,12 @@ private:
     static bool _initialized;
 
 public:
+    // Register a new command creator
+    static void registerCommand(const std::string& commandName, CommandCreator creator);
     // Create a command based on the message
     static Command* createCommand(const std::string& commandName, Server* server);
     // Execute the appropriate command based on the message
     static void executeCommand(Client* client, Server* server, const Message& message);
-    // Register a new command creator
-    static void registerCommand(const std::string& commandName, CommandCreator creator);
     // Check if a command exists
     static bool commandExists(const std::string& commandName);
 };
