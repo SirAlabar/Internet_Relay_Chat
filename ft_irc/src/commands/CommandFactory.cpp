@@ -1,12 +1,11 @@
 #include <iostream>
-
-#include "ACommand.hpp"
 #include "Client.hpp"
-#include "CommandFactory.hpp"
 #include "Message.hpp"
-#include "NickCommand.hpp"
 #include "Server.hpp"
-#include "connection/PassCommand.hpp"
+
+#include "CommandFactory.hpp"
+#include "ACommand.hpp"
+#include "NickCommand.hpp"
 
 // Initialize static members
 std::map<std::string, CommandFactory::CommandCreator> CommandFactory::_commandCreators;
