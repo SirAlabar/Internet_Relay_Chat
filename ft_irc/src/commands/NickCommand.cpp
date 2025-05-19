@@ -30,17 +30,21 @@ ACommand* NickCommand::create(Server* server)
 // Execute the NICK command
 void NickCommand::execute(Client* client, const Message& message)
 {
-    // (void)client, (void)message;
+    Print::Debug("Starting execution of NICK command");
     if (!client)
+    
     {
+        Print::Debug("Client is NULL, returning");
         return ;
     }
     
     // Get the parameters from the message
     const std::string& params = message.getParams();
+    Print::Debug("NICK parameters: '" + params + "'");
     // Parse the nickname from parameters
     if (params.empty())
     {
+        Print::Debug("Empty parameters, sending error");
         // No nickname provided, send error
         sendErrorReply(client, 431, "No nickname given");
         return ;
@@ -66,10 +70,13 @@ void NickCommand::execute(Client* client, const Message& message)
         sendErrorReply(client, 433, nickname + " :Nickname is already in use");
         return;
     }
+    Print::Debug("Extracted nickname: '" + nickname + "'");
     // Previous nickname (if any)
     std::string oldNick = client->getNickname();
+    Print::Debug("Old nickname: '" + oldNick + "'");
     // Set the new nickname
     client->setNickname(nickname);
+    Print::Debug("Nickname updated to: '" + client->getNickname() + "'");
     // If the client was already registered, inform others about the nick
     // change 
     if (client->isAuthenticated())
@@ -77,10 +84,14 @@ void NickCommand::execute(Client* client, const Message& message)
         std::string nickChangeNotice = ":" + oldNick + " NICK :" + nickname + "\r\n";
         // Send to all channels the client is in
         // client->broadcastToChannels(nickChangeNotice);
+        Print::Debug("Sending response");
         client->sendMessage(nickChangeNotice);
     }
     else
     {
+        Print::Debug("Sending confirmation to unauthenticated client");
+        std::string confirmation = ":server NICK :" + nickname + "\r\n";
+        client->sendMessage(confirmation);
         // Check if the client has completed registration (has both nickname
         // and username) client->checkRegistration();
     }
