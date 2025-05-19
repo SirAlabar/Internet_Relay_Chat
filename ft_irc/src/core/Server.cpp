@@ -206,6 +206,7 @@ void Server::run()
                 // 	  << " - keeping connection" << std::endl;
             }
         }
+        print_clients();
     }
 
     std::cout << "DEBUG: Exiting server main event loop" << std::endl;
@@ -528,4 +529,24 @@ void Server::print_clients()
 			);
 		}
 	}
+}
+
+void Server::print_clients()
+{
+    if (DEBUG)
+    {	
+        std::map<int, Client*>::iterator it = _clients.begin();
+        std::map<int, Client*>::iterator ite = _clients.end();
+
+        for (; it != ite; it++)
+        {
+            Print::Debug(Color::YELLOW + 
+                         "\n\tClient fd on server map: " + toString(it->first) + 
+                         "\n\tfd on Client class: " + it->second->getFdString() + 
+                         "\n\tnickname: " + it->second->getNickname() + 
+                         "\n\tusername: " + it->second->getUsername() + 
+                         "\n\tautenticated? == " + toString(it->second->isAuthenticated())
+            );
+        }
+    }
 }
