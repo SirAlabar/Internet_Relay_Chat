@@ -7,7 +7,14 @@ CC = c++
 INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iinclude/dcc -Iinclude/utils
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -Wno-delete-incomplete -Wno-unused-parameter
 DEBUG_FLAGS = -g
-DEBUG ?= 0
+
+ifeq ($(DEBUG), 1)
+	CFLAGS += $(DEBUG_FLAGS)
+	DEBUG_DEFINE = -DDEBUG=1
+else
+	DEBUG_DEFINE = -DDEBUG=0
+endif
+
 
 CLR_RMV = \033[0m
 RED	    = \033[1;31m
@@ -37,7 +44,9 @@ SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/core/Client.cpp \
        $(SRC_DIR)/core/Message.cpp \
        $(SRC_DIR)/utils/Socket.cpp \
-       $(SRC_DIR)/core/Channel.cpp
+       $(SRC_DIR)/core/Channel.cpp \
+       $(SRC_DIR)/utils/UtilsFun.cpp
+
 
 # Object files
 OBJ_DIR = obj
@@ -52,7 +61,8 @@ all: $(NAME)
 
 $(NAME): --header $(OBJ_DIR) $(OBJS)
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
-	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)
+
 	@printf "$(GREEN)$(NAME) binary created$(CLR_RMV) ✅\n"
 
 $(OBJ_DIR):
@@ -64,7 +74,9 @@ $(OBJ_DIR):
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) $(INCLUDE_HEADERS) -c $< -o $@
+
+	@$(CC) $(CFLAGS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -c $< -o $@
+
 
 .PHONY: va
 va: fclean $(OBJS) 
@@ -120,3 +132,4 @@ out:
 .PHONY: vi
 vi:
 	@find . -type f -name "*.cpp" -o -name "*.hpp" -o -name "Makefile" | xargs nvim
+

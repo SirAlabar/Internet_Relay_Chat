@@ -1,5 +1,6 @@
 *.o
 ircserv
+obj/
 
 
 # Sloth personal ignore
