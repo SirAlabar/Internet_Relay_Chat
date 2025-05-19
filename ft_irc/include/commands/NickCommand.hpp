@@ -22,8 +22,7 @@ public:
     virtual void execute(Client* client, const Message& message);
 
     // Static creator for factory
-    // static Command* create(Server* server); uncomment this when Command Class
-    // is made.
+    static ACommand* create(Server* server);
 };
 
 #endif
