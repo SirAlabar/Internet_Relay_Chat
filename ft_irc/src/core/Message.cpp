@@ -3,7 +3,7 @@
 #include "Message.hpp"
 #include "UtilsFun.hpp"
 
-std::map<std::string, Message::CommandHandler> Message::_commandHandlers;
+Message::CommandMap Message::_commandHandlers;
 
 void Message::initCommandHandler()
 {
@@ -17,37 +17,31 @@ void Message::initCommandHandler()
         _commandHandlers["HELP"] = &Message::handleHELP;
         _commandHandlers["NICK"] = &Message::handleNICK;
         _commandHandlers["USER"] = &Message::handleUSER;
+        _commandHandlers["PRIVMSG"] = &Message::handlePRIVMSG;
         _commandHandlers["INVALID"] = &Message::handleINVALID;
+        _commandHandlers["QUIT"] = &Message::handleQUIT;
+        _commandHandlers["PART"] = &Message::handlePART;
+        _commandHandlers["LIST"] = &Message::handleLIST;
+        _commandHandlers["PASS"] = &Message::handlePASS;
+        _commandHandlers["CAP"] = &Message::handleCAP;
+        _commandHandlers["MOTD"] = &Message::handleMOTD;
+        _commandHandlers["PING"] = &Message::handlePING;
+        _commandHandlers["WHOIS"] = &Message::handleWHOIS;
+        _commandHandlers["WHO"] = &Message::handleWHO;
+        _commandHandlers["BOT"] = &Message::handleBOT;
     }
 }
 
 Message::Message(const std::string& rawMessage)
 {
     initCommandHandler();
-    // Simple parsing of IRC message
     std::istringstream message(rawMessage);
+    message >> _command;
 
-    // Check for prefix
-    if (!message.str().empty() && message.str()[0] == ':')
+    std::getline(message, _params);
+    if (!_params.empty() && _params[0] == ' ')
     {
-        size_t spacePos = message.find(' ');
-        if (spacePos != std::string::npos)
-        {
-            _prefix = message.substr(1, spacePos - 1);
-            message = message.substr(spacePos + 1);
-        }
-    }
-
-    // Extract command
-    size_t spacePos = message.find(' ');
-    if (spacePos != std::string::npos)
-    {
-        _command = message.substr(0, spacePos);
-        _params = message.substr(spacePos + 1);
-    }
-    else
-    {
-        _command = message;
+        _params = _params.substr(1);
     }
 }
 
@@ -60,3 +54,23 @@ const std::string& Message::getCommand() const { return _command; }
 const std::string& Message::getParams() const { return _params; }
 
 Message Message::parse(const std::string& rawMessage) { return Message(rawMessage); }
+void Message::handleJOIN() {};
+void Message::handleTOPIC() {};
+void Message::handleKICK() {};
+void Message::handleINVITE() {};
+void Message::handleMODE() {};
+void Message::handleHELP() {};
+void Message::handleNICK() {};
+void Message::handleUSER() {};
+void Message::handlePRIVMSG() {};
+void Message::handleQUIT() {};
+void Message::handlePART() {};
+void Message::handleLIST() {};
+void Message::handlePASS() {};
+void Message::handleCAP() {};
+void Message::handleMOTD() {};
+void Message::handlePING() {};
+void Message::handleWHOIS() {};
+void Message::handleWHO() {};
+void Message::handleBOT() {};
+void Message::handleINVALID() {};
