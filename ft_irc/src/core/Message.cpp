@@ -12,7 +12,7 @@ Message::Message(const std::string &rawMessage) {
   parseParams(remainder);
 
     // Check for prefix
-    if (!message.empty() && message[0] == ':')
+    if (!message.str().empty() && message.str()[0] == ':')
     {
         size_t spacePos = message.find(' ');
         if (spacePos != std::string::npos)
