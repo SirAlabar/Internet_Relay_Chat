@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "General.hpp"
+
 #include "Client.hpp"
 #include "Message.hpp"
 #include "Server.hpp"
@@ -319,7 +321,7 @@ void Server::processClientMessage(int clientFd)
     }
 
     // Buffer for receiving data
-    char buffer[1024];
+    char buffer[1024] = {0};
     ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 
     std::cout << "Received " << bytesRead << " bytes from client FD: " << clientFd
@@ -534,19 +536,18 @@ void Server::print_clients()
 void Server::print_clients()
 {
     if (DEBUG)
-    {	
+    {
         std::map<int, Client*>::iterator it = _clients.begin();
         std::map<int, Client*>::iterator ite = _clients.end();
 
         for (; it != ite; it++)
         {
-            Print::Debug(Color::YELLOW + 
-                         "\n\tClient fd on server map: " + toString(it->first) + 
-                         "\n\tfd on Client class: " + it->second->getFdString() + 
-                         "\n\tnickname: " + it->second->getNickname() + 
-                         "\n\tusername: " + it->second->getUsername() + 
-                         "\n\tautenticated? == " + toString(it->second->isAuthenticated())
-            );
+            Print::Debug(
+                Color::YELLOW + "\n\tClient fd on server map: " + toString(it->first) +
+                "\n\tfd on Client class: " + it->second->getFdString() +
+                "\n\tnickname: " + it->second->getNickname() +
+                "\n\tusername: " + it->second->getUsername() +
+                "\n\tautenticated? == " + toString(it->second->isAuthenticated()));
         }
     }
 }

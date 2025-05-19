@@ -51,6 +51,18 @@ void CommandFactory::initializeCommands()
     _initialized = true;
 }
 
+// Register a new command creator
+void CommandFactory::registerCommand(const std::string& commandName,
+                                     CommandCreator creator)
+{
+    std::string upperCommandName = commandName;
+    for (size_t i = 0; i < upperCommandName.size(); ++i)
+    {
+        upperCommandName[i] = toupper(upperCommandName[i]);
+    }
+    _commandCreators[upperCommandName] = creator;
+}
+
 // Creates a command based on command name
 ACommand* CommandFactory::createCommand(const std::string& commandName, Server* server)
 {
@@ -78,7 +90,7 @@ ACommand* CommandFactory::createCommand(const std::string& commandName, Server* 
     {
         return (it->second(server));  // return command creator
     }
-    std::cout << "Unknown command: " << commandName << std::endl;
+    Print::Log("Unknown command: " + commandName);
     return (NULL);
 }
 
@@ -129,7 +141,14 @@ void CommandFactory::registerCommand(const std::string& commandName,
     std::string upperCommandName = commandName;
     for (size_t i = 0; i < upperCommandName.size(); ++i)
     {
-        upperCommandName[i] = toupper(upperCommandName[i]);
+        Print::Log("Executing :" + message.getCommand() + "for client" +
+                   client->getFdString());
+        // command->execute(client, message);
+        // delete command;
+    }
+    else
+    {
+        Print::StdErr("Command not found: " + message.getCommand());
     }
 }
 
