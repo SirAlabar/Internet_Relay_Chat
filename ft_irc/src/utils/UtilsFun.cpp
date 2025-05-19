@@ -20,6 +20,4 @@ void Print::StdErr(const std::string& str) { std::cerr << str << std::endl; }
 
 void Print::Stream(std::ofstream& os, const std::string& str) { os << str << std::endl; }
 
-// Private constructor definition (optional, but good practice)
 Print::Print() {}
-
