@@ -1,6 +1,7 @@
 #include <sstream>
 #include <string>
 
+#include "CommandFactory.hpp"
 #include "Message.hpp"
 #include "UtilsFun.hpp"
 #include <sstream>
@@ -20,6 +21,9 @@ Message::Message(const std::string& rawMessage)
     {
         Print::Debug(_params[i]);
     }
+    Print::Debug("Command: " + _command);
+    Print::Debug("Params: " + _params);
+    CommandFactory::createCommand(_command, )
 }
 
 Message::~Message() {}
