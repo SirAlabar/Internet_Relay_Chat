@@ -13,9 +13,9 @@ class Message;
 class CommandFactory
 {
 private:
-	// Map of command names to their corresponding creator functions
-	typedef ACommand* (*CommandCreator)(Server* server);
-	static std::map<std::string, CommandCreator> _commandCreators;
+    // Map of command names to their corresponding creator functions
+    typedef ACommand* (*CommandCreator)(Server* server);
+    static std::map<std::string, CommandCreator> _commandCreators;
 
 	// Private to prevent instantiation and copy
 	CommandFactory();

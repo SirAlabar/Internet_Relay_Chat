@@ -311,12 +311,12 @@ void Server::processNewConnection()
 }
 void Server::processClientMessage(int clientFd)
 {
-	Print::Debug("Processing message from client FD: " + toString(clientFd));
+    Print::Debug("Processing message from client FD: " + toString(clientFd));
 
     Client* client = getClient(clientFd);
     if (!client)
     {
-        std::cerr << "Error: Client not found for FD: " << clientFd << std::endl;
+        Print::StdErr("Error: Client not found for FD: " + toString(clientFd));
         return;
     }
 
@@ -324,25 +324,25 @@ void Server::processClientMessage(int clientFd)
     char buffer[1024] = {0};
     ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 
-    std::cout << "Received " << bytesRead << " bytes from client FD: " << clientFd
-              << std::endl;
+    Print::Debug("Received " + toString(bytesRead) + " bytes from client FD: " + 
+                toString(clientFd));
 
     if (bytesRead < 0)
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
         {
-            std::cout << "No data available, but connection is still open" << std::endl;
+            Print::Debug("No data available, but connection is still open");
             return;
         }
 
-        std::cerr << "Error receiving data: " << strerror(errno) << std::endl;
+        Print::StdErr("Error receiving data: " + toString(strerror(errno)));
         removeClient(clientFd);
         return;
     }
 
     if (bytesRead == 0)
     {
-        std::cout << "Client closed connection gracefully" << std::endl;
+        Print::Debug("Client closed connection gracefully");
         removeClient(clientFd);
         return;
     }
@@ -393,7 +393,7 @@ void Server::processClientMessage(int clientFd)
     {
         clientBuffer.clear();
         Print::StdErr("Warning: Client buffer overflow, clearing buffer");
-    }]
+    }
 }
 
 // Get server password
