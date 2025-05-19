@@ -6,3 +6,6 @@ obj/
 # Sloth personal ignore
 compile_flags.txt
 irc-study-plan-updated.md
+
+# Ivan personal ignore
+output_file.txt
