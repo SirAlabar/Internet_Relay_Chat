@@ -6,7 +6,6 @@
 #include "CommandFactory.hpp"
 #include "ACommand.hpp"
 #include "NickCommand.hpp"
-#include "connection/PassCommand.hpp"
 
 // Initialize static members
 std::map<std::string, CommandFactory::CommandCreator> CommandFactory::_commandCreators;
