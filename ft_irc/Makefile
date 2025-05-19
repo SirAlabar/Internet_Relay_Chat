@@ -99,3 +99,24 @@ debug: re
 	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
 	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░  ░▒▓██████▓▒░  $(CLR_RMV)\n"
 	@printf "             $(YELLOW)(developed by hluiz, isilva-t & joao-pol)$(CLR_RMV)\n"
+
+################################################################################
+#                              Makefile  other utils                           #
+################################################################################
+
+.PHONY: out
+out:
+	touch output_file.txt
+	rm output_file.txt
+	find . -type f \( -name "*.cpp" -o -name "*.hpp" \) -not -path "*/\.*" -not -path "*/obj/*" -not -path "*/tests/*" | while read file; do \
+		relative_path=$$(echo $$file | sed "s|^\./||"); \
+		echo "### Starting file: $$relative_path" >> output_file.txt; \
+		echo "" >> output_file.txt; \
+		cat "$$file" >> output_file.txt; \
+		echo "" >> output_file.txt; \
+		echo "" >> output_file.txt; \
+	done
+
+.PHONY: vi
+vi:
+	@find . -type f -name "*.cpp" -o -name "*.hpp" -o -name "Makefile" | xargs nvim
