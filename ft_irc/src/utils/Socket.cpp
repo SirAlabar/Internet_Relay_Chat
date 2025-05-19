@@ -1,5 +1,8 @@
 #include "utils/Socket.hpp"
 
+#include "utils/UtilsFun.hpp"
+
+
 Socket::Socket() : _fd(-1), _lastError(0), _blocking(true), _addr() {}
 
 // Constructor with domain, type, protocol
@@ -85,18 +88,27 @@ bool Socket::setNonBlocking()
 {
     if (!isValid())
     {
-	std::cerr << "ERROR: Cannot set non-blocking mode on invalid socket" << std::endl;
+
+	Print::StdErr("ERROR: Cannot set non-blocking mode on invalid socket");
+	// std::cerr << "ERROR: Cannot set non-blocking mode on invalid socket" <<
+	// std::endl;
 	return (false);
     }
 
-    std::cout << "DEBUG: Setting socket " << _fd << " to non-blocking mode" << std::endl;
+    Print::Debug("DEBUG: Setting socket " + toString(_fd) + " to non-blocking mode");
+    // std::cout << "DEBUG: Setting socket " << _fd << " to non-blocking mode" <<
+    // std::endl;
+
 
     int flags = fcntl(_fd, F_GETFL, 0);	 // get socket fd flags
     if (flags == -1)
     {
 	_lastError = errno;
-	std::cerr << "ERROR: fcntl(F_GETFL) failed: " << strerror(_lastError)
-		  << std::endl;
+
+	Print::StdErr("ERROR: fcntl(F_GETFL) failed: " + toString(strerror(_lastError)));
+	// std::cerr << "ERROR: fcntl(F_GETFL) failed: " << strerror(_lastError)
+	// << std::endl;
+
 	return (false);
     }
 
@@ -106,13 +118,18 @@ bool Socket::setNonBlocking()
 
     if (result == -1)
     {
-	std::cerr << "ERROR: fcntl(F_SETFL) failed: " << strerror(_lastError)
-		  << std::endl;
+
+	Print::StdErr("ERROR: fcntl(F_SETFL) failed: " + toString(strerror(_lastError)));
+	// std::cerr << "ERROR: fcntl(F_SETFL) failed: " << strerror(_lastError)
+	// 	  << std::endl;
 	return (false);
     }
 
-    std::cout << "DEBUG: Successfully set socket " << _fd << " to non-blocking mode"
-	      << std::endl;
+    Print::Debug("DEBUG: Successfully set socket " + toString(_fd) +
+		 " to non-blocking mode");
+    // std::cout << "DEBUG: Successfully set socket " << _fd << " to non-blocking mode"
+    //    << std::endl;
+
     _blocking = false;
     return (true);
 }
