@@ -29,4 +29,4 @@ std::string toString(T value)
     ss << value;
     return ss.str();
 }
-#endif	// PRINT_UTILS_H
+#endif  // PRINT_UTILS_H

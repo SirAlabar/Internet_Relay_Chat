@@ -1,13 +1,13 @@
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
-#include <arpa/inet.h>	 // (inet_addr, inet_ntoa)
-#include <fcntl.h>	 // (fcntl)
-#include <netdb.h>	 // (getaddrinfo, gethostbyname)
-#include <netinet/in.h>	 // (sockaddr_in)
-#include <poll.h>	 // (poll())
-#include <sys/socket.h>	 // (socker,bind, listen, accept, connect)
-#include <unistd.h>	 // (close, read, write)
+#include <arpa/inet.h>   // (inet_addr, inet_ntoa)
+#include <fcntl.h>       // (fcntl)
+#include <netdb.h>       // (getaddrinfo, gethostbyname)
+#include <netinet/in.h>  // (sockaddr_in)
+#include <poll.h>        // (poll())
+#include <sys/socket.h>  // (socker,bind, listen, accept, connect)
+#include <unistd.h>      // (close, read, write)
 
 #include <cerrno>
 #include <cstring>  // (memset, strcpy)~
