@@ -2,7 +2,6 @@
 #include <csignal>
 #include <cstdlib>
 #include <cstring>
-
 #include <iostream>
 
 #include "Server.hpp"
@@ -59,7 +58,7 @@ int main(int argc, char* argv[])
 
     if (!server.start(port, password))
     {
-	std::cerr << "Failed to start server. Exiting." << std::endl;
+	Print::StdErr("Failed to start server. Exiting.");
 	return 1;
     }
 
@@ -74,6 +73,4 @@ int main(int argc, char* argv[])
     server.stop();
 
     return 0;
-
 }
-
