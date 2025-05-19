@@ -29,6 +29,7 @@ void NickCommand::execute(Client* client, const Message& message)
 {
     Print::Debug("Starting execution of NICK command");
     if (!client)
+    
     {
         Print::Debug("Client is NULL, returning");
         return;
