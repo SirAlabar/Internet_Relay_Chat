@@ -324,7 +324,7 @@ void Server::processClientMessage(int clientFd)
     }
 
     // Buffer for receiving data
-    char buffer[1024];
+    char buffer[1024] = {0};
     ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 
     Print::Debug("Received " + toString(bytesRead) + " bytes from client FD: " + 
@@ -349,9 +349,6 @@ void Server::processClientMessage(int clientFd)
         removeClient(clientFd);
         return;
     }
-
-    // Null-terminate the received data
-    buffer[bytesRead] = '\0';
 
     // Append to client buffer
     _clientBuffers[clientFd] += buffer;
