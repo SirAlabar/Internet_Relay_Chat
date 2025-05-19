@@ -1,10 +1,11 @@
-#include "commands/CommandFactory.hpp"
-// #include "commands/Command.hpp"
 #include <iostream>
+#include "Client.hpp"
+#include "Message.hpp"
+#include "Server.hpp"
 
-#include "core/Client.hpp"
-#include "core/Message.hpp"
-#include "core/Server.hpp"
+#include "CommandFactory.hpp"
+#include "ACommand.hpp"
+#include "NickCommand.hpp"
 
 // Initialize static members
 std::map<std::string, CommandFactory::CommandCreator> CommandFactory::_commandCreators;
@@ -18,7 +19,7 @@ void CommandFactory::initializeCommands()
 	return;
     }
 
-    // // Channel commands
+    // Channel commands
     // registerCommand("INVITE", &InviteCommand::create);
     // registerCommand("JOIN", &JoinCommand::create);
     // registerCommand("KICK", &KickCommand::create);
@@ -26,18 +27,18 @@ void CommandFactory::initializeCommands()
     // registerCommand("PART", &PartCommand::create);
     // registerCommand("TOPIC", &TopicCommand::create);
 
-    // // Connection commands
-    // registerCommand("NICK", &NickCommand::create);
+    // Connection commands
+    registerCommand("NICK", &NickCommand::create);
     // registerCommand("PASS", &PassCommand::create);
     // registerCommand("QUIT", &QuitCommand::create);
     // registerCommand("USER", &UserCommand::create);
 
-    // // Messaging commands
+    // Messaging commands
     // registerCommand("NOTICE", &NoticeCommand::create);
     // registerCommand("PRIVMSG", &PrivmsgCommand::create);
     // registerCommand("WHO", &WhoCommand::create);
 
-    // // DCC commands (bonus part)
+    // DCC commands (bonus part)
     // registerCommand("DCC", &DCCCommand::create);
     // registerCommand("DCCSEND", &DCCSendCommand::create);
     // registerCommand("DCCACCEPT", &DCCAcceptCommand::create);
@@ -46,7 +47,7 @@ void CommandFactory::initializeCommands()
 }
 
 // Creates a command based on command name
-Command* CommandFactory::createCommand(const std::string& commandName, Server* server)
+ACommand* CommandFactory::createCommand(const std::string& commandName, Server* server)
 {
     if (!_initialized)
     {
@@ -57,7 +58,7 @@ Command* CommandFactory::createCommand(const std::string& commandName, Server* s
     std::string upperCommandName = commandName;
     for (size_t i = 0; i < upperCommandName.size(); ++i)
     {
-	upperCommandName[i] = toupper(upperCommandName[i]);
+        upperCommandName[i] = toupper(upperCommandName[i]);
     }
 
     // Look up the command in the map
@@ -67,7 +68,7 @@ Command* CommandFactory::createCommand(const std::string& commandName, Server* s
     // If found, create and return the command
     if (it != _commandCreators.end())
     {
-	return (it->second(server));  // return command creator
+        return (it->second(server));  // return command creator
     }
     std::cout << "Unknown command: " << commandName << std::endl;
     return (NULL);
@@ -77,20 +78,33 @@ Command* CommandFactory::createCommand(const std::string& commandName, Server* s
 void CommandFactory::executeCommand(Client* client, Server* server,
 				    const Message& message)
 {
-    (void)server, (void)client, (void)message;
-    // std::string commandName = message.getCommand();
-    //
-    // Command* command = createCommand(commandName, server);
-    //
-    // if (command)
-    // {
-    //     command->execute(client, message);
-    //     delete command;
-    // }
-    // else
-    // {
-    //     // Send error to client about unknown command
-    // }
+    std::string commandName = message.getCommand();
+    
+    ACommand* command = createCommand(commandName, server);
+    
+    if (command)
+    {
+        command->execute(client, message);
+        delete command;
+    }
+    else
+    {
+        // Send error to client about unknown command
+        if (client)
+        {
+            std::string errorMsg = ":server 421 ";
+            if (!client->getNickname().empty())
+            {
+                errorMsg += client->getNickname();
+            }
+            else
+            {
+                errorMsg += "*";
+            }
+            errorMsg += " " + commandName + " :Unknown command\r\n";
+            client->sendMessage(errorMsg);
+        }
+    }
 }
 
 // Register a new command creator
@@ -100,7 +114,7 @@ void CommandFactory::registerCommand(const std::string& commandName,
     std::string upperCommandName = commandName;
     for (size_t i = 0; i < upperCommandName.size(); ++i)
     {
-	upperCommandName[i] = toupper(upperCommandName[i]);
+        upperCommandName[i] = toupper(upperCommandName[i]);
     }
     _commandCreators[upperCommandName] = creator;
 }
@@ -110,12 +124,12 @@ bool CommandFactory::commandExists(const std::string& commandName)
 {
     if (!_initialized)
     {
-	initializeCommands();
+        initializeCommands();
     }
     std::string upperCommandName = commandName;
     for (size_t i = 0; i < upperCommandName.size(); ++i)
     {
-	upperCommandName[i] = toupper(upperCommandName[i]);
+        upperCommandName[i] = toupper(upperCommandName[i]);
     }
 
     return (_commandCreators.find(upperCommandName) != _commandCreators.end());

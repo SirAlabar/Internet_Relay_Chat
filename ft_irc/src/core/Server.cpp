@@ -1,12 +1,16 @@
 #include <unistd.h>
-
 #include <cerrno>
 #include <cstring>
 #include <iostream>
-
+#include <sstream>
 
 #include "Client.hpp"
+#include "Message.hpp"
 #include "Server.hpp"
+#include "CommandFactory.hpp"
+#include "Channel.hpp"
+#include "Socket.hpp"
+#include "UtilsFun.hpp"
 
 Server::Server() : _running(false) {}
 
@@ -310,40 +314,40 @@ void Server::processNewConnection()
 
 void Server::processClientMessage(int clientFd)
 {
-    std::cout << "Processing message from client FD: " << clientFd << std::endl;
+    Print::Debug("Processing message from client FD: " + toString(clientFd));
 
     Client* client = getClient(clientFd);
     if (!client)
     {
-	std::cerr << "Error: Client not found for FD: " << clientFd << std::endl;
-	return;
+        Print::StdErr("Error: Client not found for FD: " + toString(clientFd));
+        return;
     }
 
     // Buffer for receiving data
     char buffer[1024];
     ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 
-    std::cout << "Received " << bytesRead << " bytes from client FD: " << clientFd
-	      << std::endl;
+    Print::Debug("Received " + toString(bytesRead) + " bytes from client FD: " + 
+                toString(clientFd));
 
     if (bytesRead < 0)
     {
-	if (errno == EAGAIN || errno == EWOULDBLOCK)
-	{
-	    std::cout << "No data available, but connection is still open" << std::endl;
-	    return;
-	}
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+        {
+            Print::Debug("No data available, but connection is still open");
+            return;
+        }
 
-	std::cerr << "Error receiving data: " << strerror(errno) << std::endl;
-	removeClient(clientFd);
-	return;
+        Print::StdErr("Error receiving data: " + toString(strerror(errno)));
+        removeClient(clientFd);
+        return;
     }
 
     if (bytesRead == 0)
     {
-	std::cout << "Client closed connection gracefully" << std::endl;
-	removeClient(clientFd);
-	return;
+        Print::Debug("Client closed connection gracefully");
+        removeClient(clientFd);
+        return;
     }
 
     // Null-terminate the received data
@@ -351,13 +355,41 @@ void Server::processClientMessage(int clientFd)
 
     // Append to client buffer
     _clientBuffers[clientFd] += buffer;
-
-    // TEST
-    std::string welcome =
-	":server NOTICE * :Hello! You are connected to the IRC server\r\n";
-    client->sendMessage(welcome);
-
-    std::cout << "Sent welcome message to client FD: " << clientFd << std::endl;
+    
+    // Process complete messages (ending with \r\n)
+    std::string& clientBuffer = _clientBuffers[clientFd];
+    size_t pos;
+    
+    while ((pos = clientBuffer.find("\r\n")) != std::string::npos)
+    {
+        // Extract a complete message
+        std::string rawMessage = clientBuffer.substr(0, pos);
+        // Remove the processed message from the buffer
+        clientBuffer.erase(0, pos + 2);
+        
+        // Parse and execute the message
+        Message message = Message::parse(rawMessage);
+        Print::Debug("Processing command: " + message.getCommand());
+        
+        // Handle PING specially for keep-alive
+        if (message.getCommand() == "PING")
+        {
+            std::string pongReply = ":server PONG server :" + message.getParams() + "\r\n";
+            client->sendMessage(pongReply);
+        }
+        else
+        {
+            // Execute the command using factory
+            CommandFactory::executeCommand(client, this, message);
+        }
+    }
+    
+    // If buffer gets too large without complete messages, clear it (prevent DoS)
+    if (clientBuffer.size() > 4096)
+    {
+        clientBuffer.clear();
+        Print::StdErr("Warning: Client buffer overflow, clearing buffer");
+    }
 }
 
 // Get server password
