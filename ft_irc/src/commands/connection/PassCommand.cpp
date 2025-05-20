@@ -11,18 +11,18 @@ PassCommand::PassCommand(const PassCommand& other) : ACommand(other._server) {}
 
 PassCommand& PassCommand::operator=(const PassCommand& other)
 {
-    if (this != &other)
-    {
-        _server = other._server;
-    }
-    return (*this);
+	if (this != &other)
+	{
+		_server = other._server;
+	}
+	return (*this);
 }
 
 // Static creator for factory
 
 ACommand* PassCommand::create(Server* server)
 {
-    return (new PassCommand(server));
+	return (new PassCommand(server));
 }
 
 void PassCommand::execute(Client* client, const Message& message)
@@ -56,8 +56,8 @@ void PassCommand::execute(Client* client, const Message& message)
         return ;
     }
 
-    if(password == _server->getPassword())
-        client->setAuthenticated(true);
-    else
-        sendErrorReply(client, 464, ":Password incorrect!");
+	if(password == _server->getPassword())
+		client->setAuthenticated(true);
+	else
+		sendErrorReply(client, 464, ":Password incorrect!");
 }

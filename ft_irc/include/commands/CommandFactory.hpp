@@ -13,18 +13,18 @@ class Message;
 class CommandFactory
 {
 private:
-    // Map of command names to their corresponding creator functions
-    typedef ACommand* (*CommandCreator)(Server* server);
-    static std::map<std::string, CommandCreator> _commandCreators;
+	// Map of command names to their corresponding creator functions
+	typedef ACommand* (*CommandCreator)(Server* server);
+	static std::map<std::string, CommandCreator> _commandCreators;
 
-    // Private to prevent instantiation and copy
-    CommandFactory();
-    CommandFactory(const CommandFactory& other);
-    CommandFactory& operator=(const CommandFactory& other);
-    ~CommandFactory();
+	// Private to prevent instantiation and copy
+	CommandFactory();
+	CommandFactory(const CommandFactory& other);
+	CommandFactory& operator=(const CommandFactory& other);
+	~CommandFactory();
 
-    static void initializeCommands();
-    static bool _initialized;
+	static void initializeCommands();
+	static bool _initialized;
 
 public:
     // Register a new command creator

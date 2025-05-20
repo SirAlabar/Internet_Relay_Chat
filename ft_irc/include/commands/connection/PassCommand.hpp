@@ -14,18 +14,18 @@ class Message;
 class PassCommand : public ACommand
 {
 private:
-    // Private to prevent copying
-    PassCommand(const PassCommand& other);
-    PassCommand& operator=(const PassCommand& other);
+	// Private to prevent copying
+	PassCommand(const PassCommand& other);
+	PassCommand& operator=(const PassCommand& other);
 
 public:
-    PassCommand(Server* server);
-    virtual ~PassCommand();
-    
-    virtual void execute(Client* client, const Message& message);
+	PassCommand(Server* server);
+	virtual ~PassCommand();
+	
+	virtual void execute(Client* client, const Message& message);
 
-    // Static creator for factory
-    static ACommand* create(Server* server);
+	// Static creator for factory
+	static ACommand* create(Server* server);
 };
 
 

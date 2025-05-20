@@ -11,8 +11,8 @@ private:
     std::vector<std::string> _params;
 
 public:
-    Message(const std::string& rawMessage);
-    ~Message();
+	Message(const std::string& rawMessage);
+	~Message();
 
     const std::string& getCommand() const;
     const std::vector<std::string> getParams() const;
