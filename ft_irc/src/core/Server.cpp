@@ -342,41 +342,14 @@ void Server::processClientMessage(int clientFd)
     CommandFactory::executeCommand(client, this, msg);
     // Append to client buffer
     _clientBuffers[clientFd] += buffer;
-    
-    // Process complete messages (ending with \r\n)
-    std::string& clientBuffer = _clientBuffers[clientFd];
-    size_t pos;
-    
-    while ((pos = clientBuffer.find("\r\n")) != std::string::npos)
-    {
-        // Extract a complete message
-        std::string rawMessage = clientBuffer.substr(0, pos);
-        // Remove the processed message from the buffer
-        clientBuffer.erase(0, pos + 2);
-        
-        // Parse and execute the message
-        Message message = Message::parse(rawMessage);
-        Print::Debug("Processing command: " + message.getCommand());
-        
-        // Handle PING specially for keep-alive
-        if (message.getCommand() == "PING")
-        {
-            std::string pongReply = ":server PONG server :" + message.getParams() + "\r\n";
-            client->sendMessage(pongReply);
-        }
-        else
-        {
-            // Execute the command using factory
-            CommandFactory::executeCommand(client, this, message);
-        }
-    }
-    
-    // If buffer gets too large without complete messages, clear it (prevent DoS)
-    if (clientBuffer.size() > 4096)
-    {
-        clientBuffer.clear();
-        Print::StdErr("Warning: Client buffer overflow, clearing buffer");
-    }
+    Server::executeCommand(client, msg);
+
+    // TEST
+    std::string welcome =
+        ":server NOTICE * :Hello! You are connected to the IRC server\r\n";
+    client->sendMessage(welcome);
+
+    std::cout << "Sent welcome message to client FD: " << clientFd << std::endl;
 }
 
 // Get server password
