@@ -1,8 +1,5 @@
 #ifndef GENERAL_HPP
-<<<<<<< HEAD
 #define GENERAL_HPP
-=======
->>>>>>> aa7cedd956378f04cc90ff5f179dc379f7c4b33c
 
 #ifndef DEBUG
 #define DEBUG 0
@@ -11,7 +8,6 @@
 #ifndef LOG
 #define LOG 0
 #endif	// !LOG
-<<<<<<< HEAD
 
 #include <string>
 namespace Color {
@@ -25,6 +21,4 @@ namespace Color {
     const std::string VIOLET  = "\033[38;5;129m";
 }
 
-=======
->>>>>>> aa7cedd956378f04cc90ff5f179dc379f7c4b33c
 #endif	// !GENERAL_HPP
