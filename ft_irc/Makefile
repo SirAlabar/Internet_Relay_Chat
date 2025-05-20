@@ -4,7 +4,7 @@
 
 NAME = ircserv
 CC = c++
-INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iinclude/dcc -Iinclude/utils
+INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iinclude/dcc -Iinclude/utils -Iinclude/commands/connection
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -Wno-delete-incomplete -Wno-unused-parameter
 DEBUG_FLAGS = -g
 
@@ -48,7 +48,9 @@ SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/utils/UtilsFun.cpp \
        $(SRC_DIR)/commands/CommandFactory.cpp \
        $(SRC_DIR)/commands/ACommand.cpp \
-       $(SRC_DIR)/commands/NickCommand.cpp
+       $(SRC_DIR)/commands/NickCommand.cpp \
+       $(SRC_DIR)/commands/connection/PassCommand.cpp
+
 
 # Object files
 OBJ_DIR = obj
