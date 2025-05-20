@@ -2,16 +2,16 @@
 #include <sstream>
 
 #include "UtilsFun.hpp"
-#include "general.hpp"
+#include "General.hpp"
 
 void Print::Debug(const std::string& str)
 {
-    if (DEBUG) std::cerr << RED << "[DEBUG]: " << RESET << str << std::endl;
+    if (DEBUG) std::cerr << Color::RED << "[DEBUG]: " << Color::RESET << str << std::endl;
 }
 
 void Print::Log(const std::string& str)
 {
-    if (LOG) std::cerr << RED << "[LOG]: " << RESET << str << std::endl;
+    if (LOG) std::cerr << Color::RED << "[LOG]: " << Color::RESET << str << std::endl;
 }
 
 void Print::StdOut(const std::string& str) { std::cout << str << std::endl; }

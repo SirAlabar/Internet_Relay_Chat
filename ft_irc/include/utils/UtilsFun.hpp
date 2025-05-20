@@ -6,9 +6,6 @@
 #include <sstream>
 #include <string>
 
-#define RED "\033[31m"
-#define RESET "\033[0m"
-
 class Print
 {
 public:
@@ -29,4 +26,4 @@ std::string toString(T value)
     ss << value;
     return ss.str();
 }
-#endif	// PRINT_UTILS_H
+#endif  // PRINT_UTILS_H
