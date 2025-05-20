@@ -347,18 +347,10 @@ void Server::processClientMessage(int clientFd)
         return;
     }
 
-	if (bytesRead < 0)
-	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
-		{
-			Print::Debug("No data available, but connection is still open");
-			return;
-		}
-
-		Print::StdErr("Error receiving data: " + toString(strerror(errno)));
-		removeClient(clientFd);
-		return;
-	}
+    Message msg(buffer);
+    CommandFactory::executeCommand(client, this, msg);
+    // Append to client buffer
+    _clientBuffers[clientFd] += buffer;
 
     // TEST
     std::string welcome =
