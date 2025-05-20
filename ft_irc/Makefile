@@ -41,7 +41,7 @@ VALGRINDFLAGS          = --tool=memcheck -q --leak-check=full \
 SRC_DIR = src
 SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/core/Server.cpp \
-       $(SRC_DIR)/commands/CommandFactor.cpp \
+       $(SRC_DIR)/commands/CommandFactory.cpp \
        $(SRC_DIR)/core/Client.cpp \
        $(SRC_DIR)/core/Message.cpp \
        $(SRC_DIR)/utils/Socket.cpp \

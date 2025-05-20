@@ -299,7 +299,6 @@ void Server::processNewConnection()
 
     std::cout << "New connection accepted. FD: " << clientFd << std::endl;
 }
-
 void Server::processClientMessage(int clientFd)
 {
     std::cout << "Processing message from client FD: " << clientFd << std::endl;
@@ -342,7 +341,6 @@ void Server::processClientMessage(int clientFd)
     CommandFactory::executeCommand(client, this, msg);
     // Append to client buffer
     _clientBuffers[clientFd] += buffer;
-    Server::executeCommand(client, msg);
 
     // TEST
     std::string welcome =

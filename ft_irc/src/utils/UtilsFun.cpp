@@ -11,7 +11,7 @@ void Print::Debug(const std::string& str)
 
 void Print::Log(const std::string& str)
 {
-    if (LOG) std::cerr << Color::RED << "[LOG]: " << Color::RESET << str << std::endl;
+    if (LOG) std::cerr << Color::GREEN << "[LOG]: " << Color::RESET << str << std::endl;
 }
 
 void Print::StdOut(const std::string& str) { std::cout << str << std::endl; }
