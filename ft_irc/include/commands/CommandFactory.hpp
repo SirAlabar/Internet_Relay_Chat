@@ -5,7 +5,7 @@
 #include <string>
 
 // Forward declarations
-class Command;
+class ACommand;
 class Client;
 class Server;
 class Message;
@@ -14,7 +14,7 @@ class CommandFactory
 {
 private:
     // Map of command names to their corresponding creator functions
-    typedef Command* (*CommandCreator)(Server* server);
+    typedef ACommand* (*CommandCreator)(Server* server);
     static std::map<std::string, CommandCreator> _commandCreators;
 
     // Private to prevent instantiation and copy
@@ -28,7 +28,7 @@ private:
 
 public:
     // Create a command based on the message
-    static Command* createCommand(const std::string& commandName, Server* server);
+    static ACommand* createCommand(const std::string& commandName, Server* server);
     // Execute the appropriate command based on the message
     static void executeCommand(Client* client, Server* server, const Message& message);
     // Register a new command creator
