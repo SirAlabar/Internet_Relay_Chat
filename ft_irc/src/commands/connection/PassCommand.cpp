@@ -1,4 +1,4 @@
-#include "connection/PassCommand.hpp"
+#include "PassCommand.hpp"
 
 PassCommand::PassCommand(Server* server) : ACommand(server) {}
 
