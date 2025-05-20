@@ -65,6 +65,8 @@ ACommand* CommandFactory::createCommand(const std::string& commandName, Server* 
     std::map<std::string, CommandCreator>::iterator it =
 	_commandCreators.find(upperCommandName);
 
+    Print::Debug("Looking for command '" + upperCommandName + "': " + 
+               (it != _commandCreators.end() ? "Found" : "Not found"));
     // If found, create and return the command
     if (it != _commandCreators.end())
     {
@@ -79,16 +81,20 @@ void CommandFactory::executeCommand(Client* client, Server* server,
 				    const Message& message)
 {
     std::string commandName = message.getCommand();
+    Print::Debug("Attempting to execute command: " + commandName);
     
     ACommand* command = createCommand(commandName, server);
     
     if (command)
     {
+        Print::Debug("Command created successfully, executing...");
         command->execute(client, message);
+        Print::Debug("Command executed, cleaning up...");
         delete command;
     }
     else
     {
+        Print::Debug("Command not found, sending error");
         // Send error to client about unknown command
         if (client)
         {
