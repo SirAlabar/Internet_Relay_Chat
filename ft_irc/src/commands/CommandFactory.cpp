@@ -6,6 +6,7 @@
 #include "CommandFactory.hpp"
 #include "ACommand.hpp"
 #include "NickCommand.hpp"
+#include "connection/PassCommand.hpp"
 
 // Initialize static members
 std::map<std::string, CommandFactory::CommandCreator> CommandFactory::_commandCreators;
@@ -29,7 +30,7 @@ void CommandFactory::initializeCommands()
 
     // Connection commands
     registerCommand("NICK", &NickCommand::create);
-    // registerCommand("PASS", &PassCommand::create);
+    registerCommand("PASS", &PassCommand::create);
     // registerCommand("QUIT", &QuitCommand::create);
     // registerCommand("USER", &UserCommand::create);
 
