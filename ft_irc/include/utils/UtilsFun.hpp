@@ -7,6 +7,8 @@
 #include <string>
 #include "General.hpp"
 
+#include "General.hpp"
+
 class Print
 {
 public:

@@ -1,9 +1,8 @@
 #include <iostream>
 
-#include "NickCommand.hpp"
 #include "Client.hpp"
 #include "Message.hpp"
-
+#include "NickCommand.hpp"
 #include "Server.hpp"
 
 NickCommand::NickCommand(Server* server) : ACommand(server) {}
@@ -34,7 +33,6 @@ void NickCommand::execute(Client* client, const Message& message)
 {
     Print::Debug("Starting execution of NICK command");
     if (!client)
-
     {
         Print::Debug("Client is NULL, returning");
         return;

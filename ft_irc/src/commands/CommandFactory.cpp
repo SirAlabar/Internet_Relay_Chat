@@ -1,7 +1,4 @@
 #include <iostream>
-#include "Client.hpp"
-#include "Message.hpp"
-#include "Server.hpp"
 
 #include "ACommand.hpp"
 #include "Client.hpp"
@@ -9,7 +6,6 @@
 #include "Message.hpp"
 #include "NickCommand.hpp"
 #include "Server.hpp"
-
 #include "connection/PassCommand.hpp"
 
 // Initialize static members
@@ -51,18 +47,6 @@ void CommandFactory::initializeCommands()
     _initialized = true;
 }
 
-// Register a new command creator
-void CommandFactory::registerCommand(const std::string& commandName,
-                                     CommandCreator creator)
-{
-    std::string upperCommandName = commandName;
-    for (size_t i = 0; i < upperCommandName.size(); ++i)
-    {
-        upperCommandName[i] = toupper(upperCommandName[i]);
-    }
-    _commandCreators[upperCommandName] = creator;
-}
-
 // Creates a command based on command name
 ACommand* CommandFactory::createCommand(const std::string& commandName, Server* server)
 {
@@ -90,7 +74,7 @@ ACommand* CommandFactory::createCommand(const std::string& commandName, Server* 
     {
         return (it->second(server));  // return command creator
     }
-    Print::Log("Unknown command: " + commandName);
+    std::cout << "Unknown command: " << commandName << std::endl;
     return (NULL);
 }
 
@@ -141,15 +125,9 @@ void CommandFactory::registerCommand(const std::string& commandName,
     std::string upperCommandName = commandName;
     for (size_t i = 0; i < upperCommandName.size(); ++i)
     {
-        Print::Log("Executing :" + message.getCommand() + "for client" +
-                   client->getFdString());
-        // command->execute(client, message);
-        // delete command;
+        upperCommandName[i] = toupper(upperCommandName[i]);
     }
-    else
-    {
-        Print::StdErr("Command not found: " + message.getCommand());
-    }
+    _commandCreators[upperCommandName] = creator;
 }
 
 // Check if a command exists
