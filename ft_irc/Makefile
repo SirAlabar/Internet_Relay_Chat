@@ -50,6 +50,7 @@ SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/commands/ACommand.cpp \
        $(SRC_DIR)/commands/connection/NickCommand.cpp \
        $(SRC_DIR)/commands/connection/PassCommand.cpp \
+       $(SRC_DIR)/commands/channel/JoinCommand.cpp \
        $(SRC_DIR)/commands/connection/UserCommand.cpp
 
 
