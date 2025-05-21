@@ -125,18 +125,6 @@ void CommandFactory::registerCommand(const std::string& commandName,
     }
 }
 
-// Register a new command creator
-void CommandFactory::registerCommand(const std::string& commandName,
-                                     CommandCreator creator)
-{
-    std::string upperCommandName = commandName;
-    for (size_t i = 0; i < upperCommandName.size(); ++i)
-    {
-        upperCommandName[i] = toupper(upperCommandName[i]);
-    }
-    _commandCreators[upperCommandName] = creator;
-}
-
 // Check if a command exists
 bool CommandFactory::commandExists(const std::string& commandName)
 {
