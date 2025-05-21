@@ -4,7 +4,7 @@
 
 NAME = ircserv
 CC = c++
-INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iinclude/dcc -Iinclude/utils -Iinclude/commands/connection
+INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iinclude/dcc -Iinclude/utils -Iinclude/commands/connection -Iinclude/commands/channel
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -Wno-delete-incomplete -Wno-unused-parameter
 DEBUG_FLAGS = -g
 
