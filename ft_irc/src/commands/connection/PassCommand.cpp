@@ -29,7 +29,7 @@ void PassCommand::execute(Client* client, const Message& message)
         return ;
     }
 
-    std::string password = message.getParams();
+    std::string password = message.getParams(0);
     size_t startPass = password.find_first_not_of(" \t");
     if (password.empty() || startPass == std::string::npos)
     {
