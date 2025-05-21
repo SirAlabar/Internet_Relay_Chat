@@ -12,6 +12,7 @@ Message::Message(const std::string& rawMessage)
     std::string remainder;
     std::getline(message, remainder);
     _params = parseParams(remainder);
+    _remainder = remainder;
 
     Print::Debug("Command: " + _command);
     Print::Debug("_params: ");
@@ -20,12 +21,13 @@ Message::Message(const std::string& rawMessage)
         Print::Debug(_params[i]);
     }
     Print::Debug("Command: " + _command);
-    Print::Debug("Params: " + _params);
+    Print::Debug("Params: " + _remainder);
 }
 
 Message::~Message() {}
 
 const std::string& Message::getCommand() const { return _command; }
+const std::string& Message::getRemainder() const { return _remainder; }
 
 const std::vector<std::string> Message::getParams() const { return _params; }
 const std::string Message::getParams(size_t i) const
