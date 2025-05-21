@@ -21,37 +21,46 @@ ACommand* PassCommand::create(Server* server) { return (new PassCommand(server))
 
 void PassCommand::execute(Client* client, const Message& message)
 {
-    Print::Debug("Starting execution of PASS command");
+    Print::Do("execute PASS command");
 
     if (!client)
     {
-        Print::Debug("Client is NULL, returning");
-        return;
+        Print::Fail("Client NULL");
+        return ;
     }
 
-    std::string password = message.getParams(0);
+    std::string password = message.getParams();
     size_t startPass = password.find_first_not_of(" \t");
     if (password.empty() || startPass == std::string::npos)
     {
-        Print::Debug("no password, returning...");
+        Print::Fail("no password");
         sendErrorReply(client, 461, "PASS :Not enough parameters");
-        return;
+        return ;
     }
 
     password = password.substr(startPass);
-    if (!password.empty() && password[0] == ':') password = password.substr(1);
+    if (!password.empty() && password[0] == ':')
+        password = password.substr(1);
 
     size_t endPass = password.find_last_not_of(" \t\r\n");
-    if (endPass != std::string::npos) password = password.substr(0, endPass + 1);
+    if (endPass != std::string::npos)
+        password = password.substr(0, endPass + 1);
 
     if (client->isAuthenticated())
     {
+        Print::Warn("can't register");
         sendErrorReply(client, 462, ":You may not reregister");
-        return;
+        return ;
     }
 
-    if (password == _server->getPassword())
+    if(password == _server->getPassword())
+    {
+        Print::Ok("");
         client->setAuthenticated(true);
+    }
     else
+    {
+        Print::Warn("Password incorrect");
         sendErrorReply(client, 464, ":Password incorrect!");
+    }
 }

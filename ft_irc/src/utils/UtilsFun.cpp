@@ -6,12 +6,20 @@
 
 void Print::Debug(const std::string& str)
 {
-    if (DEBUG) std::cerr << Color::RED << "[DEBUG]: " << Color::RESET << str << std::endl;
+    if (DEBUG)
+    {
+        Print::Timestamp(Color::RED);
+        std::cerr << str << std::endl;
+    }
 }
 
 void Print::Log(const std::string& str)
 {
-    if (LOG) std::cerr << Color::RED << "[LOG]: " << Color::RESET << str << std::endl;
+    if (LOG)
+    {
+        Print::Timestamp(Color::BLUE);
+        std::cerr << str << std::endl;
+    }
 }
 
 void Print::StdOut(const std::string& str) { std::cout << str << std::endl; }
@@ -19,5 +27,56 @@ void Print::StdOut(const std::string& str) { std::cout << str << std::endl; }
 void Print::StdErr(const std::string& str) { std::cerr << str << std::endl; }
 
 void Print::Stream(std::ofstream& os, const std::string& str) { os << str << std::endl; }
+
+void    Print::Timestamp(const std::string& color)
+{
+    std::time_t	current_time_in_seconds = std::time(NULL);
+    std::tm		*time_struct = std::localtime(&current_time_in_seconds);
+
+    std::cout << color
+        << "[" 
+        << std::setfill('0') << std::setw(2) << time_struct->tm_hour
+        << std::setw(1) << ":"
+        << std::setfill('0') << std::setw(2) << time_struct->tm_min
+        << std::setw(1) << ":"
+        << std::setfill('0') << std::setw(2) << time_struct->tm_sec
+        << "] " << Color::RESET;
+}
+
+void    Print::Do(const std::string& str)
+{
+    if (LOG)
+    {
+        Print::Timestamp(Color::GREEN);
+        std::cout <<  std::setfill(' ') << std::left << std::setw(30) << str ;
+    }
+}
+
+void    Print::Ok(const std::string& str)
+{
+    if (LOG)
+    {
+        std::cout << std::setw(9) << Color::GREEN << "[  OK  ] ";
+        std::cout << Color::RESET << str << std::endl;
+    }
+}
+
+void    Print::Warn(const std::string& str)
+{
+    if (LOG)
+    {
+        std::cout << std::setw(9) << Color::YELLOW << "[ WARN ] ";
+        std::cout << Color::RESET << str << std::endl;
+    }
+}
+
+void    Print::Fail(const std::string& str)
+{
+    if (LOG)
+    {
+        std::cout << std::setw(9) << Color::RED << "[ FAIL ] ";
+        std::cout << Color::RESET << str << std::endl;
+    }
+}
 
 Print::Print() {}
