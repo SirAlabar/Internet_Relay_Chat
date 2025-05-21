@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "NickCommand.hpp"
 #include "Client.hpp"
 #include "Message.hpp"
+#include "NickCommand.hpp"
 #include "Server.hpp"
 
 NickCommand::NickCommand(Server* server) : ACommand(server) {}
@@ -28,10 +28,10 @@ ACommand* NickCommand::create(Server* server) { return (new NickCommand(server))
 void NickCommand::execute(Client* client, const Message& message)
 {
     Print::Do("executing NICK command");
-    if (!client)
+    if (!client || !client->isAuthenticated())
 
     {
-        Print::Fail("Client is NULL, returning");
+        Print::Fail("Client is NULL or not auth, returning");
         return;
     }
 
