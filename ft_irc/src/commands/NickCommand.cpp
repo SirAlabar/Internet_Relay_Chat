@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "NickCommand.hpp"
 #include "Client.hpp"
 #include "Message.hpp"
+#include "NickCommand.hpp"
 #include "Server.hpp"
 
 NickCommand::NickCommand(Server* server) : ACommand(server) {}
@@ -22,43 +22,32 @@ NickCommand& NickCommand::operator=(const NickCommand& other)
 }
 
 // Static create method for factory
-ACommand* NickCommand::create(Server* server)
-{
-    return (new NickCommand(server));
-}
+ACommand* NickCommand::create(Server* server) { return (new NickCommand(server)); }
 
 // Execute the NICK command
 void NickCommand::execute(Client* client, const Message& message)
 {
     Print::Debug("Starting execution of NICK command");
     if (!client)
-    
     {
         Print::Debug("Client is NULL, returning");
-        return ;
+        return;
     }
-    
-    // Get the parameters from the message
-    const std::string& params = message.getParams();
-    Print::Debug("NICK parameters: '" + params + "'");
+    // TODO: Move parser to a virtual Acommand::parse() = 0, so that we clean the execute
+    // function Get the parameters from the message
+    const std::string nickname = message.getParams(0);
+    Print::Debug("NICK parameters: '" + nickname + "'");
     // Parse the nickname from parameters
-    if (params.empty())
+    if (nickname.empty())
     {
         Print::Debug("Empty parameters, sending error");
         // No nickname provided, send error
         sendErrorReply(client, 431, "No nickname given");
-        return ;
+        return;
     }
     // Extract the nickname from params
-    std::string nickname = params;
-    // If the nickname contains spaces, only use the first part
-    size_t spacePos = nickname.find(' ');
-    if (spacePos != std::string::npos)
-    {
-        nickname = nickname.substr(0, spacePos);
-    }
-    // Validate the nickname
-    if (!isValidNickname(nickname))
+    if (!isValidNickname(nickname))  // TODO: sloth: I need to take only the first word
+                                     // even when we have `:`
     {
         sendErrorReply(client, 432, nickname + " :Erroneous nickname");
         return;
@@ -78,7 +67,7 @@ void NickCommand::execute(Client* client, const Message& message)
     client->setNickname(nickname);
     Print::Debug("Nickname updated to: '" + client->getNickname() + "'");
     // If the client was already registered, inform others about the nick
-    // change 
+    // change
     if (client->isAuthenticated())
     {
         std::string nickChangeNotice = ":" + oldNick + " NICK :" + nickname + "\r\n";

@@ -47,7 +47,6 @@ SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/utils/Socket.cpp \
        $(SRC_DIR)/core/Channel.cpp \
        $(SRC_DIR)/utils/UtilsFun.cpp \
-       $(SRC_DIR)/commands/CommandFactory.cpp \
        $(SRC_DIR)/commands/ACommand.cpp \
        $(SRC_DIR)/commands/NickCommand.cpp \
        $(SRC_DIR)/commands/connection/PassCommand.cpp
