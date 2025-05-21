@@ -6,7 +6,6 @@
 
 Message::Message(const std::string& rawMessage)
 {
-    Print::Log("rawMessage : " + rawMessage);
     std::istringstream message(rawMessage);
     message >> _command;
     std::string remainder;

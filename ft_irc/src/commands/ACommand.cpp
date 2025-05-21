@@ -17,7 +17,7 @@ ACommand& ACommand::operator=(const ACommand& other)
 {
     if (this != &other)
     {
-	_server = other._server;
+        _server = other._server;
     }
     return (*this);
 }
@@ -31,10 +31,10 @@ std::vector<std::string> ACommand::splitArguments(const std::string& args, char 
 
     while (std::getline(iss, token, delimiter))
     {
-	if (!token.empty())
-	{
-	    result.push_back(token);
-	}
+        if (!token.empty())
+        {
+            result.push_back(token);
+        }
     }
     return (result);
 }
@@ -45,17 +45,17 @@ bool ACommand::isValidChannelName(const std::string& channelName)
     // IRC channels typically start with # or &
     if (channelName.empty() || (channelName[0] != '#' && channelName[0] != '&'))
     {
-	return (false);
+        return (false);
     }
 
     // Check for invalid characters in channel name
     for (size_t i = 0; i < channelName.size(); ++i)
     {
-	// Spaces, control chars, commas, colons are not allowed
-	if (channelName[i] <= 32 || channelName[i] == ',' || channelName[i] == ':')
-	{
-	    return (false);
-	}
+        // Spaces, control chars, commas, colons are not allowed
+        if (channelName[i] <= 32 || channelName[i] == ',' || channelName[i] == ':')
+        {
+            return (false);
+        }
     }
 
     return (true);
@@ -66,23 +66,23 @@ bool ACommand::isValidNickname(const std::string& nickname)
 {
     if (nickname.empty())
     {
-	return (false);
+        return (false);
     }
 
     // First character should not be a special character
     if (nickname[0] == '#' || nickname[0] == '&' || nickname[0] == ':')
     {
-	return (false);
+        return (false);
     }
 
     // Check for invalid characters in nickname
     for (size_t i = 0; i < nickname.size(); ++i)
     {
-	// Spaces, control chars, commas, colons are not allowed
-	if (nickname[i] <= 32 || nickname[i] == ',' || nickname[i] == ':')
-	{
-	    return (false);
-	}
+        // Spaces, control chars, commas, colons are not allowed
+        if (nickname[i] <= 32 || nickname[i] == ',' || nickname[i] == ':')
+        {
+            return (false);
+        }
     }
 
     return (true);
@@ -104,12 +104,12 @@ void ACommand::sendNumericReply(Client* client, int numeric, const std::string& 
     {
         std::ostringstream oss;
         std::string nickname = client->getNickname();
-        
+
         if (nickname.empty())
         {
             nickname = "*";
         }
-        
+
         oss << ":server " << numeric << " " << nickname << " " << message << "\r\n";
         sendReply(client, oss.str());
     }

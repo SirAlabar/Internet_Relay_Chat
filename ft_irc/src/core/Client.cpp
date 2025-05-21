@@ -55,8 +55,8 @@ bool Client::sendMessage(const std::string& message)
     }
     else if (sentBytes < (ssize_t)message.length())
     {
-        Print::Log("WARNING: Partial send - only " + toString(sentBytes) + " of " +
-                   toString(message.length()) + " bytes sent");
+        Print::Debug("WARNING: Partial send - only " + toString(sentBytes) + " of " +
+                     toString(message.length()) + " bytes sent");
         // std::cout << "WARNING: Partial send - only " << sentBytes << " of "
         // 	  << message.length() << " bytes sent" << std::endl;
 
