@@ -109,7 +109,6 @@ void ACommand::sendNumericReply(Client* client, int numeric, const std::string& 
         {
             nickname = "*";
         }
-
         oss << ":server " << numeric << " " << nickname << " " << message << "\r\n";
         sendReply(client, oss.str());
     }

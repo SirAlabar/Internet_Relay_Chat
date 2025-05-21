@@ -1,4 +1,7 @@
 #include <iostream>
+#include "Client.hpp"
+#include "Message.hpp"
+#include "Server.hpp"
 
 #include "ACommand.hpp"
 #include "Client.hpp"
@@ -6,6 +9,7 @@
 #include "Message.hpp"
 #include "NickCommand.hpp"
 #include "Server.hpp"
+
 #include "connection/PassCommand.hpp"
 
 // Initialize static members
@@ -66,8 +70,9 @@ ACommand* CommandFactory::createCommand(const std::string& commandName, Server* 
     std::map<std::string, CommandCreator>::iterator it =
         _commandCreators.find(upperCommandName);
 
-    Print::Debug("Looking for command '" + upperCommandName +
-                 "': " + (it != _commandCreators.end() ? "Found" : "Not found"));
+
+    Print::Debug("Looking for command '" + upperCommandName + "': " + 
+               (it != _commandCreators.end() ? "Found" : "Not found"));
     // If found, create and return the command
     if (it != _commandCreators.end())
     {
@@ -84,6 +89,9 @@ void CommandFactory::executeCommand(Client* client, Server* server,
     std::string commandName = message.getCommand();
     Print::Debug("Attempting to execute command: " + commandName);
 
+    ACommand* command = createCommand(commandName, server);
+
+    
     ACommand* command = createCommand(commandName, server);
 
     if (command)

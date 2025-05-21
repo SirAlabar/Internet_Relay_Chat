@@ -2,9 +2,9 @@
 #include <cerrno>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 
 #include "Client.hpp"
-#include "CommandFactory.hpp"
 #include "Message.hpp"
 #include "Server.hpp"
 #include "CommandFactory.hpp"
@@ -206,6 +206,7 @@ void Server::run()
                 // 	  << " - keeping connection" << std::endl;
             }
         }
+        print_clients();
     }
 
     std::cout << "DEBUG: Exiting server main event loop" << std::endl;
@@ -338,18 +339,43 @@ void Server::processClientMessage(int clientFd)
         return;
     }
 
-    Message msg(buffer);
-    CommandFactory::executeCommand(client, this, msg);
     // Append to client buffer
     _clientBuffers[clientFd] += buffer;
-    Server::executeCommand(client, msg);
-
-    // TEST
-    std::string welcome =
-        ":server NOTICE * :Hello! You are connected to the IRC server\r\n";
-    client->sendMessage(welcome);
-
-    std::cout << "Sent welcome message to client FD: " << clientFd << std::endl;
+    
+    // Process complete messages (ending with \r\n)
+    std::string& clientBuffer = _clientBuffers[clientFd];
+    size_t pos;
+    
+    while ((pos = clientBuffer.find("\r\n")) != std::string::npos)
+    {
+        // Extract a complete message
+        std::string rawMessage = clientBuffer.substr(0, pos);
+        // Remove the processed message from the buffer
+        clientBuffer.erase(0, pos + 2);
+        
+        // Parse and execute the message
+        Message message = Message::parse(rawMessage);
+        Print::Debug("Processing command: " + message.getCommand());
+        
+        // Handle PING specially for keep-alive
+        if (message.getCommand() == "PING")
+        {
+            std::string pongReply = ":server PONG server :" + message.getParams() + "\r\n";
+            client->sendMessage(pongReply);
+        }
+        else
+        {
+            // Execute the command using factory
+            CommandFactory::executeCommand(client, this, message);
+        }
+    }
+    
+    // If buffer gets too large without complete messages, clear it (prevent DoS)
+    if (clientBuffer.size() > 4096)
+    {
+        clientBuffer.clear();
+        Print::StdErr("Warning: Client buffer overflow, clearing buffer");
+    }]
 }
 
 // Get server password
@@ -469,17 +495,19 @@ void Server::print_clients()
 {
     if (DEBUG)
     {
+
         std::map<int, Client*>::iterator it = _clients.begin();
         std::map<int, Client*>::iterator ite = _clients.end();
 
         for (; it != ite; it++)
         {
-            Print::Debug(
-                Color::YELLOW + "\n\tClient fd on server map: " + toString(it->first) +
-                "\n\tfd on Client class: " + it->second->getFdString() +
-                "\n\tnickname: " + it->second->getNickname() +
-                "\n\tusername: " + it->second->getUsername() +
-                "\n\tautenticated? == " + toString(it->second->isAuthenticated()));
+            Print::Debug(Color::YELLOW + 
+                         "\n\tClient fd on server map: " + toString(it->first) + 
+                         "\n\tfd on Client class: " + it->second->getFdString() + 
+                         "\n\tnickname: " + it->second->getNickname() + 
+                         "\n\tusername: " + it->second->getUsername() + 
+                         "\n\tautenticated? == " + toString(it->second->isAuthenticated())
+            );
         }
     }
 }

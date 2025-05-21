@@ -1,8 +1,9 @@
 #include <iostream>
 
+#include "NickCommand.hpp"
 #include "Client.hpp"
 #include "Message.hpp"
-#include "NickCommand.hpp"
+
 #include "Server.hpp"
 
 NickCommand::NickCommand(Server* server) : ACommand(server) {}
@@ -22,13 +23,18 @@ NickCommand& NickCommand::operator=(const NickCommand& other)
 }
 
 // Static create method for factory
-ACommand* NickCommand::create(Server* server) { return (new NickCommand(server)); }
+
+ACommand* NickCommand::create(Server* server)
+{
+    return (new NickCommand(server));
+}
 
 // Execute the NICK command
 void NickCommand::execute(Client* client, const Message& message)
 {
     Print::Debug("Starting execution of NICK command");
     if (!client)
+
     {
         Print::Debug("Client is NULL, returning");
         return;
@@ -67,7 +73,8 @@ void NickCommand::execute(Client* client, const Message& message)
     client->setNickname(nickname);
     Print::Debug("Nickname updated to: '" + client->getNickname() + "'");
     // If the client was already registered, inform others about the nick
-    // change
+    // change 
+
     if (client->isAuthenticated())
     {
         std::string nickChangeNotice = ":" + oldNick + " NICK :" + nickname + "\r\n";

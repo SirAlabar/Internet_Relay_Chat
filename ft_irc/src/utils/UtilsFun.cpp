@@ -2,6 +2,8 @@
 #include <sstream>
 
 #include "UtilsFun.hpp"
+#include "General.hpp"
+
 
 void Print::Debug(const std::string& str)
 {

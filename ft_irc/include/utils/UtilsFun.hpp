@@ -5,7 +5,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
 #include "General.hpp"
 
 class Print

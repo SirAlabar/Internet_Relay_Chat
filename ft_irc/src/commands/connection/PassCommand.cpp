@@ -1,6 +1,7 @@
 #include "PassCommand.hpp"
 #include "UtilsFun.hpp"
 
+
 PassCommand::PassCommand(Server* server) : ACommand(server) {}
 
 PassCommand::~PassCommand() {}
@@ -18,12 +19,15 @@ PassCommand& PassCommand::operator=(const PassCommand& other)
 }
 
 // Static creator for factory
-ACommand* PassCommand::create(Server* server) { return (new PassCommand(server)); }
+
+ACommand* PassCommand::create(Server* server)
+{
+    return (new PassCommand(server));
+}
 
 void PassCommand::execute(Client* client, const Message& message)
 {
     Print::Debug("Starting execution of PASS command");
-
     if (!client)
     {
         Print::Debug("Client is NULL, returning");
@@ -48,10 +52,11 @@ void PassCommand::execute(Client* client, const Message& message)
     if (client->isAuthenticated())
     {
         sendErrorReply(client, 462, ":You may not reregister");
-        return;
+
+        return ;
     }
 
-    if (password == _server->getPassword())
+    if(password == _server->getPassword())
         client->setAuthenticated(true);
     else
         sendErrorReply(client, 464, ":Password incorrect!");

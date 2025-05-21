@@ -57,6 +57,7 @@ bool Client::sendMessage(const std::string& message)
     {
         Print::Debug("WARNING: Partial send - only " + toString(sentBytes) + " of " +
                      toString(message.length()) + " bytes sent");
+
         // std::cout << "WARNING: Partial send - only " << sentBytes << " of "
         // 	  << message.length() << " bytes sent" << std::endl;
 
