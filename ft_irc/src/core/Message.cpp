@@ -1,42 +1,60 @@
 #include <sstream>
+#include <string>
 
+#include "CommandFactory.hpp"
 #include "Message.hpp"
+#include "UtilsFun.hpp"
 
 Message::Message(const std::string& rawMessage)
 {
-	// Simple parsing of IRC message
-	std::string message = rawMessage;
+    std::istringstream message(rawMessage);
+    message >> _command;
+    std::string remainder;
+    std::getline(message, remainder);
+    _params = parseParams(remainder);
 
-	// Check for prefix
-	if (!message.empty() && message[0] == ':')
-	{
-		size_t spacePos = message.find(' ');
-		if (spacePos != std::string::npos)
-		{
-			_prefix = message.substr(1, spacePos - 1);
-			message = message.substr(spacePos + 1);
-		}
-	}
-
-	// Extract command
-	size_t spacePos = message.find(' ');
-	if (spacePos != std::string::npos)
-	{
-		_command = message.substr(0, spacePos);
-		_params = message.substr(spacePos + 1);
-	}
-	else
-	{
-		_command = message;
-	}
+    Print::Debug("Command: " + _command);
+    Print::Debug("_params: ");
+    for (size_t i = 0; i < _params.size(); i++)
+    {
+        Print::Debug(_params[i]);
+    }
+    Print::Debug("Command: " + _command);
+    Print::Debug("Params: " + _params);
 }
 
 Message::~Message() {}
 
-const std::string& Message::getPrefix() const { return _prefix; }
-
 const std::string& Message::getCommand() const { return _command; }
 
-const std::string& Message::getParams() const { return _params; }
+const std::vector<std::string> Message::getParams() const { return _params; }
+const std::string Message::getParams(size_t i) const
+{
+    if (i < _params.size())
+        return _params[i];
+    else
+        return "";
+}
 
-Message Message::parse(const std::string& rawMessage) { return Message(rawMessage); }
+size_t Message::getSize() const { return _params.size(); }
+
+std::vector<std::string> Message::parseParams(const std::string& rawMessage)
+{
+    std::vector<std::string> result;
+    std::istringstream iss(rawMessage);
+    std::string temp;
+    if (rawMessage.find(":") == rawMessage.npos)
+    {
+        while (iss >> temp) result.push_back(temp);
+    }
+    else
+    {
+        std::istringstream before(rawMessage.substr(0, rawMessage.find(':')));
+        std::istringstream after(
+            rawMessage.substr(rawMessage.find(':') + 1, rawMessage.length()));
+        while (before >> temp) result.push_back(temp);
+        std::getline(after, temp);
+        if (temp.length() > 0) result.push_back(temp);
+    }
+    return result;
+}
