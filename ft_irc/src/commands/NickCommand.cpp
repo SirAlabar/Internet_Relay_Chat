@@ -39,7 +39,15 @@ void NickCommand::execute(Client* client, const Message& message)
     }
     // TODO: Move parser to a virtual Acommand::parse() = 0, so that we clean the execute
     // function Get the parameters from the message
-    const std::string nickname = message.getParams(0);
+    try
+    {
+        const std::string nickname = message.getParams(0);
+    }
+    catch (std::exception& e)
+    {
+        Print::StdErr(e.what());
+        return;
+    }
     Print::Debug("NICK parameters: '" + nickname + "'");
     // Parse the nickname from parameters
     if (nickname.empty())
