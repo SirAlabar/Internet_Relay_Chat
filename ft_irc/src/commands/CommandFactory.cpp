@@ -52,7 +52,7 @@ ACommand* CommandFactory::createCommand(const std::string& commandName, Server* 
 {
     if (!_initialized)
     {
-	initializeCommands();
+        initializeCommands();
     }
 
     // Convert command to uppercase for case-insensitive comparison

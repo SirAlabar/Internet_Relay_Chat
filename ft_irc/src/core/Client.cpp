@@ -17,9 +17,9 @@ int Client::getFd() const { return _fd; }
 
 std::string Client::getFdString() const
 {
-    std::stringstream ss;
-    ss << _fd;
-    return ss.str();
+	std::stringstream ss;
+	ss << _fd;
+	return ss.str();
 }
 
 const std::string& Client::getNickname() const { return _nickname; }
@@ -37,36 +37,36 @@ void Client::setAuthenticated(bool auth) { _authenticated = auth; }
 // No arquivo Client.cpp
 bool Client::sendMessage(const std::string& message)
 {
-    Print::Debug("Attempting to send to client FD: " + getFdString());
-    Print::Debug(message);
+	Print::Debug("Attempting to send to client FD: " + getFdString());
+	Print::Debug(message);
 
-    // Usar MSG_NOSIGNAL para evitar SIGPIPE que poderia derrubar o servidor
-    ssize_t sentBytes = send(_fd, message.c_str(), message.length(), MSG_NOSIGNAL);
+	// Usar MSG_NOSIGNAL para evitar SIGPIPE que poderia derrubar o servidor
+	ssize_t sentBytes = send(_fd, message.c_str(), message.length(), MSG_NOSIGNAL);
 
-    if (sentBytes < 0)
-    {
-        Print::StdErr("sending message: " + toString(strerror(errno)) +
-                      " (errno: " + toString(errno));
-        // std::cerr << "ERROR sending message: " << strerror(errno) << " (errno: " <<
-        // errno
-        // 	  << ")" << std::endl;
+	if (sentBytes < 0)
+	{
+		Print::StdErr("sending message: " + toString(strerror(errno)) +
+					  " (errno: " + toString(errno));
+		// std::cerr << "ERROR sending message: " << strerror(errno) << " (errno: " <<
+		// errno
+		// 	  << ")" << std::endl;
 
-        return false;
-    }
-    else if (sentBytes < (ssize_t)message.length())
-    {
-        Print::Log("WARNING: Partial send - only " + toString(sentBytes) + " of " +
-                   toString(message.length()) + " bytes sent");
-        // std::cout << "WARNING: Partial send - only " << sentBytes << " of "
-        // 	  << message.length() << " bytes sent" << std::endl;
+		return false;
+	}
+	else if (sentBytes < (ssize_t)message.length())
+	{
+		Print::Log("WARNING: Partial send - only " + toString(sentBytes) + " of " +
+				   toString(message.length()) + " bytes sent");
+		// std::cout << "WARNING: Partial send - only " << sentBytes << " of "
+		// 	  << message.length() << " bytes sent" << std::endl;
 
-        return false;
-    }
-    else
-    {
-        Print::Debug("Successfully sent " + toString(sentBytes) + " bytes");
-        // std::cout << "DEBUG: Successfully sent " << sentBytes << " bytes" << std::endl;
+		return false;
+	}
+	else
+	{
+		Print::Debug("Successfully sent " + toString(sentBytes) + " bytes");
+		// std::cout << "DEBUG: Successfully sent " << sentBytes << " bytes" << std::endl;
 
-        return true;
-    }
+		return true;
+	}
 }
