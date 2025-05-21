@@ -6,8 +6,8 @@
 #endif  // !DEBUG
 
 #ifndef LOG
-#define LOG 0
-#endif	// !LOG
+#define LOG 1
+#endif  // !LOG
 
 #include <string>
 namespace Color

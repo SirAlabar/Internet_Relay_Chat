@@ -29,22 +29,13 @@ void NickCommand::execute(Client* client, const Message& message)
 {
     Print::Debug("Starting execution of NICK command");
     if (!client)
-    
     {
         Print::Debug("Client is NULL, returning");
         return;
     }
     // TODO: Move parser to a virtual Acommand::parse() = 0, so that we clean the execute
     // function Get the parameters from the message
-    try
-    {
-        const std::string nickname = message.getParams(0);
-    }
-    catch (std::exception& e)
-    {
-        Print::StdErr(e.what());
-        return;
-    }
+    const std::string nickname = message.getParams(0);
     Print::Debug("NICK parameters: '" + nickname + "'");
     // Parse the nickname from parameters
     if (nickname.empty())
