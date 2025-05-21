@@ -185,7 +185,7 @@ void Server::stop()
 		 it != _clientSockets.end(); ++it)
 	{
 		int fd = it->first;
-		Print::StdOut("Explicitly closing client socket FD: " + fd);
+		Print::StdOut("Explicitly closing client socket FD: " + toString(fd));
 		if (it->second && it->second->isValid())
 		{
 			it->second->close();
