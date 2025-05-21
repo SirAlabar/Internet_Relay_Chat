@@ -1,12 +1,13 @@
 #include <iostream>
-#include "Client.hpp"
-#include "Message.hpp"
-#include "Server.hpp"
 
-#include "CommandFactory.hpp"
 #include "ACommand.hpp"
+#include "Client.hpp"
+#include "CommandFactory.hpp"
+#include "Message.hpp"
 #include "NickCommand.hpp"
-#include "connection/PassCommand.hpp"
+#include "PassCommand.hpp"
+#include "Server.hpp"
+#include "UserCommand.hpp"
 
 // Initialize static members
 std::map<std::string, CommandFactory::CommandCreator> CommandFactory::_commandCreators;
@@ -32,7 +33,7 @@ void CommandFactory::initializeCommands()
     registerCommand("NICK", &NickCommand::create);
     registerCommand("PASS", &PassCommand::create);
     // registerCommand("QUIT", &QuitCommand::create);
-    // registerCommand("USER", &UserCommand::create);
+    registerCommand("USER", &UserCommand::create);
 
     // Messaging commands
     // registerCommand("NOTICE", &NoticeCommand::create);
@@ -48,7 +49,7 @@ void CommandFactory::initializeCommands()
 }
 
 // Creates a command based on command name
-ACommand* CommandFactory::createCommand(const std::string& commandName, Server* server)
+ACommand *CommandFactory::createCommand(const std::string &commandName, Server *server)
 {
     if (!_initialized)
     {
@@ -64,10 +65,10 @@ ACommand* CommandFactory::createCommand(const std::string& commandName, Server* 
 
     // Look up the command in the map
     std::map<std::string, CommandCreator>::iterator it =
-	_commandCreators.find(upperCommandName);
+        _commandCreators.find(upperCommandName);
 
-    Print::Debug("Looking for command '" + upperCommandName + "': " + 
-               (it != _commandCreators.end() ? "Found" : "Not found"));
+    Print::Debug("Looking for command '" + upperCommandName +
+                 "': " + (it != _commandCreators.end() ? "Found" : "Not found"));
     // If found, create and return the command
     if (it != _commandCreators.end())
     {
@@ -78,14 +79,14 @@ ACommand* CommandFactory::createCommand(const std::string& commandName, Server* 
 }
 
 // Execute the appropriate command based on the message
-void CommandFactory::executeCommand(Client* client, Server* server,
-				    const Message& message)
+void CommandFactory::executeCommand(Client *client, Server *server,
+                                    const Message &message)
 {
     std::string commandName = message.getCommand();
     Print::Debug("Attempting to execute command: " + commandName);
-    
-    ACommand* command = createCommand(commandName, server);
-    
+
+    ACommand *command = createCommand(commandName, server);
+
     if (command)
     {
         Print::Debug("Command created successfully, executing...");
@@ -115,8 +116,8 @@ void CommandFactory::executeCommand(Client* client, Server* server,
 }
 
 // Register a new command creator
-void CommandFactory::registerCommand(const std::string& commandName,
-				     CommandCreator creator)
+void CommandFactory::registerCommand(const std::string &commandName,
+                                     CommandCreator creator)
 {
     std::string upperCommandName = commandName;
     for (size_t i = 0; i < upperCommandName.size(); ++i)
@@ -127,7 +128,7 @@ void CommandFactory::registerCommand(const std::string& commandName,
 }
 
 // Check if a command exists
-bool CommandFactory::commandExists(const std::string& commandName)
+bool CommandFactory::commandExists(const std::string &commandName)
 {
     if (!_initialized)
     {

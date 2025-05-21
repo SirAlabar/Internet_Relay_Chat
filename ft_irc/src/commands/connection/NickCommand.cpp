@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "NickCommand.hpp"
 #include "Client.hpp"
 #include "Message.hpp"
+#include "NickCommand.hpp"
 #include "Server.hpp"
 
 NickCommand::NickCommand(Server* server) : ACommand(server) {}
@@ -27,11 +27,11 @@ ACommand* NickCommand::create(Server* server) { return (new NickCommand(server))
 // Execute the NICK command
 void NickCommand::execute(Client* client, const Message& message)
 {
-    Print::Debug("Starting execution of NICK command");
-    if (!client)
+    Print::Do("executing NICK command");
+    if (!client || !client->isAuthenticated())
 
     {
-        Print::Debug("Client is NULL, returning");
+        Print::Fail("Client is NULL or not auth, returning");
         return;
     }
 
@@ -41,7 +41,7 @@ void NickCommand::execute(Client* client, const Message& message)
     // Parse the nickname from parameters
     if (params.empty())
     {
-        Print::Debug("Empty parameters, sending error");
+        Print::Fail("Empty parameters, sending error");
         // No nickname provided, send error
         sendErrorReply(client, 431, "No nickname given");
         return;
@@ -81,12 +81,12 @@ void NickCommand::execute(Client* client, const Message& message)
         std::string nickChangeNotice = ":" + oldNick + " NICK :" + nickname + "\r\n";
         // Send to all channels the client is in
         // client->broadcastToChannels(nickChangeNotice);
-        Print::Debug("Sending response");
+        Print::Ok("Sending response...");
         client->sendMessage(nickChangeNotice);
     }
     else
     {
-        Print::Debug("Sending confirmation to unauthenticated client");
+        Print::Warn("Sending confirmation to unauthenticated client");
         std::string confirmation = ":server NICK :" + nickname + "\r\n";
         client->sendMessage(confirmation);
         // Check if the client has completed registration (has both nickname

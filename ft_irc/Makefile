@@ -49,7 +49,8 @@ SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/commands/CommandFactory.cpp \
        $(SRC_DIR)/commands/ACommand.cpp \
        $(SRC_DIR)/commands/connection/NickCommand.cpp \
-       $(SRC_DIR)/commands/connection/PassCommand.cpp
+       $(SRC_DIR)/commands/connection/PassCommand.cpp \
+       $(SRC_DIR)/commands/connection/UserCommand.cpp
 
 
 # Object files
