@@ -1,12 +1,15 @@
 #include <iostream>
 
+#include "Server.hpp"
 #include "ACommand.hpp"
 #include "Client.hpp"
 #include "CommandFactory.hpp"
 #include "Message.hpp"
 #include "NickCommand.hpp"
+#include "CapCommand.hpp"
 #include "PassCommand.hpp"
-#include "Server.hpp"
+#include "PingCommand.hpp"
+#include "PongCommand.hpp"
 #include "UserCommand.hpp"
 
 // Initialize static members
@@ -30,10 +33,13 @@ void CommandFactory::initializeCommands()
     // registerCommand("TOPIC", &TopicCommand::create);
 
     // Connection commands
+    registerCommand("CAP", &CapCommand::create);
     registerCommand("NICK", &NickCommand::create);
     registerCommand("PASS", &PassCommand::create);
     // registerCommand("QUIT", &QuitCommand::create);
     registerCommand("USER", &UserCommand::create);
+    registerCommand("PING", &PingCommand::create);
+    registerCommand("PONG", &PongCommand::create);
 
     // Messaging commands
     // registerCommand("NOTICE", &NoticeCommand::create);

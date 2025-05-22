@@ -29,5 +29,23 @@ ACommand* PongCommand::create(Server* server)
 // Execute the PONG command
 void PongCommand::execute(Client* client, const Message& message)
 {
-	// Future implementation
+	Print::Do("execute PONG command");
+
+	if (!client)
+	{
+		Print::Fail("Client NULL");
+		return;
+	}
+
+	// PONG is a response to PING
+	if (message.getSize() > 0)
+	{
+		Print::Debug("PONG received with token: " + message.getParams(0));
+	}
+	else
+	{
+		Print::Debug("PONG received without token");
+	}
+	
+	Print::Ok("client is alive");
 }
