@@ -435,19 +435,29 @@ void Server::broadcast(const std::string& message, int excludeFd)
 
 Channel* Server::createChannel(const std::string& name, Client* creator)
 {
-    // For initial testing, we'll just implement a stub
-    // Return NULL for now
-    std::cout << "Channel creation requested: " << name << std::endl;
-    return NULL;
+    Print::Do("Channel creation requested: ");
+    Channel* channel = new Channel(name);
+    channel->addClient(creator);
+    channel->addOperator(creator);
+    if (channel)
+        return Print::Ok("Channel added to server"), addChannel(channel), channel;
+    else
+    {
+        Print::Fail("Failed to create Channel");
+        return NULL;
+    }
 }
 
+void Server::addChannel(Channel* channel)
+{
+    if (channel) _channels[channel->getName()] = channel;
+}
 void Server::print_clients()
 {
     if (DEBUG)
     {
         std::map<int, Client*>::iterator it = _clients.begin();
         std::map<int, Client*>::iterator ite = _clients.end();
-
         for (; it != ite; it++)
         {
             Print::Debug(
