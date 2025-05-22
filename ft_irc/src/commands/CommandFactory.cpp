@@ -5,6 +5,7 @@
 #include "CommandFactory.hpp"
 #include "Message.hpp"
 #include "NickCommand.hpp"
+#include "CapCommand.hpp"
 #include "PassCommand.hpp"
 #include "Server.hpp"
 #include "UserCommand.hpp"
@@ -30,6 +31,7 @@ void CommandFactory::initializeCommands()
     // registerCommand("TOPIC", &TopicCommand::create);
 
     // Connection commands
+    registerCommand("CAP", &CapCommand::create);
     registerCommand("NICK", &NickCommand::create);
     registerCommand("PASS", &PassCommand::create);
     // registerCommand("QUIT", &QuitCommand::create);
