@@ -46,18 +46,24 @@ void JoinCommand::execute(Client* client, const Message& message)
     if (!isValidChannelName(channelName))
     {
         Print::Fail("wrong channel name");
-        sendErrorReply(client, 403, channelName + " :No such channel");
+        sendErrorReply(client, 461, "USER :");
         return;
     }
     Channel* channel = _server->getChannel(channelName);
-    if (!channel) _server->createChannel(channelName, client);
-    channel->addClient(client);
-    std::string joinMessage =
-        ":" + client->getNickname() + " JOIN :" + channelName + "\r\n";
-    Print::Ok("Join OK");
-    client->sendMessage(joinMessage);
+    if (!channel)
+    {
+        _server->createChannel(channelName, client);
+        _server->getChannels()[channelName] = channel;
+    }
+    else
+    {
+        channel->addClient(client);
+        std::string joinMessage =
+            ":" + client->getNickname() + " JOIN :" + channelName + "\r\n";
+        client->sendMessage(joinMessage);
 
-    if (!channel->getTopic().empty())
-        sendNumericReply(client, 332, channelName + " :" + channel->getTopic());
+        if (!channel->getTopic().empty())
+            sendNumericReply(client, 332, channelName + " :" + channel->getTopic());
+    }
     // Future implementation
 }
