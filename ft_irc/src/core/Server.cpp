@@ -22,42 +22,42 @@ Server::~Server() { stop(); }
 bool Server::setupServer(int port, const std::string& password)
 {
     _password = password;
-
+    Print::Do("SetupServer...");
     // Create the server socket
     if (!_serverSocket.create(AF_INET, SOCK_STREAM, 0))
     {
-        Print::StdErr("Error creating socket: " + toString(_serverSocket.getLastError()));
+        Print::Fail("Error creating socket: " + toString(_serverSocket.getLastError()));
         return (false);
     }
     // Configure socket options
     int opt = 1;
     if (!_serverSocket.setOption(SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
     {
-        Print::StdErr("Error setting socket options: " +
+        Print::Fail("Error setting socket options: " +
                       toString(_serverSocket.getLastError()));
         return (false);
     }
     // Set as non-blocking
     if (!_serverSocket.setNonBlocking())
     {
-        Print::StdErr("Error setting socket to non-blocking: " +
+        Print::Fail("Error setting socket to non-blocking: " +
                       toString(_serverSocket.getLastError()));
         return (false);
     }
     // Bind the socket to the port
     if (!_serverSocket.bind(port))
     {
-        Print::StdErr("Error binding: " + toString(_serverSocket.getLastError()));
+        Print::Fail("Error binding: " + toString(_serverSocket.getLastError()));
         return (false);
     }
     // Listen for connections
     if (!_serverSocket.listen(10))
     {
-        Print::StdErr("Error listening: " + toString(_serverSocket.getLastError()));
+        Print::Fail("Error listening: " + toString(_serverSocket.getLastError()));
         return (false);
     }
 
-    Print::StdOut("IRC Server started on port " + toString(port));
+    Print::Ok("IRC Server started on port " + toString(port));
 
     return (true);
 }
@@ -169,21 +169,22 @@ void Server::run()
 // Stop the server and clean up resources
 void Server::stop()
 {
-    std::cout << "Starting server shutdown process..." << std::endl;
+    Print::Do("Starting server shutdown process...             \n");
     _running = false;
 
     // Close Clients
-    Print::StdOut("Cleaning up " + toString(_clients.size()) + " clients...");
+    Print::Do("Cleaning up " + toString(_clients.size()) + " clients...");
     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();
          ++it)
     {
         delete it->second;
     }
     _clients.clear();
+    Print::Ok("clients clear!");
 
     // Cloese client sockets
-    Print::StdOut("Cleaning up " + toString(_clientSockets.size()) +
-                  " client sockets...");
+    Print::Do("Cleaning up " + toString(_clientSockets.size()) +
+                  " client sockets...              \n");
     for (std::map<int, Socket*>::iterator it = _clientSockets.begin();
          it != _clientSockets.end(); ++it)
     {
@@ -196,41 +197,44 @@ void Server::stop()
         delete it->second;
     }
     _clientSockets.clear();
+    Print::Ok("Sockets cleared!");
 
     // Close channels
-    Print::StdOut("Cleaning up " + toString(_channels.size()) + " channels...");
+    Print::Do("Cleaning up " + toString(_channels.size()) + " channels...");
     for (std::map<std::string, Channel*>::iterator it = _channels.begin();
          it != _channels.end(); ++it)
     {
         delete it->second;
     }
     _channels.clear();
+    Print::Ok("channels cleared!");
 
     // Clear poll
-    Print::StdOut("Freeing poll file descriptors data...");
+    Print::Do("Freeing poll file descriptors data...");
     {
         std::vector<pollfd>().swap(_pollFds);
+        Print::Ok("");
     }
 
     // Close server socket
-    Print::StdOut("Closing server socket...");
+    Print::Do("Closing server socket...");
     _serverSocket.close();
 
-    Print::StdOut("IRC Server shutdown complete.");
+    Print::Ok("IRC Server shutdown complete.");
 }
 
 // Process a new client connection
 void Server::processNewConnection()
 {
+    Print::Do("ProcessNewConnection");
     Socket* clientSocket = new Socket(_serverSocket.accept());
     if (!clientSocket->isValid())
     {
-        std::cerr << "Error accepting connection: " << _serverSocket.getLastError()
-                  << std::endl;
+        Print::Fail("Error accepting connection: " + _serverSocket.getLastError());
         return;
     }
 
-    std::cout << "DEBUG: Socket accepted successfully" << std::endl;
+    Print::Ok("Socket accepted successfully");
 
     // Set client socket as non-blocking
     clientSocket->setNonBlocking();
@@ -252,7 +256,7 @@ void Server::processNewConnection()
     std::string welcomeMsg = ":server 001 * :Welcome to the IRC server!\r\n";
     client->sendMessage(welcomeMsg);
 
-    std::cout << "New connection accepted. FD: " << clientFd << std::endl;
+    Print::Ok("New connection accepted. FD: " + toString(clientFd));
 }
 
 void Server::processClientMessage(int clientFd)

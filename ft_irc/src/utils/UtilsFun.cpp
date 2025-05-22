@@ -32,8 +32,8 @@ void    Print::Timestamp(const std::string& color)
 {
     std::time_t	current_time_in_seconds = std::time(NULL);
     std::tm		*time_struct = std::localtime(&current_time_in_seconds);
-
-    std::cout << color
+    char originalFill = std::cout.fill();
+    std::cout << std::setw(0) << color
         << "[" 
         << std::setfill('0') << std::setw(2) << time_struct->tm_hour
         << std::setw(1) << ":"
@@ -41,6 +41,7 @@ void    Print::Timestamp(const std::string& color)
         << std::setw(1) << ":"
         << std::setfill('0') << std::setw(2) << time_struct->tm_sec
         << "] " << Color::RESET;
+    std::cout.fill(originalFill);
 }
 
 void    Print::Do(const std::string& str)
@@ -48,7 +49,8 @@ void    Print::Do(const std::string& str)
     if (LOG)
     {
         Print::Timestamp(Color::GREEN);
-        std::cout <<  std::setfill(' ') << std::left << std::setw(30) << str ;
+        std::cout << std::left << std::setw(35) << str ;
+        std::cout << std::setw(0);
     }
 }
 

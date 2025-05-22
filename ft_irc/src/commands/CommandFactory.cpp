@@ -74,7 +74,7 @@ ACommand *CommandFactory::createCommand(const std::string &commandName, Server *
     {
         return (it->second(server));  // return command creator
     }
-    std::cout << "Unknown command: " << commandName << std::endl;
+    Print::Warn("Unknown command: " + commandName);
     return (NULL);
 }
 

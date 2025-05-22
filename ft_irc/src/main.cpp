@@ -50,15 +50,15 @@ int main(int argc, char* argv[])
 	Server server;
 	g_server = &server;
 
-	Print::StdOut("Starting IRC server on port " + toString(port));
+	Print::Do("Starting IRC server on port " + toString(port) + "              \n");
 
 	if (!server.start(port, password))
 	{
-		std::cerr << "Failed to start server. Exiting." << std::endl;
+        Print::Fail("Failed to start server. Exiting...");
 		return 1;
 	}
 
-	Print::StdOut("Server started successfully. Waiting for connections...");
+	Print::Do("Server started. Waiting connections...\n");
 
 	// Run the server main loop
 	server.run();
