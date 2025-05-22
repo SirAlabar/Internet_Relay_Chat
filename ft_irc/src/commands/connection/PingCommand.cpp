@@ -29,5 +29,36 @@ ACommand* PingCommand::create(Server* server)
 // Execute the PING command
 void PingCommand::execute(Client* client, const Message& message)
 {
-	// Future implementation
+	Print::Do("execute PING command");
+
+	if (!client)
+	{
+		Print::Fail("Client NULL");
+		return;
+	}
+
+	// PING requires at least one parameter
+	if (message.getSize() == 0)
+	{
+		Print::Fail("no parameters");
+		sendErrorReply(client, 409, ":No origin specified");
+		return;
+	}
+
+	// Get the ping token/server
+	std::string token = message.getParams(0);
+	Print::Debug("PING token: " + token);
+
+	// Format: :server PONG server :token
+	std::string pongReply = ":server PONG server :" + token + "\r\n";
+	
+	// Send PONG back to client
+	if (client->sendMessage(pongReply))
+	{
+		Print::Ok("PONG sent");
+	}
+	else
+	{
+		Print::Fail("Failed to send PONG");
+	}
 }
