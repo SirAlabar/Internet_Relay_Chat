@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <sstream>
+#include <string>
 
 #include "ACommand.hpp"
 #include "Client.hpp"
@@ -43,16 +44,16 @@ std::vector<std::string> ACommand::splitArguments(const std::string& args, char 
 bool ACommand::isValidChannelName(const std::string& channelName)
 {
     // IRC channels typically start with # or &
-    if (channelName.empty() || (channelName[0] != '#' && channelName[0] != '&'))
-    {
+    Print::Warn("Valid Name? '" + channelName + "'");
+    if (channelName.empty() || (channelName[0] == '#' || channelName[0] == '&'))
         return (false);
-    }
 
     // Check for invalid characters in channel name
-    for (size_t i = 0; i < channelName.size(); ++i)
+    for (size_t i = 1; i < channelName.size(); ++i)
     {
         // Spaces, control chars, commas, colons are not allowed
-        if (channelName[i] <= 32 || channelName[i] == ',' || channelName[i] == ':')
+        if (channelName[i] <= 32 || channelName[i] == ',' || channelName[i] == ':' ||
+            channelName[i] == 7)
         {
             return (false);
         }
@@ -104,12 +105,12 @@ void ACommand::sendNumericReply(Client* client, int numeric, const std::string& 
     {
         std::ostringstream oss;
         std::string nickname = client->getNickname();
-        
+
         if (nickname.empty())
         {
             nickname = "*";
         }
-        
+
         oss << ":server " << numeric << " " << nickname << " " << message << "\r\n";
         sendReply(client, oss.str());
     }

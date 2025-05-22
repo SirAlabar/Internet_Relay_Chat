@@ -3,6 +3,7 @@
 #include "ACommand.hpp"
 #include "Client.hpp"
 #include "CommandFactory.hpp"
+#include "JoinCommand.hpp"
 #include "Message.hpp"
 #include "NickCommand.hpp"
 #include "PassCommand.hpp"
@@ -23,7 +24,7 @@ void CommandFactory::initializeCommands()
 
     // Channel commands
     // registerCommand("INVITE", &InviteCommand::create);
-    // registerCommand("JOIN", &JoinCommand::create);
+    registerCommand("JOIN", &JoinCommand::create);
     // registerCommand("KICK", &KickCommand::create);
     // registerCommand("MODE", &ModeCommand::create);
     // registerCommand("PART", &PartCommand::create);
