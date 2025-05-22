@@ -10,19 +10,19 @@ class Message;
 class JoinCommand : public ACommand
 {
 private:
-	// Private to prevent copying
-	JoinCommand(const JoinCommand& other);
-	JoinCommand& operator=(const JoinCommand& other);
+    // Private to prevent copying
+    JoinCommand(const JoinCommand& other);
+    JoinCommand& operator=(const JoinCommand& other);
 
 public:
-	JoinCommand(Server* server);
-	virtual ~JoinCommand();
+    JoinCommand(Server* server);
+    virtual ~JoinCommand();
 
-	// Execute the JOIN command
-	virtual void execute(Client* client, const Message& message);
+    // Execute the JOIN command
+    virtual void execute(Client* client, const Message& message);
 
-	// Static creator for factory
-	static ACommand* create(Server* server);
+    // Static creator for factory
+    static ACommand* create(Server* server);
 };
 
 #endif
