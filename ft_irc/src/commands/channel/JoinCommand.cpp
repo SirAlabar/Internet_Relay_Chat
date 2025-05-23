@@ -30,9 +30,9 @@ ACommand* JoinCommand::create(Server* server) { return (new JoinCommand(server))
 void JoinCommand::execute(Client* client, const Message& message)
 {
     Print::Do("executing JOIN command");
-    if (!client || !client->isAuthenticated() || client->getUsername().empty())
+    if (!client || !client->isAuthenticated() || client->getNickname().empty())
     {
-        Print::Fail("Client NULL, not auth or without Username");
+        Print::Fail("Client NULL, not auth or without NickName");
         return;
     }
 
@@ -46,22 +46,31 @@ void JoinCommand::execute(Client* client, const Message& message)
     if (!isValidChannelName(channelName))
     {
         Print::Fail("wrong channel name");
-        sendErrorReply(client, 461, "USER :");
         return;
+        sendErrorReply(client, 403, channelName + " :No such channel");
     }
     Channel* channel = _server->getChannel(channelName);
     if (!channel)
     {
-        _server->createChannel(channelName, client);
+        channel = _server->createChannel(channelName, client);
         _server->getChannels()[channelName] = channel;
     }
     else
     {
-        channel->addClient(client);
-        std::string joinMessage =
-            ":" + client->getNickname() + " JOIN :" + channelName + "\r\n";
-        client->sendMessage(joinMessage);
-
+        Print::Debug(channel->getName());
+        if (channel->getClients().find(client->getFd()) != channel->getClients().end())
+        {
+            Print::Fail("User already in channel");
+            sendErrorReply(client, 403, channelName + " :No such channel");
+            return;
+        }
+        else
+        {
+            channel->addClient(client);
+            std::string joinMessage =
+                ":" + client->getNickname() + " JOIN :" + channelName + "\r\n";
+            client->sendMessage(joinMessage);
+        }
         if (!channel->getTopic().empty())
             sendNumericReply(client, 332, channelName + " :" + channel->getTopic());
     }

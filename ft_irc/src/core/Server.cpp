@@ -440,7 +440,10 @@ Channel* Server::createChannel(const std::string& name, Client* creator)
     channel->addClient(creator);
     channel->addOperator(creator);
     if (channel)
-        return Print::Ok("Channel added to server"), addChannel(channel), channel;
+    {
+        Print::Ok("Channel added to server");
+        return channel;
+    }
     else
     {
         Print::Fail("Failed to create Channel");
@@ -452,6 +455,7 @@ void Server::addChannel(Channel* channel)
 {
     if (channel) _channels[channel->getName()] = channel;
 }
+
 void Server::print_clients()
 {
     if (DEBUG)
@@ -461,11 +465,24 @@ void Server::print_clients()
         for (; it != ite; it++)
         {
             Print::Debug(
-                Color::YELLOW + "\n\tClient fd on server map: " + toString(it->first) +
-                "\n\tfd on Client class: " + it->second->getFdString() +
-                "\n\tnickname: " + it->second->getNickname() +
-                "\n\tusername: " + it->second->getUsername() +
+                Color::YELLOW + "\tFd server map: " + toString(it->first) +
+                "\tfd Client: " + it->second->getFdString() + "\n\tnick: " +
+                it->second->getNickname() + "\tuser: " + it->second->getUsername() +
                 "\n\tautenticated? == " + toString(it->second->isAuthenticated()));
+        }
+        std::map<std::string, Channel*>::iterator itch = _channels.begin();
+        for (; itch != _channels.end(); itch++)
+        {
+            Print::Debug(Color::YELLOW + "\tChannel Name   :" + itch->second->getName() +
+                         // "\n\t" + itch->second->getTopic() +
+                         "");
+            for (std::map<int, Client*>::const_iterator itc =
+                     itch->second->getClients().begin();
+                 itc != itch->second->getClients().end(); itc++)
+            {
+                Print::Debug(Color::YELLOW + "\tFd :" + toString(itc->first) +
+                             "\tNick  :" + itc->second->getNickname());
+            }
         }
     }
 }
