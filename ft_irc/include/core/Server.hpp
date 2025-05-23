@@ -56,6 +56,7 @@ public:
     void addChannel(Channel* channel);
     void removeChannel(const std::string& name);
     std::map<std::string, Channel*>& getChannels();
+    void cleanupEmptyChannels();
 
     // Other helper methods
     const std::string& getPassword() const;

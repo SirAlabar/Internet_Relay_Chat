@@ -391,6 +391,16 @@ void Server::removeClient(int clientFd)
 {
     std::cout << "Removing client FD: " << clientFd << std::endl;
 
+    Client* client = getClient(clientFd);
+    if(client)
+    {
+        for (std::map<std::string, Channel*>::iterator it = _channels.begin();
+            it != _channels.end(); it++) 
+        {
+            it->second->removeClient(client);
+        }
+    }
+
     // Remove from poll
     for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); ++it)
     {
@@ -473,16 +483,27 @@ void Server::print_clients()
         std::map<std::string, Channel*>::iterator itch = _channels.begin();
         for (; itch != _channels.end(); itch++)
         {
-            Print::Debug(Color::YELLOW + "\tChannel Name   :" + itch->second->getName() +
+            Print::Debug(Color::ORANGE + "\tChannel Name   :" + itch->second->getName() +
                          // "\n\t" + itch->second->getTopic() +
                          "");
-            for (std::map<int, Client*>::const_iterator itc =
-                     itch->second->getClients().begin();
-                 itc != itch->second->getClients().end(); itc++)
+            std::map<int, Client*>::const_iterator itcli = itch->second->getClients().begin();
+            for (; itcli != itch->second->getClients().end(); itcli++)
             {
-                Print::Debug(Color::YELLOW + "\tFd :" + toString(itc->first) +
-                             "\tNick  :" + itc->second->getNickname());
+                Print::Debug(Color::ORANGE + "\tFd :" + toString(itcli->first) +
+                             "\tNck  :" + itcli->second->getNickname());
             }
         }
     }
+}
+
+void    Server::cleanupEmptyChannels()
+{
+    std::vector<std::string> channelsToRemove;
+    for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); it++)
+    {
+        if (it->second->isEmpty())
+            channelsToRemove.push_back(it->first);
+    }
+    for (size_t i = 0; i < channelsToRemove.size(); i++)
+        removeChannel(channelsToRemove[i]);
 }
