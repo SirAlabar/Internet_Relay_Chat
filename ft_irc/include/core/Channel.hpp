@@ -20,6 +20,8 @@ public:
 
     const std::string& getName() const;
     const std::string& getTopic() const;
+    const std::map<int, Client*>& getClients();
+    const std::map<int, Client*>& getOperators();
     void setTopic(const std::string& topic);
     void addClient(Client* client);
     void addOperator(Client* _operator);
