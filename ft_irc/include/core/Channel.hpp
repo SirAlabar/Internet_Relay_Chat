@@ -27,6 +27,7 @@ public:
     void addOperator(Client* _operator);
     void removeClient(Client* client);
     bool isOperator(Client* client) const;
+    bool isEmpty() const;
 };
 
 #endif

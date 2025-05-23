@@ -36,3 +36,5 @@ bool Channel::isOperator(Client* client) const
 
     return _operators.find(client->getFd()) != _operators.end();
 }
+
+bool Channel::isEmpty() const { return _clients.empty(); }
