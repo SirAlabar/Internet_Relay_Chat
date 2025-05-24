@@ -13,17 +13,36 @@ void Channel::setTopic(const std::string& topic) { _topic = topic; }
 
 void Channel::addClient(Client* client)
 {
-    if (client) _clients[client->getFd()] = client;
+    if (client)
+    {
+        _clients[client->getFd()] = client;
+    }
 }
 
 void Channel::removeClient(Client* client)
 {
-    if (client) _clients.erase(client->getFd());
+    if (client)
+    {
+        _clients.erase(client->getFd());
+    }
 }
 
 bool Channel::isOperator(Client* client) const
 {
-    if (!client) return false;
+    if (!client)
+    {
+        return false;
+    }
 
-    return _operators.find(client->getFd()) != _operators.end();
+    return (_operators.find(client->getFd()) != _operators.end());
+}
+
+bool Channel::hasClient(Client* client) const
+{
+    if (!client) 
+    {
+        return false;
+    }
+
+    return (_clients.find(client->getFd()) != _clients.end());
 }

@@ -25,6 +25,8 @@ public:
 	void addClient(Client* client);
 	void removeClient(Client* client);
 	bool isOperator(Client* client) const;
+	std::map<int, Client*> getClients() const { return _clients; }
+    bool hasClient(Client* client) const;
 };
 
 #endif

@@ -11,6 +11,10 @@
 #include "PingCommand.hpp"
 #include "PongCommand.hpp"
 #include "UserCommand.hpp"
+#include "QuitCommand.hpp"
+#include "NoticeCommand.hpp"
+#include "WhoCommand.hpp"
+#include "WhoIsCommand.hpp"
 
 // Initialize static members
 std::map<std::string, CommandFactory::CommandCreator> CommandFactory::_commandCreators;
@@ -36,15 +40,16 @@ void CommandFactory::initializeCommands()
     registerCommand("CAP", &CapCommand::create);
     registerCommand("NICK", &NickCommand::create);
     registerCommand("PASS", &PassCommand::create);
-    // registerCommand("QUIT", &QuitCommand::create);
+    registerCommand("QUIT", &QuitCommand::create);
     registerCommand("USER", &UserCommand::create);
     registerCommand("PING", &PingCommand::create);
     registerCommand("PONG", &PongCommand::create);
 
     // Messaging commands
-    // registerCommand("NOTICE", &NoticeCommand::create);
+    registerCommand("NOTICE", &NoticeCommand::create);
     // registerCommand("PRIVMSG", &PrivmsgCommand::create);
-    // registerCommand("WHO", &WhoCommand::create);
+    registerCommand("WHO", &WhoCommand::create);
+    registerCommand("WHOIS", &WhoIsCommand::create);
 
     // DCC commands (bonus part)
     // registerCommand("DCC", &DCCCommand::create);

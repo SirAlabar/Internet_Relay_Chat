@@ -61,26 +61,13 @@ void NoticeCommand::execute(Client* client, const Message& message)
 	std::string target = message.getParams(0);
 	std::string noticeText = message.getParams(1);
 
-	// Remove leading spaces from target
-	size_t startPos = target.find_first_not_of(" \t");
-	if (startPos != std::string::npos)
+	if (target.empty() || noticeText.empty())
 	{
-		target = target.substr(startPos);
-	}
-
-	if (target.empty())
-	{
-		Print::Fail("Empty target");
+		Print::Fail("Empty target or text");
 		return;
 	}
 
-	if (noticeText.empty())
-	{
-		Print::Fail("Empty notice text");
-		return;
-	}
-
-	Print::Debug("NOTICE from '" + client->getNickname() + "' to '" + target + "': " + noticeText);
+	Print::Debug("NOTICE from '" + client->getNickname() + "' to '" + target + "'");
 
 	// Check if target is a channel
 	if (target[0] == '#' || target[0] == '&')
@@ -152,4 +139,19 @@ void NoticeCommand::sendNoticeToUser(Client* sender, const std::string& targetNi
 void NoticeCommand::broadcastToChannel(Channel* channel, const std::string& message, int excludeFd)
 {
 	Print::Debug("Broadcasting message to channel members");
+	    
+    if (!channel)
+	{
+		return;
+	}
+    
+    std::map<int, Client*> clients = channel->getClients();
+    for (std::map<int, Client*>::iterator it = clients.begin();
+         it != clients.end(); ++it)
+    {
+        if (it->first != excludeFd && it->second)
+        {
+            it->second->sendMessage(message);
+        }
+    }
 }

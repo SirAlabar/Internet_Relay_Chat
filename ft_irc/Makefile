@@ -4,7 +4,10 @@
 
 NAME = ircserv
 CC = c++
-INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iinclude/dcc -Iinclude/utils -Iinclude/commands/connection
+INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot \
+				  -Iinclude/dcc -Iinclude/utils -Iinclude/commands/connection \
+				  -Iinclude/commands/messaging -Iinclude/commands/channel \
+				  -Iinclude/commands/dcc
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -Wno-delete-incomplete -Wno-unused-parameter
 DEBUG_FLAGS = -g
 
@@ -53,8 +56,11 @@ SRCS =  $(SRC_DIR)/main.cpp \
 		$(SRC_DIR)/commands/connection/PassCommand.cpp \
 		$(SRC_DIR)/commands/connection/UserCommand.cpp \
 		$(SRC_DIR)/commands/connection/PingCommand.cpp \
-		$(SRC_DIR)/commands/connection/PongCommand.cpp 
-
+		$(SRC_DIR)/commands/connection/PongCommand.cpp \
+		$(SRC_DIR)/commands/connection/QuitCommand.cpp \
+		$(SRC_DIR)/commands/messaging/NoticeCommand.cpp \
+		$(SRC_DIR)/commands/messaging/WhoCommand.cpp \
+		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp 
 
 # Object files
 OBJ_DIR = obj

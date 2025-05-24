@@ -172,6 +172,11 @@ void Server::stop()
 	Print::Do("Starting server shutdown process...\t\t\n");
 	_running = false;
 
+	//Clearn client buffer
+	Print::Do("Cleaning up " + toString(_clientBuffers.size()) + " client buffers...");
+    _clientBuffers.clear();
+    Print::Ok("client buffers cleared!");
+	
 	// Close Clients
 	Print::Do("Cleaning up " + toString(_clients.size()) + " clients...");
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();
@@ -182,7 +187,7 @@ void Server::stop()
 	_clients.clear();
 	Print::Ok("clients clear!");
 
-	// Cloese client sockets
+	// Close client sockets
 	Print::Do("Cleaning up " + toString(_clientSockets.size()) +
 				  " client sockets...\t\t\n");
 	for (std::map<int, Socket*>::iterator it = _clientSockets.begin();
@@ -268,6 +273,7 @@ void Server::processClientMessage(int clientFd)
 	}
 
 	// Buffer for receiving data
+
 	char buffer[1024] = {0};
 	ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 
@@ -293,10 +299,10 @@ void Server::processClientMessage(int clientFd)
 		removeClient(clientFd);
 		return;
 	}
-
+	Print::Debug("Buffer map size BEFORE: " + toString(_clientBuffers.size()));
 	// Append to client buffer
 	_clientBuffers[clientFd] += buffer;
-
+	Print::Debug("Buffer map size AFTER: " + toString(_clientBuffers.size()));
 	// Process complete messages (ending with \r\n)
 	std::string& clientBuffer = _clientBuffers[clientFd];
 	size_t pos;
@@ -380,7 +386,11 @@ void Server::removeChannel(const std::string& name)
 void Server::removeClient(int clientFd)
 {
 	Print::StdOut("Removing client FD: " + toString(clientFd));
-
+    // ADICIONAR AQUI:
+    Print::Debug("Buffer map size BEFORE remove: " + toString(_clientBuffers.size()));
+    Print::Debug("Buffer exists for FD " + toString(clientFd) + "? " + 
+                 ((_clientBuffers.find(clientFd) != _clientBuffers.end()) ? "YES" : "NO"));
+    
 	// Remove from poll
 	for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); ++it)
 	{
@@ -393,7 +403,8 @@ void Server::removeClient(int clientFd)
 
 	// Clear buffer
 	_clientBuffers.erase(clientFd);
-
+    Print::Debug("Buffer map size AFTER remove: " + toString(_clientBuffers.size()));
+    
 	// Remove client object
 	if (_clients.find(clientFd) != _clients.end())
 	{
@@ -418,17 +429,35 @@ void Server::broadcast(const std::string& message, int excludeFd)
 	{
 		if (it->first != excludeFd)
 		{
-			// implement after message
+            it->second->sendMessage(message);
 		}
 	}
 }
 
 Channel* Server::createChannel(const std::string& name, Client* creator)
 {
-	// For initial testing, we'll just implement a stub
-	// Return NULL for now
-	Print::Debug("Channel creation requested: " + name);
-	return NULL;
+    Print::Debug("Channel creation requested: " + name);
+    
+    // Verify if alway exists
+    Channel* existingChannel = getChannel(name);
+    if (existingChannel)
+    {
+        Print::Debug("Channel " + name + " already exists");
+        return existingChannel;
+    }
+    
+    // Create new channel
+    Channel* newChannel = new Channel(name);
+    _channels[name] = newChannel;
+    
+    Print::Ok("Channel " + name + " created successfully");
+    if (creator)
+    {
+        newChannel->addClient(creator);
+        Print::Debug("Added creator " + creator->getNickname() + " to channel " + name);
+    }
+    
+    return newChannel;
 }
 
 void Server::print_clients()
