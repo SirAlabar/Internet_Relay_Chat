@@ -69,13 +69,40 @@ OBJ_DIR = obj
 OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 
 ################################################################################
+#                              PROGRESS BAR SETUP                              #
+################################################################################
+
+# Progress bar variables
+TOTAL_FILES := $(words $(SRCS))
+PROGRESS_FILE := .compilation_progress
+COUNTER_FILE := /tmp/.ircserv_compilation_counter
+
+# Progress bar function
+define progress_bar
+	@current=$$(cat $(COUNTER_FILE) 2>/dev/null || echo 0); \
+	current=$$((current + 1)); \
+	echo $$current > $(COUNTER_FILE); \
+	percent=$$((current * 100 / $(TOTAL_FILES))); \
+	filled=$$((current * 50 / $(TOTAL_FILES))); \
+	empty=$$((50 - filled)); \
+	printf "\r\033[K$(CYAN)["; \
+	for i in $$(seq 1 $$filled); do printf "█"; done; \
+	for i in $$(seq 1 $$empty); do printf "░"; done; \
+	printf "] %d%% (%d/$(TOTAL_FILES)) $(YELLOW)%s$(CLR_RMV)" $$percent $$current "$(notdir $<)"; \
+	if [ $$current -eq $(TOTAL_FILES) ]; then \
+		printf "\n$(GREEN)✅ Compilation complete!$(CLR_RMV)\n"; \
+		rm -f $(COUNTER_FILE) init_progress; \
+	fi
+endef
+
+################################################################################
 #                                  Makefile  rules                             #
 ################################################################################
 
 .PHONY: all
 all: $(NAME)
 
-$(NAME): --header $(OBJ_DIR) $(OBJS)
+$(NAME): $(OBJ_DIR) init_progress $(OBJS)
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
 	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)
 
@@ -88,11 +115,23 @@ $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)/bot
 	@mkdir -p $(OBJ_DIR)/dcc
 
+init_progress: $(SRCS)
+	@printf "$(RED)░▒▓██████████████▓▒░  $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░   ░▒▓██████▓▒░  $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░  ░▒▓█▓▒░        $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
+	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░  ░▒▓██████▓▒░  $(CLR_RMV)\n"
+	@printf "             $(YELLOW)(developed by hluiz, isilva-t & joao-pol)$(CLR_RMV)\n"
+	@echo "0" > $(COUNTER_FILE)
+	@printf "$(BLUE)Compiling $(TOTAL_FILES) source files...$(CLR_RMV)\n"
+
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 
 	@$(CC) $(CFLAGS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -c $< -o $@
-
+	$(call progress_bar)
 
 .PHONY: va
 va: fclean $(OBJS) 
@@ -103,6 +142,7 @@ va: fclean $(OBJS)
 .PHONY: clean
 clean:
 	@$(RM) $(OBJ_DIR)
+	@$(RM) $(COUNTER_FILE) $(PROGRESS_FILE) init_progress
 	@printf "$(RED)Deleting $(CYAN)$(NAME) $(CLR_RMV)objs ✅\n"
 
 .PHONY: fclean
@@ -125,16 +165,6 @@ asan: --header $(OBJ_DIR) $(OBJS)
 
 	@printf "$(GREEN)$(NAME) binary created$(CLR_RMV) ✅\n"
 
-.PHONY: --header
---header:
-	@printf "$(RED)░▒▓██████████████▓▒░  $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░   ░▒▓██████▓▒░  $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░  ░▒▓█▓▒░        $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░  ░▒▓██████▓▒░  $(CLR_RMV)\n"
-	@printf "             $(YELLOW)(developed by hluiz, isilva-t & joao-pol)$(CLR_RMV)\n"
 
 ################################################################################
 #                              Makefile  other utils                           #
