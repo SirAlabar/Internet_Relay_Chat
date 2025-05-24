@@ -45,7 +45,7 @@ bool ACommand::isValidChannelName(const std::string& channelName)
 {
     // IRC channels typically start with # or &
     Print::Warn("Valid Name? '" + channelName + "'");
-    if (channelName.empty() || (channelName[0] == '#' || channelName[0] == '&'))
+    if (channelName.empty() || (channelName[0] != '#' && channelName[0] != '&'))
         return (false);
 
     // Check for invalid characters in channel name
