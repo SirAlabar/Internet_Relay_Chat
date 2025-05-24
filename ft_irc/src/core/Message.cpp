@@ -18,7 +18,7 @@ Message::Message(const std::string& rawMessage)
     Print::Debug("_params: ");
     for (size_t i = 0; i < _params.size(); i++)
     {
-        Print::Debug(_params[i]);
+        Print::Debug("'" + _params[i] + "'");
     }
     Print::Debug("Command: " + _command);
     Print::Debug("Params: " + _remainder);

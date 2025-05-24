@@ -386,20 +386,26 @@ void Server::removeChannel(const std::string& name)
 void Server::removeClient(int clientFd)
 {
 	Print::StdOut("Removing client FD: " + toString(clientFd));
-    // ADICIONAR AQUI:
-    Print::Debug("Buffer map size BEFORE remove: " + toString(_clientBuffers.size()));
-    Print::Debug("Buffer exists for FD " + toString(clientFd) + "? " + 
-                 ((_clientBuffers.find(clientFd) != _clientBuffers.end()) ? "YES" : "NO"));
-    
-	// Remove from poll
-	for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); ++it)
-	{
-		if (it->fd == clientFd)
-		{
-			_pollFds.erase(it);
-			break;
-		}
-	}
+
+    Client* client = getClient(clientFd);
+    if(client)
+    {
+        for (std::map<std::string, Channel*>::iterator it = _channels.begin();
+            it != _channels.end(); it++) 
+        {
+            it->second->removeClient(client);
+        }
+    }
+
+    // Remove from poll
+    for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); ++it)
+    {
+        if (it->fd == clientFd)
+        {
+            _pollFds.erase(it);
+            break;
+        }
+    }
 
 	// Clear buffer
 	_clientBuffers.erase(clientFd);
@@ -438,7 +444,7 @@ Channel* Server::createChannel(const std::string& name, Client* creator)
 {
     Print::Debug("Channel creation requested: " + name);
     
-    // Verify if alway exists
+    // Verify if already exists  
     Channel* existingChannel = getChannel(name);
     if (existingChannel)
     {
@@ -454,6 +460,7 @@ Channel* Server::createChannel(const std::string& name, Client* creator)
     if (creator)
     {
         newChannel->addClient(creator);
+        newChannel->addOperator(creator);
         Print::Debug("Added creator " + creator->getNickname() + " to channel " + name);
     }
     
@@ -462,19 +469,58 @@ Channel* Server::createChannel(const std::string& name, Client* creator)
 
 void Server::print_clients()
 {
-	if (DEBUG)
-	{
-		std::map<int, Client*>::iterator it = _clients.begin();
-		std::map<int, Client*>::iterator ite = _clients.end();
+    if (DEBUG)
+    {
+        std::map<int, Client*>::iterator it = _clients.begin();
+        std::map<int, Client*>::iterator ite = _clients.end();
+        for (; it != ite; it++)
+        {
+            Print::Debug(
+                Color::YELLOW + "\tFd server map: " + toString(it->first) +
+                "\tfd Client: " + it->second->getFdString() + "\n\tnick: " +
+                it->second->getNickname() + "\tuser: " + it->second->getUsername() +
+                "\n\tautenticated? == " + toString(it->second->isAuthenticated()));
+        }
+        std::map<std::string, Channel*>::iterator itch = _channels.begin();
+        for (; itch != _channels.end(); itch++)
+        {
+            Print::Debug(Color::ORANGE + "\tChannel Name   :" + itch->second->getName() +
+                          "\n\t" + itch->second->getTopic() + "");
+            std::map<int, Client*>::const_iterator itcli = itch->second->getClients().begin();
+            for (; itcli != itch->second->getClients().end(); itcli++)
+            {
+                Print::Debug(Color::ORANGE + "\tFd :" + toString(itcli->first) +
+                             "\tNck  :" + itcli->second->getNickname());
+            }
+        }
+    }
+}
 
-		for (; it != ite; it++)
-		{
-			Print::Debug(
-				Color::YELLOW + "\n\tClient fd on server map: " + toString(it->first) +
-				"\n\tfd on Client class: " + it->second->getFdString() +
-				"\n\tnickname: " + it->second->getNickname() +
-				"\n\tusername: " + it->second->getUsername() +
-				"\n\tautenticated? == " + toString(it->second->isAuthenticated()));
-		}
-	}
+void    Server::cleanupEmptyChannels()
+{
+    std::vector<std::string> channelsToRemove;
+    for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); it++)
+    {
+        if (it->second->isEmpty())
+            channelsToRemove.push_back(it->first);
+    }
+    for (size_t i = 0; i < channelsToRemove.size(); i++)
+        removeChannel(channelsToRemove[i]);
+}
+
+void    Server::broadcastChannel(const std::string& message, const std::string& chName, int excludeFd)
+{
+    Channel* channel = getChannel(chName);
+    if (!channel)
+        return;
+
+    const std::map<int, Client*>& clients = channel->getClients();
+
+    std::map<int, Client*>::const_iterator it = clients.begin();
+    std::map<int, Client*>::const_iterator ite = clients.end();
+    for (; it != ite; it++)
+    {
+        if (it->first != excludeFd)
+            it->second->sendMessage(message);
+    }
 }
