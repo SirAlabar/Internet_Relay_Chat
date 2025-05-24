@@ -4,8 +4,9 @@
 
 NAME = ircserv
 CC = c++
-INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iinclude/dcc -Iinclude/utils -Iinclude/commands/connection
+INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iinclude/dcc -Iinclude/utils -Iinclude/commands/connection -Iinclude/commands/channel
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -Wno-delete-incomplete -Wno-unused-parameter
+ASANFLAGS = -fsanitize=undefined,memory -fno-omit-frame-pointer
 DEBUG_FLAGS = -g
 
 ifeq ($(DEBUG), 1)
@@ -48,10 +49,11 @@ SRCS =  $(SRC_DIR)/main.cpp \
 		$(SRC_DIR)/utils/UtilsFun.cpp \
 		$(SRC_DIR)/commands/CommandFactory.cpp \
 		$(SRC_DIR)/commands/ACommand.cpp \
-		$(SRC_DIR)/commands/connection/CapCommand.cpp \
+		$(SRC_DIR)/commands/channel/JoinCommand.cpp \
 		$(SRC_DIR)/commands/connection/NickCommand.cpp \
 		$(SRC_DIR)/commands/connection/PassCommand.cpp \
 		$(SRC_DIR)/commands/connection/UserCommand.cpp \
+		$(SRC_DIR)/commands/connection/CapCommand.cpp \
 		$(SRC_DIR)/commands/connection/PingCommand.cpp \
 		$(SRC_DIR)/commands/connection/PongCommand.cpp 
 
@@ -108,6 +110,14 @@ re: fclean all
 .PHONY: debug
 debug: CFLAGS += $(DEBUG_FLAGS)
 debug: re
+
+.PHONY: asan
+asan: --header $(OBJ_DIR) $(OBJS)
+
+	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
+	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)
+
+	@printf "$(GREEN)$(NAME) binary created$(CLR_RMV) ✅\n"
 
 .PHONY: --header
 --header:

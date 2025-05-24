@@ -29,9 +29,8 @@ void NickCommand::execute(Client* client, const Message& message)
 {
     Print::Do("executing NICK command");
     if (!client || !client->isAuthenticated())
-
     {
-        Print::Fail("Client is NULL or not auth, returning");
+        Print::Fail("Client is NULL, returning");
         return;
     }
 
