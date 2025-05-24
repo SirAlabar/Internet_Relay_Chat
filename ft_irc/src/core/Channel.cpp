@@ -22,7 +22,7 @@ void Channel::addClient(Client* client)
 
 void Channel::addOperator(Client* _operator)
 {
-    if (_operator) _clients[_operator->getFd()] = _operator;
+    if (_operator) _operators[_operator->getFd()] = _operator;
 }
 
 void Channel::removeClient(Client* client)
