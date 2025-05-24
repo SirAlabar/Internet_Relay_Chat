@@ -507,3 +507,20 @@ void    Server::cleanupEmptyChannels()
     for (size_t i = 0; i < channelsToRemove.size(); i++)
         removeChannel(channelsToRemove[i]);
 }
+
+void    Server::broadcastChannel(const std::string& message, const std::string& chName, int excludeFd)
+{
+    Channel* channel = getChannel(chName);
+    if (!channel)
+        return;
+
+    const std::map<int, Client*>& clients = channel->getClients();
+
+    std::map<int, Client*>::const_iterator it = clients.begin();
+    std::map<int, Client*>::const_iterator ite = clients.end();
+    for (; it != ite; it++)
+    {
+        if (it->first != excludeFd)
+            it->second->sendMessage(message);
+    }
+}
