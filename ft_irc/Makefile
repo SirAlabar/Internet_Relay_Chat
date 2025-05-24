@@ -40,19 +40,22 @@ VALGRINDFLAGS          = --tool=memcheck -q --leak-check=full \
 
 # Main source files
 SRC_DIR = src
-SRCS = $(SRC_DIR)/main.cpp \
-       $(SRC_DIR)/core/Server.cpp \
-       $(SRC_DIR)/core/Client.cpp \
-       $(SRC_DIR)/core/Message.cpp \
-       $(SRC_DIR)/utils/Socket.cpp \
-       $(SRC_DIR)/core/Channel.cpp \
-       $(SRC_DIR)/utils/UtilsFun.cpp \
-       $(SRC_DIR)/commands/CommandFactory.cpp \
-       $(SRC_DIR)/commands/ACommand.cpp \
-       $(SRC_DIR)/commands/connection/NickCommand.cpp \
-       $(SRC_DIR)/commands/connection/PassCommand.cpp \
-       $(SRC_DIR)/commands/channel/JoinCommand.cpp \
-       $(SRC_DIR)/commands/connection/UserCommand.cpp
+SRCS =  $(SRC_DIR)/main.cpp \
+		$(SRC_DIR)/core/Server.cpp \
+		$(SRC_DIR)/core/Client.cpp \
+		$(SRC_DIR)/core/Message.cpp \
+		$(SRC_DIR)/utils/Socket.cpp \
+		$(SRC_DIR)/core/Channel.cpp \
+		$(SRC_DIR)/utils/UtilsFun.cpp \
+		$(SRC_DIR)/commands/CommandFactory.cpp \
+		$(SRC_DIR)/commands/ACommand.cpp \
+		$(SRC_DIR)/commands/channel/JoinCommand.cpp \
+		$(SRC_DIR)/commands/connection/NickCommand.cpp \
+		$(SRC_DIR)/commands/connection/PassCommand.cpp \
+		$(SRC_DIR)/commands/connection/UserCommand.cpp \
+		$(SRC_DIR)/commands/connection/CapCommand.cpp \
+		$(SRC_DIR)/commands/connection/PingCommand.cpp \
+		$(SRC_DIR)/commands/connection/PongCommand.cpp 
 
 
 # Object files
