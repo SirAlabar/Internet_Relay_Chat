@@ -1,5 +1,4 @@
 name: IRC Server Tests
-
 on:
   pull_request:
     branches: [ main, master, develop ]
@@ -10,91 +9,26 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
+    
     steps:
     - name: 🔄 Checkout code
       uses: actions/checkout@v4
-
+      
     - name: 📦 Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential netcat-traditional valgrind
-        
-    - name: 🔧 Setup test environment
-      run: |
-        mkdir -p tests/logs tests/conn_logs tests/channel_logs tests/msg_logs tests/stress_logs tests/valgrind_logs
-        chmod +x *.sh
-        ls -la *.sh
-        
+        sudo apt-get install -y build-essential netcat-traditional
+       
     - name: 🏗️ Compile IRC Server
-      run: |
-        make clean
-        make
-        ls -la ircserv
-        
-    - name: 🧪 Run Connection Tests
-      run: |
-        timeout 300 ./test_connection.sh
-        
-    - name: 📺 Run Channel Tests  
-      run: |
-        timeout 300 ./test_channels.sh
-        
-    - name: 💬 Run Messaging Tests
-      run: |
-        timeout 300 ./test_messaging.sh
-        
-    - name: 🚀 Run Main Test Suite
-      run: |
-        timeout 600 ./run_tests_fixed.sh
-
-    - name: 💾 Upload test logs on failure
+      run: make
+       
+    - name: 🧪 Run Tests
+      run: make test
+      
+    - name: 💾 Upload logs on failure
       if: failure()
       uses: actions/upload-artifact@v4
       with:
         name: test-logs
         path: tests/
         retention-days: 7
-
-    - name: 📊 Test Summary
-      if: always()
-      run: |
-        echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
-        if [ $? -eq 0 ]; then
-          echo "✅ All tests passed successfully!" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "❌ Some tests failed. Check the logs for details." >> $GITHUB_STEP_SUMMARY
-        fi
-
-  stress-test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: test
-    if: github.event_name == 'push'
-
-    steps:
-    - name: 🔄 Checkout code
-      uses: actions/checkout@v4
-
-    - name: 📦 Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential netcat-traditional
-        
-    - name: 🔧 Setup test environment
-      run: make test-setup
-        
-    - name: 🏗️ Compile IRC Server
-      run: make
-        
-    - name: 🔥 Run Stress Tests
-      run: |
-        timeout 600 make test-stress || echo "⚠️ Stress tests completed with warnings"
-        
-    - name: 💾 Upload stress test logs
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: stress-test-logs
-        path: tests/stress_logs/
-        retention-days: 3
