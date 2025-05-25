@@ -5,6 +5,7 @@
 #include "Client.hpp"
 #include "CommandFactory.hpp"
 #include "JoinCommand.hpp"
+#include "ListCommand.hpp"
 #include "Message.hpp"
 #include "NickCommand.hpp"
 #include "CapCommand.hpp"
@@ -33,6 +34,7 @@ void CommandFactory::initializeCommands()
     // registerCommand("INVITE", &InviteCommand::create);
     registerCommand("JOIN", &JoinCommand::create);
     // registerCommand("KICK", &KickCommand::create);
+    registerCommand("LIST", &ListCommand::create);
     // registerCommand("MODE", &ModeCommand::create);
     // registerCommand("PART", &PartCommand::create);
     // registerCommand("TOPIC", &TopicCommand::create);
