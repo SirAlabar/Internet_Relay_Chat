@@ -13,6 +13,10 @@ private:
 	// Private to prevent copying
 	PrivmsgCommand(const PrivmsgCommand& other);
 	PrivmsgCommand& operator=(const PrivmsgCommand& other);
+	
+	void handleChannelMessage(Client* sender, const std::string& channelName, const std::string& message);
+	void handlePrivateMessage(Client* sender, const std::string& targetNick, const std::string& message);
+	std::string createMessage(Client* sender, const std::string& command, const std::string& target, const std::string& message);
 
 public:
 	PrivmsgCommand(Server* server);

@@ -65,6 +65,7 @@ SRCS =  $(SRC_DIR)/main.cpp \
 		$(SRC_DIR)/commands/connection/PongCommand.cpp \
 		$(SRC_DIR)/commands/connection/QuitCommand.cpp \
 		$(SRC_DIR)/commands/messaging/NoticeCommand.cpp \
+		$(SRC_DIR)/commands/messaging/PrivmsgCommand.cpp \
 		$(SRC_DIR)/commands/messaging/WhoCommand.cpp \
 		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp 
 
@@ -191,3 +192,90 @@ out:
 vi:
 	@find . -type f -name "*.cpp" -o -name "*.hpp" -o -name "Makefile" | xargs nvim
 
+
+################################################################################
+#                                  TEST RULES                                  #
+################################################################################
+
+.PHONY: test test-connection test-channels test-messaging test-stress test-valgrind test-all test-setup test-clean
+
+# Setup test environment
+test-setup:
+	@printf "$(BLUE)Setting up test environment...$(CLR_RMV)\n"
+	@mkdir -p tests/scripts
+	@chmod +x tests/scripts/*.sh 2>/dev/null || true
+	@printf "$(GREEN)Test environment ready$(CLR_RMV) ✅\n"
+
+# Run all tests (default)
+test: $(NAME) test-setup
+	@printf "$(GREEN)Running complete IRC test suite...$(CLR_RMV)\n"
+	@./tests/scripts/run_tests.sh
+
+# Run specific test suites
+test-connection: $(NAME) test-setup
+	@printf "$(BLUE)Running connection tests...$(CLR_RMV)\n"
+	@./tests/scripts/test_connection.sh
+
+test-channels: $(NAME) test-setup
+	@printf "$(BLUE)Running channel tests...$(CLR_RMV)\n"
+	@./tests/scripts/test_channels.sh
+
+test-messaging: $(NAME) test-setup
+	@printf "$(BLUE)Running messaging tests...$(CLR_RMV)\n"
+	@./tests/scripts/test_messaging.sh
+
+test-stress: $(NAME) test-setup
+	@printf "$(YELLOW)Running stress tests (this may take a while)...$(CLR_RMV)\n"
+	@./tests/scripts/test_stress.sh
+
+test-valgrind: $(NAME) test-setup
+	@printf "$(YELLOW)Running memory leak tests with Valgrind (this will take several minutes)...$(CLR_RMV)\n"
+	@./tests/scripts/test_valgrind.sh
+
+# Run all tests including stress and valgrind
+test-all: $(NAME) test-setup
+	@printf "$(GREEN)Running ALL tests (including stress and valgrind)...$(CLR_RMV)\n"
+	@printf "$(YELLOW)This will take 10+ minutes. Press Ctrl+C to cancel.$(CLR_RMV)\n"
+	@sleep 3
+	@./tests/scripts/run_tests.sh && \
+	 ./tests/scripts/test_connection.sh && \
+	 ./tests/scripts/test_channels.sh && \
+	 ./tests/scripts/test_messaging.sh && \
+	 ./tests/scripts/test_stress.sh && \
+	 ./tests/scripts/test_valgrind.sh
+	@printf "$(GREEN)🎉 All tests completed successfully!$(CLR_RMV)\n"
+
+# Quick test (basic functionality only)
+test-quick: $(NAME) test-setup
+	@printf "$(BLUE)Running quick tests...$(CLR_RMV)\n"
+	@./tests/scripts/test_connection.sh
+
+# Clean test artifacts
+test-clean:
+	@printf "$(RED)Cleaning test artifacts...$(CLR_RMV)\n"
+	@rm -f tests/*.log
+	@rm -f *.log
+	@rm -f valgrind_output.log
+	@printf "$(GREEN)Test cleanup completed$(CLR_RMV) ✅\n"
+
+# Test with debug output
+test-debug: CFLAGS += $(DEBUG_FLAGS) -DDEBUG=1
+test-debug: re test
+
+# Show test help
+test-help:
+	@printf "$(BLUE)IRC Test Suite Commands:$(CLR_RMV)\n"
+	@printf "$(GREEN)make test$(CLR_RMV)           - Run basic test suite\n"
+	@printf "$(GREEN)make test-quick$(CLR_RMV)     - Run only quick connection tests\n"
+	@printf "$(GREEN)make test-connection$(CLR_RMV) - Test authentication and connection\n"
+	@printf "$(GREEN)make test-channels$(CLR_RMV)   - Test channel operations (JOIN, PART, etc.)\n"
+	@printf "$(GREEN)make test-messaging$(CLR_RMV)  - Test PRIVMSG functionality\n"
+	@printf "$(GREEN)make test-stress$(CLR_RMV)     - Test server under load (slow)\n"
+	@printf "$(GREEN)make test-valgrind$(CLR_RMV)   - Check for memory leaks (very slow)\n"
+	@printf "$(GREEN)make test-all$(CLR_RMV)        - Run ALL tests (10+ minutes)\n"
+	@printf "$(GREEN)make test-debug$(CLR_RMV)      - Run tests with debug build\n"
+	@printf "$(GREEN)make test-clean$(CLR_RMV)      - Clean test artifacts\n"
+	@printf "$(BLUE)Example usage:$(CLR_RMV)\n"
+	@printf "  make && make test-quick    # Quick verification\n"
+	@printf "  make test-channels         # Test channel commands\n"
+	@printf "  make test-all             # Full test suite\n"
