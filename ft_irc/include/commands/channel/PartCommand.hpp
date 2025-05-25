@@ -6,6 +6,7 @@
 class Client;
 class Server;
 class Message;
+class Channel;
 
 class PartCommand : public ACommand
 {
@@ -13,6 +14,8 @@ private:
 	// Private to prevent copying
 	PartCommand(const PartCommand& other);
 	PartCommand& operator=(const PartCommand& other);
+
+	void executePartFromChannel(Client* client, Channel* channel, const std::string& partMessage);
 
 public:
 	PartCommand(Server* server);

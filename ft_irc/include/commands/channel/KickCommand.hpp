@@ -6,6 +6,7 @@
 class Client;
 class Server;
 class Message;
+class Channel;
 
 class KickCommand : public ACommand
 {
@@ -14,6 +15,8 @@ private:
 	KickCommand(const KickCommand& other);
 	KickCommand& operator=(const KickCommand& other);
 
+	void executeKickFromChannel(Client* kicker, Client* target, Channel* channel, const std::string& reason);
+	
 public:
 	KickCommand(Server* server);
 	virtual ~KickCommand();

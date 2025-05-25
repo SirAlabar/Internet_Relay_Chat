@@ -43,10 +43,17 @@ std::vector<std::string> ACommand::splitArguments(const std::string& args, char 
 // Check if a channel name is valid according to IRC standards
 bool ACommand::isValidChannelName(const std::string& channelName)
 {
+    if (channelName.length() < 2)
+    {
+        return false;
+    }
+
     // IRC channels typically start with # or &
     Print::Warn("Valid Name? '" + channelName + "'");
     if (channelName.empty() || (channelName[0] != '#' && channelName[0] != '&'))
+    {
         return (false);
+    }
 
     // Check for invalid characters in channel name
     for (size_t i = 1; i < channelName.size(); ++i)
