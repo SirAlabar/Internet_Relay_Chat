@@ -172,6 +172,11 @@ void Server::stop()
 	Print::Do("Starting server shutdown process...\t\t\n");
 	_running = false;
 
+	//Clearn client buffer
+	Print::Do("Cleaning up " + toString(_clientBuffers.size()) + " client buffers...");
+    _clientBuffers.clear();
+    Print::Ok("client buffers cleared!");
+	
 	// Close Clients
 	Print::Do("Cleaning up " + toString(_clients.size()) + " clients...");
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();
@@ -182,7 +187,7 @@ void Server::stop()
 	_clients.clear();
 	Print::Ok("clients clear!");
 
-	// Cloese client sockets
+	// Close client sockets
 	Print::Do("Cleaning up " + toString(_clientSockets.size()) +
 				  " client sockets...\t\t\n");
 	for (std::map<int, Socket*>::iterator it = _clientSockets.begin();
@@ -268,6 +273,7 @@ void Server::processClientMessage(int clientFd)
 	}
 
 	// Buffer for receiving data
+
 	char buffer[1024] = {0};
 	ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 
@@ -293,10 +299,10 @@ void Server::processClientMessage(int clientFd)
 		removeClient(clientFd);
 		return;
 	}
-
+	Print::Debug("Buffer map size BEFORE: " + toString(_clientBuffers.size()));
 	// Append to client buffer
 	_clientBuffers[clientFd] += buffer;
-
+	Print::Debug("Buffer map size AFTER: " + toString(_clientBuffers.size()));
 	// Process complete messages (ending with \r\n)
 	std::string& clientBuffer = _clientBuffers[clientFd];
 	size_t pos;
@@ -403,7 +409,8 @@ void Server::removeClient(int clientFd)
 
 	// Clear buffer
 	_clientBuffers.erase(clientFd);
-
+    Print::Debug("Buffer map size AFTER remove: " + toString(_clientBuffers.size()));
+    
 	// Remove client object
 	if (_clients.find(clientFd) != _clients.end())
 	{
@@ -428,32 +435,36 @@ void Server::broadcast(const std::string& message, int excludeFd)
 	{
 		if (it->first != excludeFd)
 		{
-			// implement after message
+            it->second->sendMessage(message);
 		}
 	}
 }
 
 Channel* Server::createChannel(const std::string& name, Client* creator)
 {
-    Print::Do("Channel creation requested: ");
-    Channel* channel = new Channel(name);
-    channel->addClient(creator);
-    channel->addOperator(creator);
-    if (channel)
+    Print::Debug("Channel creation requested: " + name);
+    
+    // Verify if already exists  
+    Channel* existingChannel = getChannel(name);
+    if (existingChannel)
     {
-        Print::Ok("Channel added to server");
-        return channel;
+        Print::Debug("Channel " + name + " already exists");
+        return existingChannel;
     }
-    else
+    
+    // Create new channel
+    Channel* newChannel = new Channel(name);
+    _channels[name] = newChannel;
+    
+    Print::Ok("Channel " + name + " created successfully");
+    if (creator)
     {
-        Print::Fail("Failed to create Channel");
-        return NULL;
+        newChannel->addClient(creator);
+        newChannel->addOperator(creator);
+        Print::Debug("Added creator " + creator->getNickname() + " to channel " + name);
     }
-}
-
-void Server::addChannel(Channel* channel)
-{
-    if (channel) _channels[channel->getName()] = channel;
+    
+    return newChannel;
 }
 
 void Server::print_clients()

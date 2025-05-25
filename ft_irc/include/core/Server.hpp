@@ -54,7 +54,6 @@ public:
     // Channel management
     Channel* getChannel(const std::string& name);
     Channel* createChannel(const std::string& name, Client* creator);
-    void addChannel(Channel* channel);
     void removeChannel(const std::string& name);
     std::map<std::string, Channel*>& getChannels();
     void cleanupEmptyChannels();
