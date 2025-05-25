@@ -30,5 +30,112 @@ ACommand* InviteCommand::create(Server* server)
 // Execute the INVITE command
 void InviteCommand::execute(Client* client, const Message& message)
 {
-	// Future implementation
+	Print::Do("execute INVITE command");
+
+	if (!client)
+	{
+		Print::Fail("Client NULL");
+		return;
+	}
+
+	if (!client->isAuthenticated() || client->getNickname().empty())
+	{
+		Print::Fail("Client not properly registered");
+		sendErrorReply(client, 451, ":You have not registered");
+		return;
+	}
+
+	// INVITE requires exactly 2 parameters: nickname and channel
+	if (message.getSize() < 2 || message.getParams(0).empty() || message.getParams(1).empty())
+	{
+		Print::Fail("Not enough parameters for INVITE");
+		sendErrorReply(client, 461, "INVITE :Not enough parameters");
+		return;
+	}
+
+	std::string targetNick = message.getParams(0);
+	std::string channelName = message.getParams(1);
+
+	Print::Debug("INVITE command: inviting '" + targetNick + "' to '" + channelName + "'");
+
+	if (!isValidChannelName(channelName))
+	{
+		Print::Warn("Invalid channel name: " + channelName);
+		sendErrorReply(client, 403, channelName + " :No such channel");
+		return;
+	}
+
+	Channel* channel = _server->getChannel(channelName);
+	if (!channel)
+	{
+		Print::Warn("Channel does not exist: " + channelName);
+		sendErrorReply(client, 403, channelName + " :No such channel");
+		return;
+	}
+
+	if (!channel->hasClient(client))
+	{
+		Print::Warn("Inviter not in channel: " + channelName);
+		sendErrorReply(client, 442, channelName + " :You're not on that channel");
+		return;
+	}
+
+	// uncoment after mode command
+	// if (channel->hasMode('i') && !channel->isOperator(client))
+	// {
+	// 	Print::Warn("Inviter is not operator in: " + channelName);
+	// 	sendErrorReply(client, 482, channelName + " :You're not channel operator");
+	// 	return;
+	// }
+
+	Client* targetClient = _server->getClientByNick(targetNick);
+	if (!targetClient)
+	{
+		Print::Warn("Target user not found: " + targetNick);
+		sendErrorReply(client, 401, targetNick + " :No such nick/channel");
+		return;
+	}
+
+	if (channel->hasClient(targetClient))
+	{
+		Print::Warn("Target already in channel: " + targetNick + " in " + channelName);
+		sendErrorReply(client, 443, targetNick + " " + channelName + " :is already on channel");
+		return;
+	}
+
+	executeInvite(client, targetClient, channel);
+
+	Print::Ok("INVITE command completed successfully");
+}
+
+void InviteCommand::executeInvite(Client* inviter, Client* target, Channel* channel)
+{
+	std::string inviterNick = inviter->getNickname();
+	std::string inviterUser = inviter->getUsername();
+	std::string targetNick = target->getNickname();
+	std::string channelName = channel->getName();
+
+	Print::Debug("Executing invite: " + inviterNick + " invites " + targetNick + " to " + channelName);
+
+	// Send RPL_INVITING (341) to the inviter
+	sendNumericReply(inviter, 341, targetNick + " " + channelName);
+
+	// Send INVITE message to the target user
+	std::string inviteMsg = ":" + inviterNick;
+	if (!inviterUser.empty())
+	{
+		inviteMsg += "!" + inviterUser + "@localhost";
+	}
+	inviteMsg += " INVITE " + targetNick + " :" + channelName + "\r\n";
+
+	Print::Debug("Sending invite message to target: " + inviteMsg);
+
+	if (target->sendMessage(inviteMsg))
+	{
+		Print::Ok("Invitation sent from " + inviterNick + " to " + targetNick + " for channel " + channelName);
+	}
+	else
+	{
+		Print::Fail("Failed to send invitation to " + targetNick);
+	}
 }
