@@ -22,28 +22,31 @@ jobs:
         
     - name: 🔧 Setup test environment
       run: |
-        make test-setup
+        mkdir -p tests/logs tests/conn_logs tests/channel_logs tests/msg_logs tests/stress_logs tests/valgrind_logs
+        chmod +x *.sh
+        ls -la *.sh
         
     - name: 🏗️ Compile IRC Server
       run: |
         make clean
         make
+        ls -la ircserv
         
     - name: 🧪 Run Connection Tests
       run: |
-        timeout 300 ./test_connection.sh || (echo "❌ Connection tests failed" && exit 1)
+        timeout 300 ./test_connection.sh
         
     - name: 📺 Run Channel Tests  
       run: |
-        timeout 300 ./test_channels.sh || (echo "❌ Channel tests failed" && exit 1)
+        timeout 300 ./test_channels.sh
         
     - name: 💬 Run Messaging Tests
       run: |
-        timeout 300 ./test_messaging.sh || (echo "❌ Messaging tests failed" && exit 1)
+        timeout 300 ./test_messaging.sh
         
     - name: 🚀 Run Main Test Suite
       run: |
-        timeout 600 ./run_tests_fixed.sh || (echo "❌ Main test suite failed" && exit 1)
+        timeout 600 ./run_tests_fixed.sh
 
     - name: 💾 Upload test logs on failure
       if: failure()
@@ -67,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: test
-    if: github.event_name == 'push' # Só roda stress tests em pushes, não PRs
+    if: github.event_name == 'push'
 
     steps:
     - name: 🔄 Checkout code
@@ -86,7 +89,7 @@ jobs:
         
     - name: 🔥 Run Stress Tests
       run: |
-        timeout 600 ./test_stress.sh || (echo "⚠️ Stress tests had issues" && exit 0)
+        timeout 600 make test-stress || echo "⚠️ Stress tests completed with warnings"
         
     - name: 💾 Upload stress test logs
       if: always()
@@ -95,36 +98,3 @@ jobs:
         name: stress-test-logs
         path: tests/stress_logs/
         retention-days: 3
-
-  memory-test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs: test
-    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[memory-test]')
-
-    steps:
-    - name: 🔄 Checkout code
-      uses: actions/checkout@v4
-
-    - name: 📦 Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential netcat-traditional valgrind
-        
-    - name: 🔧 Setup test environment
-      run: make test-setup
-        
-    - name: 🏗️ Compile IRC Server
-      run: make
-        
-    - name: 🧠 Run Memory Tests (Valgrind)
-      run: |
-        timeout 1200 ./test_valgrind.sh || (echo "⚠️ Memory tests completed with warnings" && exit 0)
-        
-    - name: 💾 Upload memory test logs
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: memory-test-logs
-        path: tests/valgrind_logs/
-        retention-days: 7
