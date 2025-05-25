@@ -103,9 +103,90 @@ void ModeCommand::execute(Client* client, const Message& message)
 
 void ModeCommand::showChannelModes(Client* client, Channel* channel)
 {
+	std::string modes = "+";
+	std::string params = "";
 
+	if (channel->isInviteOnly())
+	{
+		modes += "i";
+	}
+	if (channel->isTopicRestricted())
+	{
+		modes += "t";
+	}
+	if (channel->hasKey())
+	{
+		modes += "k";
+		if (!params.empty())
+		{
+			params += " ";
+		}
+		params += channel->getKey();
+	}
+	if (channel->hasUserLimit())
+	{
+		modes += "l";
+		if (!params.empty())
+		{
+			params += " ";
+		}
+		params += toString(channel->getUserLimit());
+	}
+	if (modes == "+")
+	{
+		modes = "+";
+	}
+
+	std::string reply = ":server 324 " + client->getNickname() + " " + 
+						channel->getName() + " " + modes;
+	if (!params.empty())
+	{
+		reply += " " + params;
+	}
+	reply += "\r\n";
+
+	client->sendMessage(reply);
 }
 
 void ModeCommand::processModeChanges(Client* client, Channel* channel, 
 									const std::string& modeString, const Message& message)
 {
+
+}
+
+bool ModeCommand::processInviteOnlyMode(Channel* channel, bool adding, std::string& appliedModes)
+{
+
+}
+
+bool ModeCommand::processTopicRestrictedMode(Channel* channel, bool adding, std::string& appliedModes)
+{
+
+}
+
+bool ModeCommand::processChannelKeyMode(Client* client, Channel* channel, bool adding,
+									   const Message& message, size_t& paramIndex,
+									   std::string& appliedModes, std::string& appliedParams)
+{
+
+}
+
+bool ModeCommand::processOperatorMode(Client* client, Channel* channel, bool adding,
+									 const Message& message, size_t& paramIndex,
+									 std::string& appliedModes, std::string& appliedParams)
+{
+
+}
+
+bool ModeCommand::processUserLimitMode(Client* client, Channel* channel, bool adding,
+									  const Message& message, size_t& paramIndex,
+									  std::string& appliedModes, std::string& appliedParams)
+{
+
+}
+
+void ModeCommand::broadcastModeChange(Client* client, Channel* channel,
+									 const std::string& appliedModes, const std::string& appliedParams)
+{
+
+}
