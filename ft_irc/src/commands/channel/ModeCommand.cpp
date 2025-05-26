@@ -42,7 +42,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (!client->isAuthenticated())
 	{
 		Print::Fail("Client not authenticated");
-		sendErrorReply(client, ERR_NOTREGISTERED, ":You have not registered");
+		sendErrorReply(client, IRC::ERR_NOTREGISTERED, ":You have not registered");
 		return;
 	}
 
@@ -50,7 +50,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (message.getSize() < 1 || message.getParams(0).empty())
 	{
 		Print::Fail("Not enough parameters");
-		sendErrorReply(client, ERR_NEEDMOREPARAMS, "MODE :Not enough parameters");
+		sendErrorReply(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters");
 		return;
 	}
 
@@ -59,7 +59,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (!isValidChannelName(channelName))
 	{
 		Print::Fail("Invalid channel name");
-		sendErrorReply(client, ERR_NOSUCHCHANNEL, channelName + " :No such channel");
+		sendErrorReply(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel");
 		return;
 	}
 
@@ -67,7 +67,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (!channel)
 	{
 		Print::Fail("Channel not found");
-		sendErrorReply(client, ERR_NOSUCHCHANNEL, channelName + " :No such channel");
+		sendErrorReply(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel");
 		return;
 	}
 
@@ -82,7 +82,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (!channel->hasClient(client))
 	{
 		Print::Fail("Client not in channel");
-		sendErrorReply(client, ERR_NOTONCHANNEL, channelName + " :You're not on that channel");
+		sendErrorReply(client, IRC::ERR_NOTONCHANNEL, channelName + " :You're not on that channel");
 		return;
 	}
 
@@ -90,7 +90,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (!channel->isOperator(client))
 	{
 		Print::Fail("Client not operator");
-		sendErrorReply(client, ERR_CHANOPRIVSNEEDED, channelName + " :You're not channel operator");
+		sendErrorReply(client, IRC::ERR_CHANOPRIVSNEEDED, channelName + " :You're not channel operator");
 		return;
 	}
 
@@ -197,7 +197,7 @@ void ModeCommand::processModeChanges(Client* client, Channel* channel,
 
 			default:
 				// Unknown mode
-				sendErrorReply(client, ERR_UNKNOWNMODE, std::string(1, mode) + " :is unknown mode char to me");
+				sendErrorReply(client, IRC::ERR_UNKNOWNMODE, std::string(1, mode) + " :is unknown mode char to me");
 				break;
 		}
 	}
@@ -277,7 +277,7 @@ bool ModeCommand::processChannelKeyMode(Client* client, Channel* channel, bool a
 		}
 		else
 		{
-			sendErrorReply(client, ERR_NEEDMOREPARAMS, "MODE +k :Not enough parameters");
+			sendErrorReply(client, IRC::ERR_NEEDMOREPARAMS, "MODE +k :Not enough parameters");
 		}
 	}
 	else
@@ -302,25 +302,25 @@ bool ModeCommand::processOperatorMode(Client* client, Channel* channel, bool add
 		std::string targetNick = message.getParams(paramIndex);
 		Client* targetClient = _server->getClientByNick(targetNick);
 
-		if (!targetNick)
+		if (!targetClient)
 		{
-			sendErrorReply(client, ERR_NOSUCHNICK, targetNick + " :No such nick");
+			sendErrorReply(client, IRC::ERR_NOSUCHNICK, targetNick + " :No such nick");
 		}
 		else if (!channel->hasClient(targetClient))
 		{
-			sendErrorReply(client, ERR_USERNOTINCHANNEL, targetNick + " " + channel->getName() +
+			sendErrorReply(client, IRC::ERR_USERNOTINCHANNEL, targetNick + " " + channel->getName() +
 			" :They aren't on that channel");
 		}
 		else
 		{
 			if (adding)
 			{
-				channel->addOperator(targetNick);
+				channel->addOperator(targetClient);
 				Print::Debug("Added operator: " + targetNick);
 			}
 			else
 			{
-				channel->removeOperator(targetNick);
+				channel->removeOperator(targetClient);
 				Print::Debug("Removed operator: " + targetNick);
 			}
 			appliedModes += (adding ? "+" : "-");
@@ -337,8 +337,8 @@ bool ModeCommand::processOperatorMode(Client* client, Channel* channel, bool add
 	}
 	else
 	{
-		sendErrorReply(client, ERR_NEEDMOREPARAMS, "MODE " + (adding ? "+" : "-") +
-		"o :Not enough parameters");
+		sendErrorReply(client, IRC::ERR_NEEDMOREPARAMS,
+			std::string("MODE ") + (adding ? "+" : "-") + "o :Not enough parameters");
 	}
 	return false;
 }
@@ -351,13 +351,55 @@ bool ModeCommand::processUserLimitMode(Client* client, Channel* channel, bool ad
 	{
 		if (paramIndex < message.getSize() && !message.getParams(paramIndex).empty())
 		{
-			
+			std::string limitStr = message.getParams(paramIndex);
+			int limit = atoi(limitStr.c_str());
+			if (limit > 0)
+			{
+				channel->setUserLimit(limit);
+				appliedModes += "+l";
+				if (!appliedParams.empty()) 
+				{
+					appliedParams += " ";
+				}
+				appliedParams += limitStr;
+				paramIndex++;
+				Print::Debug("User limit set to: " + limitStr);
+				return true;
+			}
+			else
+			{
+				sendErrorReply(client, 696, channel->getName() + " l * :Invalid limit");
+			}
+		}
+		else
+		{
+			sendErrorReply(client, 461, "MODE +l :Not enough parameters");
 		}
 	}
+	else
+	{
+		if (channel->hasUserLimit())
+		{
+			channel->removeUserLimit();
+			appliedModes += "-l";
+			Print::Debug("User limit removed");
+			return true;
+		}
+	}
+	return false;
 }
 
 void ModeCommand::broadcastModeChange(Client* client, Channel* channel,
 									 const std::string& appliedModes, const std::string& appliedParams)
 {
+	std::string modeChange = ":" + client->getNickname() + " MODE " + 
+							channel->getName() + " " + appliedModes;
+	if (!appliedParams.empty())
+	{
+		modeChange += " " + appliedParams;
+	}
+	modeChange += "\r\n";
 
+	channel->broadcast(modeChange, -1); // Broadcast to all members
+	Print::Debug("Broadcasted mode change: " + appliedModes);
 }
