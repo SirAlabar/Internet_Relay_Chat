@@ -6,6 +6,7 @@
 class Client;
 class Server;
 class Message;
+class Channel;
 
 class InviteCommand : public ACommand
 {
@@ -13,6 +14,8 @@ private:
 	// Private to prevent copying
 	InviteCommand(const InviteCommand& other);
 	InviteCommand& operator=(const InviteCommand& other);
+
+	void executeInvite(Client* inviter, Client* target, Channel* channel);
 
 public:
 	InviteCommand(Server* server);

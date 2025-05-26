@@ -5,10 +5,12 @@
 #include "Client.hpp"
 #include "CommandFactory.hpp"
 #include "JoinCommand.hpp"
+#include "InviteCommand.hpp"
 #include "ListCommand.hpp"
 #include "KickCommand.hpp"
 #include "PartCommand.hpp"
 #include "Message.hpp"
+#include "PrivmsgCommand.hpp"
 #include "NickCommand.hpp"
 #include "CapCommand.hpp"
 #include "PassCommand.hpp"
@@ -33,7 +35,7 @@ void CommandFactory::initializeCommands()
     }
 
     // Channel commands
-    // registerCommand("INVITE", &InviteCommand::create);
+    registerCommand("INVITE", &InviteCommand::create);
     registerCommand("JOIN", &JoinCommand::create);
     registerCommand("KICK", &KickCommand::create);
     registerCommand("LIST", &ListCommand::create);
@@ -52,7 +54,7 @@ void CommandFactory::initializeCommands()
 
     // Messaging commands
     registerCommand("NOTICE", &NoticeCommand::create);
-    // registerCommand("PRIVMSG", &PrivmsgCommand::create);
+    registerCommand("PRIVMSG", &PrivmsgCommand::create);
     registerCommand("WHO", &WhoCommand::create);
     registerCommand("WHOIS", &WhoIsCommand::create);
 
