@@ -3,6 +3,7 @@
 #include "Message.hpp"
 #include "Server.hpp"
 #include "Channel.hpp"
+#include "General.hpp"
 #include "UtilsFun.hpp"
 
 ModeCommand::ModeCommand(Server* server) : ACommand(server) {}
@@ -41,7 +42,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (!client->isAuthenticated())
 	{
 		Print::Fail("Client not authenticated");
-		sendErrorReply(client, 451, ":You have not registered");
+		sendErrorReply(client, ERR_NOTREGISTERED, ":You have not registered");
 		return;
 	}
 
@@ -49,7 +50,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (message.getSize() < 1 || message.getParams(0).empty())
 	{
 		Print::Fail("Not enough parameters");
-		sendErrorReply(client, 461, "MODE :Not enough parameters");
+		sendErrorReply(client, ERR_NEEDMOREPARAMS, "MODE :Not enough parameters");
 		return;
 	}
 
@@ -58,7 +59,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (!isValidChannelName(channelName))
 	{
 		Print::Fail("Invalid channel name");
-		sendErrorReply(client, 403, channelName + " :No such channel");
+		sendErrorReply(client, ERR_NOSUCHCHANNEL, channelName + " :No such channel");
 		return;
 	}
 
@@ -66,7 +67,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (!channel)
 	{
 		Print::Fail("Channel not found");
-		sendErrorReply(client, 403, channelName + " :No such channel");
+		sendErrorReply(client, ERR_NOSUCHCHANNEL, channelName + " :No such channel");
 		return;
 	}
 
@@ -81,7 +82,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (!channel->hasClient(client))
 	{
 		Print::Fail("Client not in channel");
-		sendErrorReply(client, 442, channelName + " :You're not on that channel");
+		sendErrorReply(client, ERR_NOTONCHANNEL, channelName + " :You're not on that channel");
 		return;
 	}
 
@@ -89,7 +90,7 @@ void ModeCommand::execute(Client* client, const Message& message)
 	if (!channel->isOperator(client))
 	{
 		Print::Fail("Client not operator");
-		sendErrorReply(client, 482, channelName + " :You're not channel operator");
+		sendErrorReply(client, ERR_CHANOPRIVSNEEDED, channelName + " :You're not channel operator");
 		return;
 	}
 
@@ -151,38 +152,208 @@ void ModeCommand::showChannelModes(Client* client, Channel* channel)
 void ModeCommand::processModeChanges(Client* client, Channel* channel, 
 									const std::string& modeString, const Message& message)
 {
+	bool adding = true;
+	std::string appliedModes = "";
+	std::string appliedParams = "";
+	size_t paramIndex = 2;
 
+	for (size_t i = 0; i < modeString.length(); ++i)
+	{
+		char mode = modeString[i];
+
+		if (mode == '+')
+		{
+			adding = true;
+			continue;
+		}
+		else if (mode == '-')
+		{
+			adding = false;
+			continue;
+		}
+
+		// Process individual modes
+		switch (mode)
+		{
+			case 'i': // Invite-only
+				processInviteOnlyMode(channel, adding, appliedModes);
+				break;
+
+			case 't': // Topic restricted
+				processTopicRestrictedMode(channel, adding, appliedModes);
+				break;
+
+			case 'k': // Channel key
+				processChannelKeyMode(client, channel, adding, message, paramIndex, appliedModes, appliedParams);
+				break;
+
+			case 'o': // Operator privilege
+				processOperatorMode(client, channel, adding, message, paramIndex, appliedModes, appliedParams);
+				break;
+
+			case 'l': // User limit
+				processUserLimitMode(client, channel, adding, message, paramIndex, appliedModes, appliedParams);
+				break;
+
+			default:
+				// Unknown mode
+				sendErrorReply(client, ERR_UNKNOWNMODE, std::string(1, mode) + " :is unknown mode char to me");
+				break;
+		}
+	}
+
+	// Send mode change notification to all channel members
+	if (!appliedModes.empty())
+	{
+		broadcastModeChange(client, channel, appliedModes, appliedParams);
+	}
 }
 
 bool ModeCommand::processInviteOnlyMode(Channel* channel, bool adding, std::string& appliedModes)
 {
-
+	if (adding != channel->isInviteOnly())
+	{
+		channel->setInviteOnly(adding);
+		
+		if (adding)
+		{
+			appliedModes += "+";
+			Print::Debug("Channel set to invite-only");
+		}
+		else
+		{
+			appliedModes += "-";
+			Print::Debug("Channel removed from invite-only");
+		}
+		
+		appliedModes += "i";
+		return true;
+	}
+	return false;
 }
 
 bool ModeCommand::processTopicRestrictedMode(Channel* channel, bool adding, std::string& appliedModes)
 {
-
+	if (adding != channel->isTopicRestricted())
+	{
+		channel->setTopicRestricted(adding);
+		
+		if (adding)
+		{
+			appliedModes += "+";
+			Print::Debug("Topic restriction enabled");
+		}
+		else
+		{
+			appliedModes += "-";
+			Print::Debug("Topic restriction disabled");
+		}
+		
+		appliedModes += "t";
+		return true;
+	}
+	return false;
 }
 
 bool ModeCommand::processChannelKeyMode(Client* client, Channel* channel, bool adding,
 									   const Message& message, size_t& paramIndex,
 									   std::string& appliedModes, std::string& appliedParams)
 {
-
+	if (adding)
+	{
+		if (paramIndex < message.getSize() && !message.getParams(paramIndex).empty())
+		{
+			std::string key = message.getParams(paramIndex);
+			channel->setKey(key);
+			appliedModes += "+k";
+			if (!appliedParams.empty()) 
+			{
+				appliedParams += " ";
+			}
+			appliedParams += key;
+			paramIndex++;
+			Print::Debug("Channel key set");
+			return true;
+		}
+		else
+		{
+			sendErrorReply(client, ERR_NEEDMOREPARAMS, "MODE +k :Not enough parameters");
+		}
+	}
+	else
+	{
+		if (channel->hasKey())
+		{
+			channel->removeKey();
+			appliedModes += "-k";
+			Print::Debug("Channel key removed");
+			return true;
+		}
+	}
+	return false;
 }
 
 bool ModeCommand::processOperatorMode(Client* client, Channel* channel, bool adding,
 									 const Message& message, size_t& paramIndex,
 									 std::string& appliedModes, std::string& appliedParams)
 {
+	if (paramIndex < message.getSize() && !message.getParams(paramIndex).empty())
+	{
+		std::string targetNick = message.getParams(paramIndex);
+		Client* targetClient = _server->getClientByNick(targetNick);
 
+		if (!targetNick)
+		{
+			sendErrorReply(client, ERR_NOSUCHNICK, targetNick + " :No such nick");
+		}
+		else if (!channel->hasClient(targetClient))
+		{
+			sendErrorReply(client, ERR_USERNOTINCHANNEL, targetNick + " " + channel->getName() +
+			" :They aren't on that channel");
+		}
+		else
+		{
+			if (adding)
+			{
+				channel->addOperator(targetNick);
+				Print::Debug("Added operator: " + targetNick);
+			}
+			else
+			{
+				channel->removeOperator(targetNick);
+				Print::Debug("Removed operator: " + targetNick);
+			}
+			appliedModes += (adding ? "+" : "-");
+			appliedModes += "o";
+			if (!appliedParams.empty())
+			{
+				appliedParams += " ";
+			}
+			appliedParams += targetNick;
+			paramIndex++;
+			return true;
+		}
+		paramIndex++;
+	}
+	else
+	{
+		sendErrorReply(client, ERR_NEEDMOREPARAMS, "MODE " + (adding ? "+" : "-") +
+		"o :Not enough parameters");
+	}
+	return false;
 }
 
 bool ModeCommand::processUserLimitMode(Client* client, Channel* channel, bool adding,
 									  const Message& message, size_t& paramIndex,
 									  std::string& appliedModes, std::string& appliedParams)
 {
-
+	if (adding)
+	{
+		if (paramIndex < message.getSize() && !message.getParams(paramIndex).empty())
+		{
+			
+		}
+	}
 }
 
 void ModeCommand::broadcastModeChange(Client* client, Channel* channel,
