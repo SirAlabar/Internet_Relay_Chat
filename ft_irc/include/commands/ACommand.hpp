@@ -5,10 +5,13 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+
 #include "General.hpp"
+
 #include "Client.hpp"
 #include "Message.hpp"
 #include "Server.hpp"
+#include "Channel.hpp"
 
 // Forward declarations
 class Client;
