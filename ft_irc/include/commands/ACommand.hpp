@@ -32,9 +32,9 @@ public:
 	bool isValidNickname(const std::string& nickname);
 
 	// Send replies to clients
-	void sendReply(Client* client, const std::string& reply);
-	void sendNumericReply(Client* client, int numeric, const std::string& message);
-	void sendErrorReply(Client* client, int numeric, const std::string& message);
+	void sendReply(Client* client, const std::string& reply) const;
+	void sendNumericReply(Client* client, int numeric, const std::string& message) const;
+	void sendErrorReply(Client* client, int numeric, const std::string& message) const;
 };
 
 #endif

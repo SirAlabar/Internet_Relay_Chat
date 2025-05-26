@@ -97,7 +97,7 @@ bool ACommand::isValidNickname(const std::string& nickname)
 }
 
 // Send a reply message to a client
-void ACommand::sendReply(Client* client, const std::string& reply)
+void ACommand::sendReply(Client* client, const std::string& reply) const
 {
     if (client)
     {
@@ -106,7 +106,7 @@ void ACommand::sendReply(Client* client, const std::string& reply)
 }
 
 // Send a numeric reply (according to IRC protocol) to a client
-void ACommand::sendNumericReply(Client* client, int numeric, const std::string& message)
+void ACommand::sendNumericReply(Client* client, int numeric, const std::string& message) const
 {
     if (client)
     {
@@ -124,7 +124,7 @@ void ACommand::sendNumericReply(Client* client, int numeric, const std::string& 
 }
 
 // Send an error reply to a client
-void ACommand::sendErrorReply(Client* client, int numeric, const std::string& message)
+void ACommand::sendErrorReply(Client* client, int numeric, const std::string& message) const
 {
     sendNumericReply(client, numeric, message);
 }
