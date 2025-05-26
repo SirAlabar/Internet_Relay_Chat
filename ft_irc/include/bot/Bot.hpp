@@ -38,7 +38,7 @@ public:
     void processMessage(const std::string& rawMessage);
     void sendMessage(const std::string& message);
 
-    void authenticate();
+    bool authenticate();
     void joinChannel(const std::string& channel);
     void partChannel(const std::string& channel);
     void handleBotCommand(const std::string& channel, const std::string& user,

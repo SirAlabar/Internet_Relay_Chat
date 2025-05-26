@@ -1,5 +1,5 @@
-#include "utils/Socket.hpp"
-#include "utils/UtilsFun.hpp"
+#include "Socket.hpp"
+#include "UtilsFun.hpp"
 
 Socket::Socket() : _fd(-1), _lastError(0), _blocking(true), _addr() {}
 

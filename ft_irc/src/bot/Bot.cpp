@@ -48,6 +48,8 @@ Bot::Bot(std::string host, int port, std::string password)
     Print::Log("[BOT] Bot initialized - Target: " + host + " : " + toString(port));
 }
 
+Bot::~Bot() {};
+void Bot::disconnect() {};
 bool Bot::connect()
 {
     Print::Do("[BOT] Attempting to connect to " + _serverHost + " : " +
@@ -57,29 +59,60 @@ bool Bot::connect()
         Print::Fail("Error creating socket: " + toString(_socket.getLastError()));
         return (false);
     }
-    // Configure socket options
+    // Connect to server
     if (!_socket.connect(_serverHost, _serverPort))
     {
-        Print::Fail("[BOT] Error connecting");
+        Print::Fail("[BOT] Failed to connect: " + _socket.getLastError());
         return (false);
     }
-    // Set as non-blocking
-    if (!_socket.setNonBlocking())
+    Print::Ok("[BOT] Connected to server succesfully!");
+    if (!authenticate())
     {
-        Print::Fail("Error setting socket to non-blocking: " +
-                    toString(_socket.getLastError()));
+        Print::Fail("[BOT] Failed to authenticate: " + _socket.getLastError());
+        disconnect();
         return (false);
     }
     Print::Ok("[BOT] started on port " + toString(_serverPort));
-
     return (true);
 }
 
+bool Bot::authenticate()
+{
+    Print::Do("[BOT] Start authenticating...");
+    std::string pass = "PASS " + _password + "\r\n";
+    std::string nick = "NICK " + _nickname + "\r\n";
+    std::string user = "USER " + _nickname + " 0 * :IRC Bot\r\n";
+    if (_socket.send(pass) < 0)
+    {
+        Print::Fail("[BOT] Failed to send PASS command");
+        return (false);
+    }
+    if (_socket.send(nick) < 0)
+    {
+        Print::Fail("[BOT] Failed to send NICK command");
+        return (false);
+    }
+    if (_socket.send(user) < 0)
+    {
+        Print::Fail("[BOT] Failed to send USER command");
+        return (false);
+    }
+    _authenticated = true;
+    Print::Ok("[BOT] Authentication commands succesfull sent");
+    return (true);
+}
+
+void Bot::run() { Print::Do("[BOT] Bot is running"); }
 int main(int argc, char* argv[])
 {
     if (argc == 3)
     {
         Bot bot("localhost", toInt(argv[1]), std::string(argv[2]));
+        if (bot.connect())
+        {
+            Print::Ok("[BOT] Starting main loop...");
+            bot.run();
+        }
     }
     else
     {
