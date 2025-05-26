@@ -67,7 +67,8 @@ SRCS =  $(SRC_DIR)/main.cpp \
 		$(SRC_DIR)/commands/messaging/NoticeCommand.cpp \
 		$(SRC_DIR)/commands/messaging/PrivmsgCommand.cpp \
 		$(SRC_DIR)/commands/messaging/WhoCommand.cpp \
-		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp 
+		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp \
+		$(SRC_DIR)/commands/channel/TopicCommand.cpp
 
 # Object files
 OBJ_DIR = obj

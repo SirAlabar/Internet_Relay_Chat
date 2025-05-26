@@ -1,7 +1,15 @@
 #include "Channel.hpp"
 #include "Client.hpp"
 
-Channel::Channel(const std::string& name) : _name(name) {}
+Channel::Channel(const std::string& name)
+    : _name(name),
+    _topic(""),
+    _inviteOnly(false),
+    _topicRestricted(false),
+    _hasKey(false),
+    _key(""),
+    _hasUserLimit(false),
+    _userLimit(0) {}
 
 Channel::~Channel() {}
 
