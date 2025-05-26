@@ -34,7 +34,7 @@ std::vector<std::string> ACommand::splitArguments(const std::string& args, char 
 }
 
 // Check if a channel name is valid according to IRC standards
-bool ACommand::isValidChannelName(const std::string& channelName)
+bool ACommand::isValidChannelName(const std::string& channelName) const
 {
     if (channelName.length() < 2)
     {
@@ -63,7 +63,7 @@ bool ACommand::isValidChannelName(const std::string& channelName)
 }
 
 // Check if a nickname is valid according to IRC standards
-bool ACommand::isValidNickname(const std::string& nickname)
+bool ACommand::isValidNickname(const std::string& nickname) const
 {
     if (nickname.empty())
     {

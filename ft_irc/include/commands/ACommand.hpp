@@ -35,8 +35,8 @@ public:
 
 	std::vector<std::string> splitArguments(const std::string& args,
 						char delimiter = ' ');
-	bool isValidChannelName(const std::string& channelName);
-	bool isValidNickname(const std::string& nickname);
+	bool isValidChannelName(const std::string& channelName) const;
+	bool isValidNickname(const std::string& nickname) const;
 
 	// Send replies to clients
 	void sendReply(Client* client, const std::string& reply) const;
