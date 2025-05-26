@@ -2,12 +2,19 @@
 #define ACOMMAND_HPP
 
 #include <string>
+#include <sstream>
 #include <vector>
+#include <algorithm>
+#include "General.hpp"
+#include "Client.hpp"
+#include "Message.hpp"
+#include "Server.hpp"
 
 // Forward declarations
 class Client;
 class Server;
 class Message;
+class Channel;
 
 class ACommand
 {
