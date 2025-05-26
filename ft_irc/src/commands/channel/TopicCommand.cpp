@@ -32,25 +32,15 @@ ACommand* TopicCommand::create(Server* server)
 void TopicCommand::execute(Client* client, const Message& message)
 {
     Print::Do("execute TOPIC command");
-
-    if(!validateClient(client))
-    {
-        return;
-    }
-    
-    if(!validateParameterCount(client, message, 1, "TOPIC"))
+    if(!validateClientRegist(client)
+        || !validateParameterCount(client, message, 1, "TOPIC"))
     {
         return;
     }
 
     std::string channelName = message.getParams(0);
     Channel* channel = validateAndGetChannel(client, channelName);
-    if (!channel)
-    {
-        return;
-    }
-
-    if (!validateChannelMembership(client, channel, channelName))    
+    if (!channel || !validateChannelMembership(client, channel, channelName))
     {
         return;
     }
@@ -63,21 +53,41 @@ void TopicCommand::execute(Client* client, const Message& message)
         return;
     }
 
-    std::string newTopic = message.getParams(1);
-    if (!newTopic.empty())
+    if (message.getSize() == 1)
     {
-        channel->setTopic(message.getParams(1));
+        std::string currentTopic = channel->getTopic();
+        if (currentTopic.empty())
+        {
+            sendNumericReply(client, IRC::RPL_NOTOPIC, 
+                             channelName + " :No topic is set");
+        }
+        else
+        {
+            sendNumericReply(client, IRC::RPL_TOPIC,
+                             channelName + " :" + currentTopic);
+        }
+        return ;
+    }
+
+    std::string newTopic = message.getParams(1);
+    if (newTopic.empty())
+    {
+        channel->setTopic("");
+    }
+    else
+    {
+        channel->setTopic(newTopic);
     }
 
     std::string topicMsg = ":" + client->getNickname();
     if (!client->getUsername().empty())
     {
-        topicMsg += "!" + client->getUsername() + "@localhost"; // need to change that localhost!!!
-        //
+        topicMsg += "!" + client->getUsername() + "@localhost";
+        // need to change that localhost, blhac!!!
     }
-    topicMsg += " TOPIC " + channelName + " :" + newTopic + "\r\n";
 
+    topicMsg += " TOPIC " + channelName
+        + " :" + newTopic + "\r\n";
     _server->broadcastChannel(topicMsg, channelName, -1);
-
     Print::Ok("");
 }
