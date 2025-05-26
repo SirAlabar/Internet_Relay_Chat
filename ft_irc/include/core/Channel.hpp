@@ -14,6 +14,13 @@ private:
     std::map<int, Client*> _clients;
     std::map<int, Client*> _operators;
 
+	bool _inviteOnly;
+    bool _topicRestricted;
+    bool _hasKey;
+    std::string _key;
+    bool _hasUserLimit;
+    int _userLimit;
+
 public:
     Channel(const std::string& name);
     ~Channel();
@@ -34,7 +41,28 @@ public:
 
     // Operator management
     void addOperator(Client* _operator);
+	void removeOperator(Client* client);
     bool isOperator(Client* client) const;
+
+	// Mode management
+    bool isInviteOnly() const;
+    void setInviteOnly(bool inviteOnly);
+    
+    bool isTopicRestricted() const;
+    void setTopicRestricted(bool restricted);
+    
+    bool hasKey() const;
+    const std::string& getKey() const;
+    void setKey(const std::string& key);
+    void removeKey();
+    
+    bool hasUserLimit() const;
+    int getUserLimit() const;
+    void setUserLimit(int limit);
+    void removeUserLimit();
+
+    // Broadcasting
+    void broadcast(const std::string& message, int excludeFd = -1);
 
     // Utility
     bool isEmpty() const;
