@@ -133,10 +133,6 @@ void ModeCommand::showChannelModes(Client* client, Channel* channel)
 		}
 		params += toString(channel->getUserLimit());
 	}
-	if (modes == "+")
-	{
-		modes = "+";
-	}
 
 	std::string reply = ":server 324 " + client->getNickname() + " " + 
 						channel->getName() + " " + modes;
@@ -147,19 +143,24 @@ void ModeCommand::showChannelModes(Client* client, Channel* channel)
 	reply += "\r\n";
 
 	client->sendMessage(reply);
+	Print::Debug("Sent channel modes: " + modes);
 }
 
 void ModeCommand::processModeChanges(Client* client, Channel* channel, 
 									const std::string& modeString, const Message& message)
 {
 	bool adding = true;
-	std::string appliedModes = "";
+	std::string addedModes = "";
+	std::string removedModes = "";
 	std::string appliedParams = "";
 	size_t paramIndex = 2;
+
+	Print::Debug("Starting mode processing: " + modeString);
 
 	for (size_t i = 0; i < modeString.length(); ++i)
 	{
 		char mode = modeString[i];
+		Print::Debug("Processing char: " + std::string(1, mode) + " (adding: " + toString(adding) + ")");
 
 		if (mode == '+')
 		{
@@ -173,91 +174,122 @@ void ModeCommand::processModeChanges(Client* client, Channel* channel,
 		}
 
 		// Process individual modes
+		bool modeChanged = false;
 		switch (mode)
 		{
 			case 'i': // Invite-only
-				processInviteOnlyMode(channel, adding, appliedModes);
+				modeChanged = processInviteOnlyMode(channel, adding);
+				if (modeChanged)
+				{
+					if (adding)
+						addedModes += "i";
+					else
+						removedModes += "i";
+				}
 				break;
 
 			case 't': // Topic restricted
-				processTopicRestrictedMode(channel, adding, appliedModes);
+				modeChanged = processTopicRestrictedMode(channel, adding);
+				if (modeChanged)
+				{
+					if (adding)
+						addedModes += "t";
+					else
+						removedModes += "t";
+				}
 				break;
 
 			case 'k': // Channel key
-				processChannelKeyMode(client, channel, adding, message, paramIndex, appliedModes, appliedParams);
+				modeChanged = processChannelKeyMode(client, channel, adding, message, paramIndex, appliedParams);
+				if (modeChanged)
+				{
+					if (adding)
+						addedModes += "k";
+					else
+						removedModes += "k";
+				}
 				break;
 
 			case 'o': // Operator privilege
-				processOperatorMode(client, channel, adding, message, paramIndex, appliedModes, appliedParams);
+				modeChanged = processOperatorMode(client, channel, adding, message, paramIndex, appliedParams);
+				if (modeChanged)
+				{
+					if (adding)
+						addedModes += "o";
+					else
+						removedModes += "o";
+				}
 				break;
 
 			case 'l': // User limit
-				processUserLimitMode(client, channel, adding, message, paramIndex, appliedModes, appliedParams);
+				modeChanged = processUserLimitMode(client, channel, adding, message, paramIndex, appliedParams);
+				if (modeChanged)
+				{
+					if (adding)
+						addedModes += "l";
+					else
+						removedModes += "l";
+				}
 				break;
 
 			default:
-				// Unknown mode
+				Print::Warn("Unknown mode: " + std::string(1, mode));
 				sendErrorReply(client, IRC::ERR_UNKNOWNMODE, std::string(1, mode) + " :is unknown mode char to me");
 				break;
 		}
 	}
 
-	// Send mode change notification to all channel members
-	if (!appliedModes.empty())
+	// Build final mode string
+	std::string finalModes = "";
+	if (!addedModes.empty())
 	{
-		broadcastModeChange(client, channel, appliedModes, appliedParams);
+		finalModes += "+" + addedModes;
+	}
+	if (!removedModes.empty())
+	{
+		finalModes += "-" + removedModes;
+	}
+
+	// Send mode change notification to all channel members
+	if (!finalModes.empty())
+	{
+		Print::Debug("Final modes to broadcast: " + finalModes);
+		Print::Debug("Params to broadcast: " + appliedParams);
+		broadcastModeChange(client, channel, finalModes, appliedParams);
+	}
+	else
+	{
+		Print::Debug("No mode changes applied");
 	}
 }
 
-bool ModeCommand::processInviteOnlyMode(Channel* channel, bool adding, std::string& appliedModes)
+bool ModeCommand::processInviteOnlyMode(Channel* channel, bool adding)
 {
 	if (adding != channel->isInviteOnly())
 	{
 		channel->setInviteOnly(adding);
-		
-		if (adding)
-		{
-			appliedModes += "+";
-			Print::Debug("Channel set to invite-only");
-		}
-		else
-		{
-			appliedModes += "-";
-			Print::Debug("Channel removed from invite-only");
-		}
-		
-		appliedModes += "i";
+		Print::Debug("Invite-only mode " + std::string(adding ? "enabled" : "disabled"));
 		return true;
 	}
+	Print::Debug("Invite-only mode already " + std::string(adding ? "enabled" : "disabled"));
 	return false;
 }
 
-bool ModeCommand::processTopicRestrictedMode(Channel* channel, bool adding, std::string& appliedModes)
+bool ModeCommand::processTopicRestrictedMode(Channel* channel, bool adding)
 {
 	if (adding != channel->isTopicRestricted())
 	{
 		channel->setTopicRestricted(adding);
-		
-		if (adding)
-		{
-			appliedModes += "+";
-			Print::Debug("Topic restriction enabled");
-		}
-		else
-		{
-			appliedModes += "-";
-			Print::Debug("Topic restriction disabled");
-		}
-		
-		appliedModes += "t";
+		Print::Debug("Topic restriction " + std::string(adding ? "enabled" : "disabled"));
 		return true;
 	}
+	Print::Debug("Topic restriction already " + std::string(adding ? "enabled" : "disabled"));
 	return false;
 }
 
 bool ModeCommand::processChannelKeyMode(Client* client, Channel* channel, bool adding,
 									   const Message& message, size_t& paramIndex,
-									   std::string& appliedModes, std::string& appliedParams)
+									   std::string& appliedParams)
 {
 	if (adding)
 	{
@@ -265,18 +297,18 @@ bool ModeCommand::processChannelKeyMode(Client* client, Channel* channel, bool a
 		{
 			std::string key = message.getParams(paramIndex);
 			channel->setKey(key);
-			appliedModes += "+k";
 			if (!appliedParams.empty()) 
 			{
 				appliedParams += " ";
 			}
 			appliedParams += key;
 			paramIndex++;
-			Print::Debug("Channel key set");
+			Print::Debug("Channel key set to: " + key);
 			return true;
 		}
 		else
 		{
+			Print::Warn("MODE +k requires a parameter");
 			sendErrorReply(client, IRC::ERR_NEEDMOREPARAMS, "MODE +k :Not enough parameters");
 		}
 	}
@@ -285,17 +317,17 @@ bool ModeCommand::processChannelKeyMode(Client* client, Channel* channel, bool a
 		if (channel->hasKey())
 		{
 			channel->removeKey();
-			appliedModes += "-k";
 			Print::Debug("Channel key removed");
 			return true;
 		}
+		Print::Debug("Channel key already not set");
 	}
 	return false;
 }
 
 bool ModeCommand::processOperatorMode(Client* client, Channel* channel, bool adding,
 									 const Message& message, size_t& paramIndex,
-									 std::string& appliedModes, std::string& appliedParams)
+									 std::string& appliedParams)
 {
 	if (paramIndex < message.getSize() && !message.getParams(paramIndex).empty())
 	{
@@ -304,27 +336,35 @@ bool ModeCommand::processOperatorMode(Client* client, Channel* channel, bool add
 
 		if (!targetClient)
 		{
+			Print::Warn("Target user not found: " + targetNick);
 			sendErrorReply(client, IRC::ERR_NOSUCHNICK, targetNick + " :No such nick");
 		}
 		else if (!channel->hasClient(targetClient))
 		{
+			Print::Warn("Target user not in channel: " + targetNick);
 			sendErrorReply(client, IRC::ERR_USERNOTINCHANNEL, targetNick + " " + channel->getName() +
 			" :They aren't on that channel");
 		}
 		else
 		{
-			if (adding)
+			bool currentlyOp = channel->isOperator(targetClient);
+			if (adding && !currentlyOp)
 			{
 				channel->addOperator(targetClient);
 				Print::Debug("Added operator: " + targetNick);
 			}
-			else
+			else if (!adding && currentlyOp)
 			{
 				channel->removeOperator(targetClient);
 				Print::Debug("Removed operator: " + targetNick);
 			}
-			appliedModes += (adding ? "+" : "-");
-			appliedModes += "o";
+			else
+			{
+				Print::Debug("User " + targetNick + " is already " + (adding ? "operator" : "not operator"));
+				paramIndex++;
+				return false;
+			}
+			
 			if (!appliedParams.empty())
 			{
 				appliedParams += " ";
@@ -337,6 +377,7 @@ bool ModeCommand::processOperatorMode(Client* client, Channel* channel, bool add
 	}
 	else
 	{
+		Print::Warn("MODE " + std::string(adding ? "+" : "-") + "o requires a parameter");
 		sendErrorReply(client, IRC::ERR_NEEDMOREPARAMS,
 			std::string("MODE ") + (adding ? "+" : "-") + "o :Not enough parameters");
 	}
@@ -345,7 +386,7 @@ bool ModeCommand::processOperatorMode(Client* client, Channel* channel, bool add
 
 bool ModeCommand::processUserLimitMode(Client* client, Channel* channel, bool adding,
 									  const Message& message, size_t& paramIndex,
-									  std::string& appliedModes, std::string& appliedParams)
+									  std::string& appliedParams)
 {
 	if (adding)
 	{
@@ -356,7 +397,6 @@ bool ModeCommand::processUserLimitMode(Client* client, Channel* channel, bool ad
 			if (limit > 0)
 			{
 				channel->setUserLimit(limit);
-				appliedModes += "+l";
 				if (!appliedParams.empty()) 
 				{
 					appliedParams += " ";
@@ -368,12 +408,15 @@ bool ModeCommand::processUserLimitMode(Client* client, Channel* channel, bool ad
 			}
 			else
 			{
-				sendErrorReply(client, 696, channel->getName() + " l * :Invalid limit");
+				Print::Warn("Invalid user limit: " + limitStr);
+				sendErrorReply(client, IRC::ERR_INVALIDLIMIT, channel->getName() + " l * :Invalid limit");
+				paramIndex++;
 			}
 		}
 		else
 		{
-			sendErrorReply(client, 461, "MODE +l :Not enough parameters");
+			Print::Warn("MODE +l requires a parameter");
+			sendErrorReply(client, IRC::ERR_NEEDMOREPARAMS, "MODE +l :Not enough parameters");
 		}
 	}
 	else
@@ -381,10 +424,10 @@ bool ModeCommand::processUserLimitMode(Client* client, Channel* channel, bool ad
 		if (channel->hasUserLimit())
 		{
 			channel->removeUserLimit();
-			appliedModes += "-l";
 			Print::Debug("User limit removed");
 			return true;
 		}
+		Print::Debug("User limit already not set");
 	}
 	return false;
 }
@@ -400,6 +443,7 @@ void ModeCommand::broadcastModeChange(Client* client, Channel* channel,
 	}
 	modeChange += "\r\n";
 
-	channel->broadcast(modeChange, -1); // Broadcast to all members
-	Print::Debug("Broadcasted mode change: " + appliedModes);
+	Print::Debug("Broadcasting mode change: " + modeChange);
+	channel->broadcast(modeChange, -1);
+	Print::Ok("Mode change broadcasted");
 }

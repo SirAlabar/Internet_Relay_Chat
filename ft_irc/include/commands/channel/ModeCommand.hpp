@@ -21,19 +21,19 @@ private:
 						   const std::string& modeString, const Message& message);
 	
 	// Individual mode processors
-	bool processInviteOnlyMode(Channel* channel, bool adding, std::string& appliedModes);
-	bool processTopicRestrictedMode(Channel* channel, bool adding, std::string& appliedModes);
-	bool processChannelKeyMode(Client* client, Channel* channel, bool adding, 
-							   const Message& message, size_t& paramIndex, 
-							   std::string& appliedModes, std::string& appliedParams);
+	bool processInviteOnlyMode(Channel* channel, bool adding);
+	bool processTopicRestrictedMode(Channel* channel, bool adding);
+	bool processChannelKeyMode(Client* client, Channel* channel, bool adding,
+								const Message& message, size_t& paramIndex,
+								std::string& appliedParams);
 	bool processOperatorMode(Client* client, Channel* channel, bool adding,
-							const Message& message, size_t& paramIndex,
-							std::string& appliedModes, std::string& appliedParams);
+								const Message& message, size_t& paramIndex,
+								std::string& appliedParams);
 	bool processUserLimitMode(Client* client, Channel* channel, bool adding,
-							 const Message& message, size_t& paramIndex,
-							 std::string& appliedModes, std::string& appliedParams);
-	void broadcastModeChange(Client* client, Channel* channel, 
-							const std::string& appliedModes, const std::string& appliedParams);
+								const Message& message, size_t& paramIndex,
+								std::string& appliedParams);
+	void broadcastModeChange(Client* client, Channel* channel,
+								const std::string& appliedModes, const std::string& appliedParams);
 
 public:
 	ModeCommand(Server* server);
