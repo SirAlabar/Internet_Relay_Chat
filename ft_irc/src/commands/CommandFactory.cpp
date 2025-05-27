@@ -10,6 +10,7 @@
 #include "KickCommand.hpp"
 #include "PartCommand.hpp"
 #include "Message.hpp"
+#include "ModeCommand.hpp"
 #include "PrivmsgCommand.hpp"
 #include "NickCommand.hpp"
 #include "CapCommand.hpp"
@@ -21,6 +22,7 @@
 #include "NoticeCommand.hpp"
 #include "WhoCommand.hpp"
 #include "WhoIsCommand.hpp"
+#include "TopicCommand.hpp"
 
 // Initialize static members
 std::map<std::string, CommandFactory::CommandCreator> CommandFactory::_commandCreators;
@@ -39,9 +41,9 @@ void CommandFactory::initializeCommands()
     registerCommand("JOIN", &JoinCommand::create);
     registerCommand("KICK", &KickCommand::create);
     registerCommand("LIST", &ListCommand::create);
-    // registerCommand("MODE", &ModeCommand::create);
+    registerCommand("MODE", &ModeCommand::create);
     registerCommand("PART", &PartCommand::create);
-    // registerCommand("TOPIC", &TopicCommand::create);
+    registerCommand("TOPIC", &TopicCommand::create);
 
     // Connection commands
     registerCommand("CAP", &CapCommand::create);

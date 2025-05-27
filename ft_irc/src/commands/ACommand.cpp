@@ -1,11 +1,5 @@
-#include <algorithm>
-#include <sstream>
-#include <string>
-
 #include "ACommand.hpp"
-#include "Client.hpp"
-#include "Message.hpp"
-#include "Server.hpp"
+#include "General.hpp"
 
 // Constructor with server reference
 ACommand::ACommand(Server* server) : _server(server) {}
@@ -41,7 +35,7 @@ std::vector<std::string> ACommand::splitArguments(const std::string& args, char 
 }
 
 // Check if a channel name is valid according to IRC standards
-bool ACommand::isValidChannelName(const std::string& channelName)
+bool ACommand::isValidChannelName(const std::string& channelName) const
 {
     if (channelName.length() < 2)
     {
@@ -70,7 +64,7 @@ bool ACommand::isValidChannelName(const std::string& channelName)
 }
 
 // Check if a nickname is valid according to IRC standards
-bool ACommand::isValidNickname(const std::string& nickname)
+bool ACommand::isValidNickname(const std::string& nickname) const
 {
     if (nickname.empty())
     {
@@ -97,7 +91,7 @@ bool ACommand::isValidNickname(const std::string& nickname)
 }
 
 // Send a reply message to a client
-void ACommand::sendReply(Client* client, const std::string& reply)
+void ACommand::sendReply(Client* client, const std::string& reply) const
 {
     if (client)
     {
@@ -106,7 +100,7 @@ void ACommand::sendReply(Client* client, const std::string& reply)
 }
 
 // Send a numeric reply (according to IRC protocol) to a client
-void ACommand::sendNumericReply(Client* client, int numeric, const std::string& message)
+void ACommand::sendNumericReply(Client* client, int numeric, const std::string& message) const
 {
     if (client)
     {
@@ -124,7 +118,76 @@ void ACommand::sendNumericReply(Client* client, int numeric, const std::string& 
 }
 
 // Send an error reply to a client
-void ACommand::sendErrorReply(Client* client, int numeric, const std::string& message)
+void ACommand::sendErrorReply(Client* client, int numeric, const std::string& message) const
 {
     sendNumericReply(client, numeric, message);
+}
+
+bool    ACommand::validateClient(Client* client) const
+{
+    return client ? true : (Print::Fail("Client NULL"), false);
+}
+
+bool    ACommand::validateClientRegist(Client* client) const
+{
+    if(!validateClient(client)) return false;
+    if (!client->isAuthenticated() || client->getNickname().empty())
+    {
+        Print::Fail("Client not properly registered!");
+        sendErrorReply(client, IRC::ERR_NOTREGISTERED, ":You have not registered");
+        return false;
+    }
+    return true;
+}
+
+bool ACommand::validateParameterCount(Client* client,
+                                      const Message& message,
+                                      size_t minParams,
+                                      const std::string& commandName) const
+{
+    if (!validateClient(client)) return false;
+
+    if (message.getSize() < minParams || message.getParams(0).empty())
+    {
+        Print::Fail("Not enough parameters for " + commandName);
+        sendErrorReply(client, IRC::ERR_NEEDMOREPARAMS,
+                       commandName + " :Not enough parameters");
+        return false;
+    }
+    return true;
+}
+
+Channel* ACommand::validateAndGetChannel(Client* client, 
+                                         const std::string& channelName)
+{
+    if (!isValidChannelName(channelName))
+    {
+        Print::Warn("Invalid channel name: " + channelName);
+        sendErrorReply(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel");
+        return NULL;
+    }
+    if (!validateClient(client)) return NULL;
+    
+    Channel* channel = _server->getChannel(channelName);
+    if (!channel)
+    {
+        Print::Warn("Channel does not exist: " + channelName);
+        sendErrorReply(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel");
+        return NULL;
+    }
+    return channel;
+}
+
+bool    ACommand::validateChannelMembership(Client* client, Channel* channel,
+                                            const std::string& channelName) const
+{
+    if (!validateClient(client)) return false;
+   
+    if (!channel->hasClient(client))
+    {
+        Print::Warn("Client not in channel: " + channelName);
+        sendErrorReply(client, IRC::ERR_NOTONCHANNEL, channelName + " :You're not on that channel");
+        return false;
+    }
+    return true;
 }

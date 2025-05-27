@@ -363,6 +363,200 @@ test_server_stability() {
     fi
 }
 
+# Test MODE command
+test_mode_command() {
+    log_info "=== Testing MODE Command ==="
+    
+    # Test MODE on channel by setting +i (invite-only)
+    send_irc_session "mode_channel_set" 6 \
+        "PASS $IRC_PASSWORD" \
+        "NICK modetest1" \
+        "USER modetest1 0 * :Mode Tester 1" \
+        "JOIN #modetest" \
+        "MODE #modetest +i"
+    
+    if [ -f "$TEST_DIR/mode_channel_set.log" ]; then
+        if grep -q "MODE #modetest \+i" "$TEST_DIR/mode_channel_set.log"; then
+            log_success "✅ Channel mode +i set correctly"
+        else
+            log_warning "⚠️  Failed to detect MODE +i on channel"
+        fi
+    fi
+
+    # Test MODE on channel by unsetting +i
+    send_irc_session "mode_channel_unset" 6 \
+        "PASS $IRC_PASSWORD" \
+        "NICK modetest2" \
+        "USER modetest2 0 * :Mode Tester 2" \
+        "JOIN #modetest" \
+        "MODE #modetest -i"
+    
+    if [ -f "$TEST_DIR/mode_channel_unset.log" ]; then
+        if grep -q "MODE #modetest -i" "$TEST_DIR/mode_channel_unset.log"; then
+            log_success "✅ Channel mode -i unset correctly"
+        else
+            log_warning "⚠️  Failed to detect MODE -i on channel"
+        fi
+    fi
+
+    # Test user MODE request (e.g., asking for their own modes)
+    send_irc_session "mode_user" 5 \
+        "PASS $IRC_PASSWORD" \
+        "NICK modetest3" \
+        "USER modetest3 0 * :Mode Tester 3" \
+        "MODE modetest3"
+    
+    if [ -f "$TEST_DIR/mode_user.log" ]; then
+        if grep -q "221" "$TEST_DIR/mode_user.log"; then
+            log_success "✅ User mode query (MODE <nick>) works"
+        else
+            log_warning "⚠️  User mode query might not be implemented"
+        fi
+    fi
+
+    # Error case: MODE with missing parameters
+    send_irc_session "mode_error" 5 \
+        "PASS $IRC_PASSWORD" \
+        "NICK modetest4" \
+        "USER modetest4 0 * :Mode Tester 4" \
+        "MODE"
+    
+    if [ -f "$TEST_DIR/mode_error.log" ]; then
+        if grep -q "461.*MODE" "$TEST_DIR/mode_error.log"; then
+            log_success "✅ MODE error (not enough parameters) handled"
+        else
+            log_warning "⚠️  MODE error handling may be missing"
+        fi
+    fi
+}
+
+# Test full MODE behavior
+test_mode_advanced() {
+    log_info "=== Testing Advanced MODE Behavior ==="
+
+    # Set +i (invite-only), then try to join without invite
+    send_irc_session "mode_set_invite" 6 \
+        "PASS $IRC_PASSWORD" \
+        "NICK opuser" \
+        "USER opuser 0 * :Operator User" \
+        "JOIN #secret" \
+        "MODE #secret +i"
+
+    send_irc_session "mode_join_denied" 4 \
+        "PASS $IRC_PASSWORD" \
+        "NICK outsider" \
+        "USER outsider 0 * :Outside User" \
+        "JOIN #secret"
+
+    if grep -q "473.*#secret" "$TEST_DIR/mode_join_denied.log"; then
+        log_success "✅ Invite-only (+i) prevents unauthorized joins"
+    else
+        log_error "❌ Invite-only not enforced properly"
+    fi
+
+    # Set +t (topic only by op), then try to change topic as non-op
+    send_irc_session "mode_set_topic" 6 \
+        "PASS $IRC_PASSWORD" \
+        "NICK topicop" \
+        "USER topicop 0 * :Topic Operator" \
+        "JOIN #topicchan" \
+        "MODE #topicchan +t"
+
+    send_irc_session "mode_topic_fail" 4 \
+        "PASS $IRC_PASSWORD" \
+        "NICK topicuser" \
+        "USER topicuser 0 * :Topic User" \
+        "JOIN #topicchan" \
+        "TOPIC #topicchan :New topic"
+
+    if grep -q "482.*#topicchan" "$TEST_DIR/mode_topic_fail.log"; then
+        log_success "✅ Topic restriction (+t) enforced correctly"
+    else
+        log_error "❌ Topic restriction not enforced"
+    fi
+
+    # Set +k (password) and attempt join without password
+    send_irc_session "mode_set_key" 6 \
+        "PASS $IRC_PASSWORD" \
+        "NICK keyop" \
+        "USER keyop 0 * :Key Op" \
+        "JOIN #keychan" \
+        "MODE #keychan +k secretpass"
+
+    send_irc_session "mode_key_fail" 4 \
+        "PASS $IRC_PASSWORD" \
+        "NICK keyfail" \
+        "USER keyfail 0 * :Key Fail" \
+        "JOIN #keychan"
+
+    if grep -q "475.*#keychan" "$TEST_DIR/mode_key_fail.log"; then
+        log_success "✅ Channel key (+k) blocks join without password"
+    else
+        log_error "❌ Channel key not enforced"
+    fi
+
+    # Set +l (limit to 1) and test second user blocked
+    send_irc_session "mode_set_limit" 6 \
+        "PASS $IRC_PASSWORD" \
+        "NICK limitop" \
+        "USER limitop 0 * :Limit Op" \
+        "JOIN #limitchan" \
+        "MODE #limitchan +l 1"
+
+    send_irc_session "mode_limit_fail" 4 \
+        "PASS $IRC_PASSWORD" \
+        "NICK lim2" \
+        "USER lim2 0 * :Too many users" \
+        "JOIN #limitchan"
+
+    if grep -q "471.*#limitchan" "$TEST_DIR/mode_limit_fail.log"; then
+        log_success "✅ User limit (+l) enforced correctly"
+    else
+        log_error "❌ User limit not enforced"
+    fi
+
+    # Test giving operator (+o) to another user
+    send_irc_session "mode_op_grant" 8 \
+        "PASS $IRC_PASSWORD" \
+        "NICK grantor" \
+        "USER grantor 0 * :Op Giver" \
+        "JOIN #optest" \
+        "MODE #optest +o grantor"
+
+    send_irc_session "mode_op_target" 6 \
+        "PASS $IRC_PASSWORD" \
+        "NICK targetop" \
+        "USER targetop 0 * :Target Op" \
+        "JOIN #optest"
+
+    send_irc_session "mode_op_give" 5 \
+        "PASS $IRC_PASSWORD" \
+        "NICK grantor" \
+        "USER grantor 0 * :Op Giver" \
+        "MODE #optest +o targetop"
+
+    if grep -q "MODE #optest \+o targetop" "$TEST_DIR/mode_op_give.log"; then
+        log_success "✅ Operator privilege (+o) assigned correctly"
+    else
+        log_error "❌ Failed to assign operator"
+    fi
+
+    # Test removing +i, +t, +k, +l
+    send_irc_session "mode_unset_all" 6 \
+        "PASS $IRC_PASSWORD" \
+        "NICK unsetter" \
+        "USER unsetter 0 * :Unset Modes" \
+        "JOIN #unsettest" \
+        "MODE #unsettest +i+t+k secret -i -t -k"
+
+    if grep -q "MODE #unsettest.*-i" "$TEST_DIR/mode_unset_all.log"; then
+        log_success "✅ Modes can be removed correctly"
+    else
+        log_warning "⚠️  Failed to verify mode removals"
+    fi
+}
+
+
 # Show server log excerpt
 show_server_log() {
     local lines="${1:-30}"
@@ -411,6 +605,8 @@ main() {
     test_cap_negotiation
     test_channel_operations
     test_messaging
+    test_mode_command
+    test_mode_advanced
     test_error_handling
     test_server_stability
     

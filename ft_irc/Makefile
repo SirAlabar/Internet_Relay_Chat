@@ -54,6 +54,7 @@ SRCS =  $(SRC_DIR)/main.cpp \
 		$(SRC_DIR)/commands/CommandFactory.cpp \
 		$(SRC_DIR)/commands/ACommand.cpp \
 		$(SRC_DIR)/commands/channel/JoinCommand.cpp \
+		$(SRC_DIR)/commands/channel/ModeCommand.cpp \
 		$(SRC_DIR)/commands/channel/InviteCommand.cpp \
 		$(SRC_DIR)/commands/channel/ListCommand.cpp \
 		$(SRC_DIR)/commands/channel/PartCommand.cpp \
@@ -68,7 +69,8 @@ SRCS =  $(SRC_DIR)/main.cpp \
 		$(SRC_DIR)/commands/messaging/NoticeCommand.cpp \
 		$(SRC_DIR)/commands/messaging/PrivmsgCommand.cpp \
 		$(SRC_DIR)/commands/messaging/WhoCommand.cpp \
-		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp 
+		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp \
+		$(SRC_DIR)/commands/channel/TopicCommand.cpp
 
 SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
 		$(SRC_DIR)/bot/CommandBot.cpp \
