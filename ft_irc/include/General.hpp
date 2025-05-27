@@ -70,6 +70,7 @@ namespace IRC
 
     // Operator privilege errors
     const int ERR_CHANOPRIVSNEEDED  = 482;
+    const int ERR_INVALIDLIMIT      = 696;
 }
 
 #endif	// !GENERAL_HPP
