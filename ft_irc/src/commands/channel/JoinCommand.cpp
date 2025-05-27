@@ -70,6 +70,27 @@ void JoinCommand::execute(Client* client, const Message& message)
         }
         else
         {
+            {
+                if (channel->isInviteOnly())
+                {
+                    Print::Warn("Channel is invite-only");
+                    return;
+                }
+                if (channel->hasKey())
+                {
+                    if (message.getParams(1).empty()
+                        || message.getParams(1) != channel->getKey())
+                    {
+                        Print::Warn("Wrong or missing channel key");
+                        return;
+                    }
+                }
+                if (channel->hasUserLimit())
+                {
+                    // logic here
+                }
+
+            }
             channel->addClient(client);
             client->sendMessage(joinMessage);
             _server->broadcastChannel(joinMessage, channelName, client->getFd());
