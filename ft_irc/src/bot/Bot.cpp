@@ -201,7 +201,6 @@ void sigHandlerBot(int signum)
         g_bot->disconnect();
         g_bot = NULL;
     }
-    exit(signum);
 }
 
 int main(int argc, char* argv[])
