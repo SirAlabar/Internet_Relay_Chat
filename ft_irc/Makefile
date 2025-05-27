@@ -177,7 +177,7 @@ debug: CFLAGS += $(DEBUG_FLAGS)
 debug: re
 
 .PHONY: asan
-asan: --header $(OBJ_DIR) $(OBJS)
+asan: $(OBJ_DIR) $(OBJS)
 
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
 	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)
