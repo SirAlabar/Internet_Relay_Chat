@@ -74,22 +74,23 @@ void JoinCommand::execute(Client* client, const Message& message)
                 if (channel->isInviteOnly())
                 {
                     Print::Warn("Channel is invite-only");
+                    sendErrorReply(client, IRC::ERR_INVITEONLYCHAN, channelName + " :Cannot join channel (+i)");
                     return;
                 }
-                if (channel->hasKey())
+                if (channel->hasKey() 
+                    && (message.getParams(1).empty() || message.getParams(1) != channel->getKey()))
                 {
-                    if (message.getParams(1).empty()
-                        || message.getParams(1) != channel->getKey())
-                    {
-                        Print::Warn("Wrong or missing channel key");
-                        return;
-                    }
+                    Print::Warn("Wrong or missing channel key");
+                    sendErrorReply(client, IRC::ERR_BADCHANNELKEY, channelName + " :Cannot join channel (+k)");
+                    return;
                 }
-                if (channel->hasUserLimit())
+                if (channel->hasUserLimit()
+                    && channel->getClients().size() >= channel->getUserLimit())
                 {
-                    // logic here
+                    Print::Warn("Channel full");
+                    sendErrorReply(client, IRC::ERR_CHANNELISFULL, channelName + " :Cannot join channel (+l)");
+                    return;
                 }
-
             }
             channel->addClient(client);
             client->sendMessage(joinMessage);
