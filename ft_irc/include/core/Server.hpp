@@ -25,6 +25,8 @@ private:
     std::map<std::string, Channel*> _channels;  // Map of name to Channel objects
     std::string _password;                      // Server password
     bool _running;
+    bool _botconnected;
+    static std::string _botpass;
 
     std::map<int, std::string> _clientBuffers;  // Buffer to store partial messagens by fd
 
@@ -49,7 +51,8 @@ public:
     Client* getClient(int fd);
     Client* getClientByNick(const std::string& nickname);
     void broadcast(const std::string& message, int excludeFd = -1);
-    void broadcastChannel(const std::string& message, const std::string& channel, int excludeFd = -1);
+    void broadcastChannel(const std::string& message, const std::string& channel,
+                          int excludeFd = -1);
 
     // Channel management
     Channel* getChannel(const std::string& name);
@@ -63,6 +66,9 @@ public:
 
     // utils for print data structures - only for understand what's in
     void print_clients();
+    // utils for bot
+    const std::string& getBotPassword() const;
+    void haveBot();
 };
 
 #endif

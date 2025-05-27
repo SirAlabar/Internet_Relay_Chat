@@ -26,7 +26,7 @@ void PassCommand::execute(Client* client, const Message& message)
     if (!client)
     {
         Print::Fail("Client NULL");
-        return ;
+        return;
     }
 
     std::string password = message.getParams(0);
@@ -35,27 +35,31 @@ void PassCommand::execute(Client* client, const Message& message)
     {
         Print::Fail("no password");
         sendErrorReply(client, 461, "PASS :Not enough parameters");
-        return ;
+        return;
     }
 
     password = password.substr(startPass);
-    if (!password.empty() && password[0] == ':')
-        password = password.substr(1);
+    if (!password.empty() && password[0] == ':') password = password.substr(1);
 
     size_t endPass = password.find_last_not_of(" \t\r\n");
-    if (endPass != std::string::npos)
-        password = password.substr(0, endPass + 1);
+    if (endPass != std::string::npos) password = password.substr(0, endPass + 1);
 
     if (client->isAuthenticated())
     {
         Print::Warn("can't register");
         sendErrorReply(client, 462, ":You may not reregister");
-        return ;
+        return;
     }
 
-    if(password == _server->getPassword())
+    if (password == _server->getPassword())
     {
         Print::Ok("");
+        client->setAuthenticated(true);
+    }
+    else if (password == _server->getBotPassword())
+    {
+        _server->haveBot();
+        client->setBot();
         client->setAuthenticated(true);
     }
     else

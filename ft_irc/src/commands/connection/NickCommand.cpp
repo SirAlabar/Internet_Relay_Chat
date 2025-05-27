@@ -61,7 +61,12 @@ void NickCommand::execute(Client* client, const Message& message)
     }
     // Check if the nickname is already in use
     Client* existingClient = _server->getClientByNick(nickname);
-    if (existingClient && existingClient != client)
+    if ((existingClient && existingClient != client))
+    {
+        sendErrorReply(client, 433, nickname + " :Nickname is already in use");
+        return;
+    }
+    if ((nickname.find("IRCBot") != std::string::npos && client->isBot() == false))
     {
         sendErrorReply(client, 433, nickname + " :Nickname is already in use");
         return;
