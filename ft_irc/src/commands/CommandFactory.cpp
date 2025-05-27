@@ -10,6 +10,7 @@
 #include "KickCommand.hpp"
 #include "PartCommand.hpp"
 #include "Message.hpp"
+#include "ModeCommand.hpp"
 #include "PrivmsgCommand.hpp"
 #include "NickCommand.hpp"
 #include "CapCommand.hpp"
@@ -40,7 +41,7 @@ void CommandFactory::initializeCommands()
     registerCommand("JOIN", &JoinCommand::create);
     registerCommand("KICK", &KickCommand::create);
     registerCommand("LIST", &ListCommand::create);
-    // registerCommand("MODE", &ModeCommand::create);
+    registerCommand("MODE", &ModeCommand::create);
     registerCommand("PART", &PartCommand::create);
     registerCommand("TOPIC", &TopicCommand::create);
 
