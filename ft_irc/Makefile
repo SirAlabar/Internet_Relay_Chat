@@ -3,6 +3,7 @@
 ################################################################################
 
 NAME = ircserv
+BOTNAME = ircbot
 CC = c++
 INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot \
 				  -Iinclude/dcc -Iinclude/utils -Iinclude/commands/connection \
@@ -71,9 +72,18 @@ SRCS =  $(SRC_DIR)/main.cpp \
 		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp \
 		$(SRC_DIR)/commands/channel/TopicCommand.cpp
 
+SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
+		$(SRC_DIR)/bot/CommandBot.cpp \
+		$(SRC_DIR)/utils/Socket.cpp \
+		$(SRC_DIR)/utils/UtilsFun.cpp
+
+
+
+
 # Object files
 OBJ_DIR = obj
 OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
+OBJSBOT = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCSBOT))
 
 ################################################################################
 #                              PROGRESS BAR SETUP                              #
@@ -136,12 +146,11 @@ init_progress: $(SRCS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
-
 	@$(CC) $(CFLAGS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -c $< -o $@
 	$(call progress_bar)
 
 .PHONY: va
-va: fclean $(OBJS) 
+va: fclean $(OBJS)
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
 	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) -o $(NAME) 
 	@echo -n "valgrind $(VALGRINDFLAGS) ./$(NAME) " ; read args; valgrind $(VALGRINDFLAGS) ./$(NAME) $$args
@@ -154,18 +163,24 @@ clean:
 
 .PHONY: fclean
 fclean: clean
-	@$(RM) $(NAME)
+	@$(RM) $(NAME) $(BOTNAME)
 	@printf "$(RED)Deleting $(CYAN)$(NAME) $(CLR_RMV)binary ✅\n"
 
 .PHONY: re
 re: fclean all
 
+bonus: $(NAME) $(BOTNAME)
+
+$(BOTNAME):
+	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW) $(BOTNAME) $(CLR_RMV)...\n"
+	@$(CC) $(CFLAGS) $(SRCSBOT) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(BOTNAME)
+	@printf "$(GREEN)$(BOTNAME) binary created$(CLR_RMV) ✅\n"
 .PHONY: debug
 debug: CFLAGS += $(DEBUG_FLAGS)
 debug: re
 
 .PHONY: asan
-asan: --header $(OBJ_DIR) $(OBJS)
+asan: $(OBJ_DIR) $(OBJS)
 
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
 	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)

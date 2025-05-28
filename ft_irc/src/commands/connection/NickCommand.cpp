@@ -61,7 +61,12 @@ void NickCommand::execute(Client* client, const Message& message)
     }
     // Check if the nickname is already in use
     Client* existingClient = _server->getClientByNick(nickname);
-    if (existingClient && existingClient != client)
+    if ((existingClient && existingClient != client))
+    {
+        sendErrorReply(client, 433, nickname + " :Nickname is already in use");
+        return;
+    }
+    if ((nickname.find("IRCBot") != std::string::npos && client->isBot() == false))
     {
         sendErrorReply(client, 433, nickname + " :Nickname is already in use");
         return;
@@ -90,5 +95,19 @@ void NickCommand::execute(Client* client, const Message& message)
         client->sendMessage(confirmation);
         // Check if the client has completed registration (has both nickname
         // and username) client->checkRegistration();
+    }
+    if (!client->getNickname().empty() && !client->getUsername().empty())
+    {
+        sendNumericReply(client, 001,
+                         ":Welcome to the IRC Network " + client->getNickname() + "!" +
+                             client->getUsername() + "@localhost");
+        sendNumericReply(client, 002, ":Host is server, running version 1.0");
+
+        Print::Ok("Client registration done!");
+    }
+    else
+    {
+        Print::Warn("Registration not complete. Nick: '" + client->getNickname() +
+                    "', User: '" + client->getUsername() + "'");
     }
 }

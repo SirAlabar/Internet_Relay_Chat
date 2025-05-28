@@ -14,6 +14,7 @@ private:
     std::string _nickname;
     std::string _username;
     bool _authenticated;
+    bool _isBot;
 
 public:
     Client(int fd);
@@ -27,9 +28,11 @@ public:
     const std::string& getUsername() const;
     void setUsername(const std::string& username);
     bool isAuthenticated() const;
+    bool isBot();
     void setAuthenticated(bool auth);
 
     bool sendMessage(const std::string& message);
+    void setBot(bool status);
 };
 
 #endif
