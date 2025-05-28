@@ -125,7 +125,7 @@ bool Channel::hasUserLimit() const
     return _hasUserLimit;
 }
 
-int Channel::getUserLimit() const
+size_t Channel::getUserLimit() const
 {
     return _userLimit;
 }
