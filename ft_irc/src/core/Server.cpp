@@ -336,14 +336,14 @@ const std::string& Server::getPassword() const { return (_password); }
 const std::string& Server::getBotPassword() const { return (_botpass); }
 
 void Server::setBot(bool status) { _botConnected = status; }
-bool Server::getBot() { return _botConnected; }
+bool Server::hasBot() { return _botConnected; }
 
 void Server::addBotToAllChannels(Client* bot)
 {
     Print::Do("Adding bot to all channels");
     if (!bot || !bot->isBot())
     {
-        Print::Fail("Bot not found.");
+        Print::Warn("Bot not found.");
         return;
     }
     for (std::map<std::string, Channel*>::iterator it = _channels.begin();

@@ -70,7 +70,7 @@ public:
     const std::string& getBotPassword() const;
     void addBotToAllChannels(Client* bot);
     void setBot(bool status);
-    bool getBot();
+    bool hasBot();
 };
 
 #endif
