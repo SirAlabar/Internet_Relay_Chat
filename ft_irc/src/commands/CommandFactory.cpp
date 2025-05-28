@@ -23,6 +23,7 @@
 #include "WhoCommand.hpp"
 #include "WhoIsCommand.hpp"
 #include "TopicCommand.hpp"
+#include "MotdCommand.hpp"
 
 // Initialize static members
 std::map<std::string, CommandFactory::CommandCreator> CommandFactory::_commandCreators;
@@ -59,6 +60,7 @@ void CommandFactory::initializeCommands()
     registerCommand("PRIVMSG", &PrivmsgCommand::create);
     registerCommand("WHO", &WhoCommand::create);
     registerCommand("WHOIS", &WhoIsCommand::create);
+    registerCommand("MOTD", &MotdCommand::create);
 
     _initialized = true;
 }
