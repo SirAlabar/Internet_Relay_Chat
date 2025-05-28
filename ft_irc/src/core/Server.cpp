@@ -492,32 +492,56 @@ Channel* Server::createChannel(const std::string& name, Client* creator)
 
 void Server::print_clients()
 {
-    if (DEBUG)
+    if (LOG)
     {
+        std::cout << std::right << Color::YELLOW 
+            << std::setw(10) << "FD" << "|"
+            << std::setw(10) << "NICK" << "|"
+            << std::setw(10) << "USER" << "|"
+            << std::setw(10) << "AUTH?" << "|"
+            << std::setw(10) << "BOT?" << "|"
+            << std::endl;
+
         std::map<int, Client*>::iterator it = _clients.begin();
         std::map<int, Client*>::iterator ite = _clients.end();
         for (; it != ite; it++)
         {
-            Print::Debug(
-                Color::YELLOW + "\tFd server map: " + toString(it->first) +
-                "\tfd Client: " + it->second->getFdString() + "\n\tnick: '" +
-                it->second->getNickname() + "'\tuser: '" + it->second->getUsername() +
-                "'\n\tautenticated? == " + toString(it->second->isAuthenticated()) +
-                "\tisBot? == " + toString(it->second->isBot()));
+            std::cout << std::right 
+                << std::setw(10) << Server::formatStr(it->second->getFdString()) << "|"
+                << std::setw(10) << Server::formatStr(it->second->getNickname()) << "|"
+                << std::setw(10) << Server::formatStr(it->second->getUsername()) << "|"
+                << std::setw(10) << Server::formatStr(
+                    it->second->isAuthenticated() ? "YES" : "") << "|"
+                << std::setw(10) << Server::formatStr(
+                    it->second->isBot() ? "YES" : "") << "|"
+                << std::endl;
         }
         std::map<std::string, Channel*>::iterator itch = _channels.begin();
         for (; itch != _channels.end(); itch++)
         {
-            Print::Debug(Color::ORANGE + "\tChannel Name   :" + itch->second->getName() +
-                         "\n\t" + itch->second->getTopic() + "");
+             std::cout << Color::GREEN
+                + "======= Channel Name   :" + itch->second->getName()
+                + "\t" + itch->second->getTopic() + "\n" + Color::ORANGE;
+
+            std::cout << std::right
+                << std::setw(10) << "FD" << "|"
+                << std::setw(10) << "NICK" << "|"
+                << std::setw(10) << "OPERATOR" << "|"
+                << std::endl;
+
             std::map<int, Client*>::const_iterator itcli =
                 itch->second->getClients().begin();
             for (; itcli != itch->second->getClients().end(); itcli++)
             {
-                Print::Debug(Color::ORANGE + "\tFd :" + toString(itcli->first) +
-                             "\tNck  :" + itcli->second->getNickname());
+                 std::cout << std::right 
+                    << std::setw(10) << toString(itcli->first) << "|"
+                    << std::setw(10) << toString(itcli->second->getNickname()) << "|"
+                    << std::setw(10) << toString(itch->second->isOperator(itcli->second)) << "|"
+                    << std::endl;
             }
+            std::cout << Color::RESET;
         }
+        std::cout << Color::RESET;
     }
 }
 
@@ -547,4 +571,13 @@ void Server::broadcastChannel(const std::string& message, const std::string& chN
     {
         if (it->first != excludeFd) it->second->sendMessage(message);
     }
+}
+
+std::string	Server::formatStr(const std::string& str)
+{
+	std::string	format = str;
+
+	if (format.length() > 10)
+		format = format.substr(0, 9) + ".";
+	return (format);
 }
