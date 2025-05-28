@@ -71,6 +71,12 @@ namespace IRC
     // Operator privilege errors
     const int ERR_CHANOPRIVSNEEDED  = 482;
     const int ERR_INVALIDLIMIT      = 696;
+
+    //MOTD related replyes
+    const int RPL_MOTDSTART         = 375;
+    const int RPL_MOTD              = 372;
+    const int RPL_ENDOFMOTD         = 376;
+    const int ERR_NOMOTD            = 422;
 }
 
 #endif	// !GENERAL_HPP
