@@ -58,8 +58,8 @@ void PassCommand::execute(Client* client, const Message& message)
     }
     else if (password == _server->getBotPassword())
     {
-        _server->haveBot();
-        client->setBot();
+        _server->setBot(true);
+        client->setBot(true);
         client->setAuthenticated(true);
         _server->addBotToAllChannels(client);
     }

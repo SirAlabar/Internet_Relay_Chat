@@ -107,7 +107,7 @@ void NickCommand::execute(Client* client, const Message& message)
     }
     else
     {
-        Print::Fail("Registration not complete. Nick: '" + client->getNickname() +
+        Print::Warn("Registration not complete. Nick: '" + client->getNickname() +
                     "', User: '" + client->getUsername() + "'");
     }
 }

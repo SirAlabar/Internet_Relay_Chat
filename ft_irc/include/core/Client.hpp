@@ -32,7 +32,7 @@ public:
     void setAuthenticated(bool auth);
 
     bool sendMessage(const std::string& message);
-    void setBot();
+    void setBot(bool status);
 };
 
 #endif

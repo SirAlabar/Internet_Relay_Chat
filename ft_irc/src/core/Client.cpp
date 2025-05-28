@@ -35,7 +35,7 @@ bool Client::isAuthenticated() const { return _authenticated; }
 void Client::setAuthenticated(bool auth) { _authenticated = auth; }
 
 bool Client::isBot() { return _isBot; }
-void Client::setBot() { _isBot = true; }
+void Client::setBot(bool status) { _isBot = status; }
 bool Client::sendMessage(const std::string& message)
 {
     Print::Debug("Attempting to send to client FD: " + getFdString());
