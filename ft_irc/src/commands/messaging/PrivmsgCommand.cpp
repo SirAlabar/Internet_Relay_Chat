@@ -79,15 +79,19 @@ void PrivmsgCommand::execute(Client* client, const Message& message)
     Print::Debug("PRIVMSG: '" + client->getNickname() + "' -> '" + target + "': '" +
                  messageText + "'");
 
-    // Check if target is a channel (starts with # or &)
-    if (target[0] == '#' || target[0] == '&')
-    {
-        handleChannelMessage(client, target, messageText);
-    }
-    else
-    {
-        handlePrivateMessage(client, target, messageText);
-    }
+	// Check if target is a channel (starts with # or &)
+	if (target[0] == '#' || target[0] == '&')
+	{
+		handleChannelMessage(client, target, messageText);
+	}
+	else
+	{
+        if (isDccMessage(messageText))
+        {
+            sendDccNotify(client, target, messageText);
+        }
+		handlePrivateMessage(client, target, messageText);
+	}
 
     Print::Ok("PRIVMSG command completed");
     forwardToBot(client, message);
@@ -188,15 +192,47 @@ std::string PrivmsgCommand::createMessage(Client* sender, const std::string& com
                                           const std::string& target,
                                           const std::string& message)
 {
-    std::string result = ":" + sender->getNickname();
+	std::string result = ":" + sender->getNickname();
+	
+	std::string username = sender->getUsername();
+	if (!username.empty())
+	{
+		result += "!" + username + "@localhost";
+	}
+	
+	result += " " + command + " " + target + " :" + message + "\r\n";
+	
+	return result;
+}
 
-    std::string username = sender->getUsername();
-    if (!username.empty())
+bool    PrivmsgCommand::isDccMessage(const std::string& message)
+{
+    return (message.size() >= 4 && message.substr(0, 4) == "\001DCC");
+}
+
+void    PrivmsgCommand::sendDccNotify(Client* sender, const std::string& target,
+                                      const std::string& message)
+{
+    std::string dccContent = message;
+    if (dccContent[0] == '\001' && dccContent[dccContent.length()-1] == '\001')
     {
-        result += "!" + username + "@localhost";
+        dccContent = dccContent.substr(1, dccContent.length()-2);
     }
 
-    result += " " + command + " " + target + " :" + message + "\r\n";
+    std::vector<std::string> parts = splitArguments(dccContent, ' ');
+    if (parts.size() >= 3 && parts[0] == "DCC" && parts[1] == "SEND")
+    {
+        Client* targetClient = _server->getClientByNick(target);
+        if (targetClient)
+        {
+            std::string notification = 
+                ":server NOTICE " + target + 
+                " :\002File Transfer Offer\002 - " + 
+                sender->getNickname() 
+                + " wants to send you: \002" + 
+                parts[2] + "\002\r\n";
 
-    return result;
+            targetClient->sendMessage(notification);
+        }
+    }
 }

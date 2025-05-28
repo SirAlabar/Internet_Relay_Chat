@@ -33,13 +33,11 @@ void    Print::Timestamp(const std::string& color)
     std::time_t	current_time_in_seconds = std::time(NULL);
     std::tm		*time_struct = std::localtime(&current_time_in_seconds);
     char originalFill = std::cout.fill();
-    std::cout << std::setw(0) << color
+    std::cout << color
         << "[" 
-        << std::setfill('0') << std::setw(2) << time_struct->tm_hour
-        << std::setw(1) << ":"
-        << std::setfill('0') << std::setw(2) << time_struct->tm_min
-        << std::setw(1) << ":"
-        << std::setfill('0') << std::setw(2) << time_struct->tm_sec
+        << std::setfill('0') << std::right << std::setw(2) << time_struct->tm_hour << ":"
+        << std::setfill('0') << std::right << std::setw(2) << time_struct->tm_min << ":"
+        << std::setfill('0') << std::right << std::setw(2) << time_struct->tm_sec
         << "] " << Color::RESET;
     std::cout.fill(originalFill);
 }

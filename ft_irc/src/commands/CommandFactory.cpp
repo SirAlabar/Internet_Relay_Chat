@@ -60,11 +60,6 @@ void CommandFactory::initializeCommands()
     registerCommand("WHO", &WhoCommand::create);
     registerCommand("WHOIS", &WhoIsCommand::create);
 
-    // DCC commands (bonus part)
-    // registerCommand("DCC", &DCCCommand::create);
-    // registerCommand("DCCSEND", &DCCSendCommand::create);
-    // registerCommand("DCCACCEPT", &DCCAcceptCommand::create);
-
     _initialized = true;
 }
 
