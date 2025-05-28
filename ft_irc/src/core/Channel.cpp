@@ -5,7 +5,7 @@ Channel::Channel(const std::string& name)
     : _name(name),
     _topic(""),
     _inviteOnly(false),
-    _topicRestricted(false),
+    _topicRestricted(true),
     _hasKey(false),
     _key(""),
     _hasUserLimit(false),
@@ -125,7 +125,7 @@ bool Channel::hasUserLimit() const
     return _hasUserLimit;
 }
 
-int Channel::getUserLimit() const
+size_t Channel::getUserLimit() const
 {
     return _userLimit;
 }

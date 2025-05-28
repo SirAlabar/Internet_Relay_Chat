@@ -19,7 +19,7 @@ private:
     bool _hasKey;
     std::string _key;
     bool _hasUserLimit;
-    int _userLimit;
+    size_t _userLimit;
 
 public:
     Channel(const std::string& name);
@@ -57,7 +57,7 @@ public:
     void removeKey();
     
     bool hasUserLimit() const;
-    int getUserLimit() const;
+    size_t getUserLimit() const;
     void setUserLimit(int limit);
     void removeUserLimit();
 
