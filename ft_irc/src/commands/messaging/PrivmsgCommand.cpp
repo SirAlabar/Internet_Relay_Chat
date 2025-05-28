@@ -88,6 +88,10 @@ void PrivmsgCommand::execute(Client* client, const Message& message)
 	}
 	else
 	{
+        if (isDccMessage(messageText))
+        {
+            sendDccNotify(client, target, messageText);
+        }
 		handlePrivateMessage(client, target, messageText);
 	}
 
@@ -184,4 +188,36 @@ std::string PrivmsgCommand::createMessage(Client* sender, const std::string& com
 	result += " " + command + " " + target + " :" + message + "\r\n";
 	
 	return result;
+}
+
+bool    PrivmsgCommand::isDccMessage(const std::string& message)
+{
+    return (message.size() >= 4 && message.substr(0, 4) == "\001DCC");
+}
+
+void    PrivmsgCommand::sendDccNotify(Client* sender, const std::string& target,
+                                      const std::string& message)
+{
+    std::string dccContent = message;
+    if (dccContent[0] == '\001' && dccContent[dccContent.length()-1] == '\001')
+    {
+        dccContent = dccContent.substr(1, dccContent.length()-2);
+    }
+
+    std::vector<std::string> parts = splitArguments(dccContent, ' ');
+    if (parts.size() >= 3 && parts[0] == "DCC" && parts[1] == "SEND")
+    {
+        Client* targetClient = _server->getClientByNick(target);
+        if (targetClient)
+        {
+            std::string notification = 
+                ":server NOTICE " + target + 
+                " :\002File Transfer Offer\002 - " + 
+                sender->getNickname() 
+                + " wants to send you: \002" + 
+                parts[2] + "\002\r\n";
+
+            targetClient->sendMessage(notification);
+        }
+    }
 }

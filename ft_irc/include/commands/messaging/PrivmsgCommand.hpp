@@ -18,6 +18,9 @@ private:
 	void handlePrivateMessage(Client* sender, const std::string& targetNick, const std::string& message);
 	std::string createMessage(Client* sender, const std::string& command, const std::string& target, const std::string& message);
 
+    bool    isDccMessage(const std::string& message);
+    void    sendDccNotify(Client* sender, const std::string& target, const std::string& message);
+
 public:
 	PrivmsgCommand(Server* server);
 	virtual ~PrivmsgCommand();
