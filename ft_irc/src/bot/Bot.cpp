@@ -129,8 +129,8 @@ void Bot::run()
 
 void Bot::processMessage(const std::string& rawMessage)
 {
-    Print::Debug("[BOT] Processing the message");
-    CommandBotFactory::executeCommand(const Message& message)
+    Print::Log("[BOT] Processing the message ----------->" + rawMessage);
+    CommandBotFactory::executeCommand(rawMessage);
 }
 
 void Bot::disconnect()

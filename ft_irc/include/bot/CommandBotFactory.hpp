@@ -1,11 +1,11 @@
-#ifndef COMMANDBOTFACTORY_HPP
-#define COMMANDBOTFACTORY_HPP
+#ifndef COMMANDBOTFABotCTORY_HPP
+#define COMMANDBOTFABotCTORY_HPP
 
 #include <map>
 #include <string>
 
 // Forward declarations
-class ACommand;
+class ABotCommand;
 class Client;
 class Server;
 class Message;
@@ -14,7 +14,7 @@ class CommandBotFactory
 {
 private:
     // Map of command names to their corresponding creator functions
-    typedef ACommand* (*CommandCreator)(Server* server);
+    typedef ABotCommand* (*CommandCreator)(Server* server);
     static std::map<std::string, CommandCreator> _commandCreators;
 
     // Private to prevent instantiation and copy
@@ -28,9 +28,9 @@ private:
 
 public:
     // Create a command based on the message
-    static ACommand* createCommand(const std::string& commandName, Server* server);
+    static ABotCommand* createCommand(const std::string& commandName, Server* server);
     // Execute the appropriate command based on the message
-    static void executeCommand(const Message& message);
+    static void executeCommand(const Message& message, Server* server = NULL);
     // Register a new command creator
     static void registerCommand(const std::string& commandName, CommandCreator creator);
     // Check if a command exists

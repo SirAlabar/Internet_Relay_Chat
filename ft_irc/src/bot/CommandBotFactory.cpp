@@ -1,12 +1,13 @@
 #include <iostream>
 
-#include "ACommand.hpp"
+#include "ABotCommand.hpp"
 #include "CapCommand.hpp"
 #include "Client.hpp"
 #include "CommandBotFactory.hpp"
-#include "DadJokesCommand.hpp"
-#include "HelpCommand.hpp"
-#include "WeatherCommand.hpp"
+#include "Message.hpp"
+#include "bot/commands_bot/DadJokesCommand.hpp"
+#include "bot/commands_bot/HelpCommand.hpp"
+#include "bot/commands_bot/WeatherCommand.hpp"
 
 // Initialize static members
 std::map<std::string, CommandBotFactory::CommandCreator>
@@ -22,15 +23,16 @@ void CommandBotFactory::initializeCommands()
     }
 
     // Channel commands
-    registerCommand("weather", &WeatherCommand::create);
-    registerCommand("help", &HelpCommand::create);
-    registerCommand("dadjokes", &DadJokesCommand::create);
+    registerCommand("WEATHER", &WeatherCommand::create);
+    registerCommand("HELP", &HelpCommand::create);
+    registerCommand("DADJOKES", &DadJokesCommand::create);
 
     _initialized = true;
 }
 
 // Creates a command based on command name
-ACommand *CommandBotFactory::createCommand(const std::string &commandName, Server *server)
+ABotCommand *CommandBotFactory::createCommand(const std::string &commandName,
+                                              Server *server)
 {
     if (!_initialized)
     {
@@ -60,39 +62,29 @@ ACommand *CommandBotFactory::createCommand(const std::string &commandName, Serve
 }
 
 // Execute the appropriate command based on the message
-void CommandBotFactory::executeCommand(Client *client, Server *server,
-                                       const Message &message)
+void CommandBotFactory::executeCommand(const Message &rawMessage, Server *server)
 {
-    std::string commandName = message.getCommand();
-    Print::Debug("Attempting to execute command: " + commandName);
+    // :joao!joao-pol@localhost PRIVMSG #penis :!hello
+    if (rawMessage.getSize() < 3 || rawMessage.getParams(0) != "PRIVMSG" ||
+        rawMessage.getParams(2)[0] != '!')
+        return;
+    std::string channel = rawMessage.getParams(1);
+    std::string commandName = rawMessage.getParams(2).substr(1);
+    Print::Debug("[BOT] Attempting to execute command: " + commandName);
+    Print::Debug("[BOT] rawMessage: " + rawMessage.getRemainder());
 
-    ACommand *command = createCommand(commandName, server);
+    ABotCommand *command = createCommand(commandName, server);
 
     if (command)
     {
         Print::Debug("Command created successfully, executing...");
-        command->execute(client, message);
+        command->execute(NULL, rawMessage);
         Print::Debug("Command executed, cleaning up...");
         delete command;
     }
     else
     {
         Print::Debug("Command not found, sending error");
-        // Send error to client about unknown command
-        if (client)
-        {
-            std::string errorMsg = ":server 421 ";
-            if (!client->getNickname().empty())
-            {
-                errorMsg += client->getNickname();
-            }
-            else
-            {
-                errorMsg += "*";
-            }
-            errorMsg += " " + commandName + " :Unknown command\r\n";
-            client->sendMessage(errorMsg);
-        }
     }
 }
 

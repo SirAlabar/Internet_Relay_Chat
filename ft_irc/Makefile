@@ -73,15 +73,37 @@ SRCS =  $(SRC_DIR)/main.cpp \
 		$(SRC_DIR)/commands/channel/TopicCommand.cpp
 
 SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
+		$(SRC_DIR)/core/Server.cpp \
+		$(SRC_DIR)/core/Client.cpp \
+		$(SRC_DIR)/core/Message.cpp \
+		$(SRC_DIR)/core/Channel.cpp \
 		$(SRC_DIR)/bot/ABotCommand.cpp \
 		$(SRC_DIR)/bot/CommandBotFactory.cpp \
 		$(SRC_DIR)/bot/commands_bot/DadJokesCommand.cpp \
 		$(SRC_DIR)/bot/commands_bot/WeatherCommand.cpp \
 		$(SRC_DIR)/bot/commands_bot/HelpCommand.cpp \
 		$(SRC_DIR)/utils/Socket.cpp \
-		$(SRC_DIR)/utils/Socket.cpp \
+		$(SRC_DIR)/commands/CommandFactory.cpp \
+		$(SRC_DIR)/commands/ACommand.cpp \
+		$(SRC_DIR)/commands/channel/JoinCommand.cpp \
+		$(SRC_DIR)/commands/channel/ModeCommand.cpp \
+		$(SRC_DIR)/commands/channel/InviteCommand.cpp \
+		$(SRC_DIR)/commands/channel/ListCommand.cpp \
+		$(SRC_DIR)/commands/channel/PartCommand.cpp \
+		$(SRC_DIR)/commands/channel/KickCommand.cpp \
+		$(SRC_DIR)/commands/connection/NickCommand.cpp \
+		$(SRC_DIR)/commands/connection/PassCommand.cpp \
+		$(SRC_DIR)/commands/connection/UserCommand.cpp \
+		$(SRC_DIR)/commands/connection/CapCommand.cpp \
+		$(SRC_DIR)/commands/connection/PingCommand.cpp \
+		$(SRC_DIR)/commands/connection/PongCommand.cpp \
+		$(SRC_DIR)/commands/connection/QuitCommand.cpp \
+		$(SRC_DIR)/commands/messaging/NoticeCommand.cpp \
+		$(SRC_DIR)/commands/messaging/PrivmsgCommand.cpp \
+		$(SRC_DIR)/commands/messaging/WhoCommand.cpp \
+		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp \
+		$(SRC_DIR)/commands/channel/TopicCommand.cpp \
 		$(SRC_DIR)/utils/UtilsFun.cpp
-
 
 
 

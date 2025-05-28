@@ -1,13 +1,13 @@
 #ifndef WEATHERCOMMAND_HPP
 #define WEATHERCOMMAND_HPP
 
-#include "ACommand.hpp"
+#include "ABotCommand.hpp"
 
 class Client;
 class Server;
 class Message;
 
-class WeatherCommand : public ACommand
+class WeatherCommand : public ABotCommand
 {
 private:
     // Private to prevent copying
@@ -22,7 +22,7 @@ public:
     virtual void execute(Client* client, const Message& message);
 
     // Static creator for factory
-    static ACommand* create(Server* server);
+    static ABotCommand* create(Server* server);
 };
 
 #endif

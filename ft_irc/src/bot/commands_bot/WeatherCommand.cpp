@@ -5,12 +5,14 @@
 #include "Server.hpp"
 #include "WeatherCommand.hpp"
 
-WeatherCommand::WeatherCommand(Server* server) : ACommand(server) {}
+WeatherCommand::WeatherCommand(Server* server) : ABotCommand(server) {}
 
 WeatherCommand::~WeatherCommand() {}
 
 // private, not used
-WeatherCommand::WeatherCommand(const WeatherCommand& other) : ACommand(other._server) {}
+WeatherCommand::WeatherCommand(const WeatherCommand& other) : ABotCommand(other._server)
+{
+}
 
 WeatherCommand& WeatherCommand::operator=(const WeatherCommand& other)
 {
@@ -22,7 +24,10 @@ WeatherCommand& WeatherCommand::operator=(const WeatherCommand& other)
 }
 
 // Static create method for factory
-ACommand* WeatherCommand::create(Server* server) { return (new WeatherCommand(server)); }
+ABotCommand* WeatherCommand::create(Server* server)
+{
+    return (new WeatherCommand(server));
+}
 
 // Execute the Weather command
 void WeatherCommand::execute(Client* client, const Message& message)

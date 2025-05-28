@@ -5,12 +5,12 @@
 #include "Message.hpp"
 #include "Server.hpp"
 
-HelpCommand::HelpCommand(Server* server) : ACommand(server) {}
+HelpCommand::HelpCommand(Server* server) : ABotCommand(server) {}
 
 HelpCommand::~HelpCommand() {}
 
 // private, not used
-HelpCommand::HelpCommand(const HelpCommand& other) : ACommand(other._server) {}
+HelpCommand::HelpCommand(const HelpCommand& other) : ABotCommand(other._server) {}
 
 HelpCommand& HelpCommand::operator=(const HelpCommand& other)
 {
@@ -22,7 +22,7 @@ HelpCommand& HelpCommand::operator=(const HelpCommand& other)
 }
 
 // Static create method for factory
-ACommand* HelpCommand::create(Server* server) { return (new HelpCommand(server)); }
+ABotCommand* HelpCommand::create(Server* server) { return (new HelpCommand(server)); }
 
 // Execute the Help command
 void HelpCommand::execute(Client* client, const Message& message)

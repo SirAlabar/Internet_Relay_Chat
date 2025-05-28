@@ -5,12 +5,13 @@
 #include "Message.hpp"
 #include "Server.hpp"
 
-DadJokesCommand::DadJokesCommand(Server* server) : ACommand(server) {}
+DadJokesCommand::DadJokesCommand(Server* server) : ABotCommand(server) {}
 
 DadJokesCommand::~DadJokesCommand() {}
 
 // private, not used
-DadJokesCommand::DadJokesCommand(const DadJokesCommand& other) : ACommand(other._server)
+DadJokesCommand::DadJokesCommand(const DadJokesCommand& other)
+    : ABotCommand(other._server)
 {
 }
 
@@ -24,7 +25,7 @@ DadJokesCommand& DadJokesCommand::operator=(const DadJokesCommand& other)
 }
 
 // Static create method for factory
-ACommand* DadJokesCommand::create(Server* server)
+ABotCommand* DadJokesCommand::create(Server* server)
 {
     return (new DadJokesCommand(server));
 }
