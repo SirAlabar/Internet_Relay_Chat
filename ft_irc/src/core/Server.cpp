@@ -335,7 +335,8 @@ void Server::processClientMessage(int clientFd)
 const std::string& Server::getPassword() const { return (_password); }
 const std::string& Server::getBotPassword() const { return (_botpass); }
 
-void Server::haveBot() { _botConnected = true; }
+void Server::setBot(bool status) { _botConnected = status; }
+bool Server::getBot() { return _botConnected; }
 
 void Server::addBotToAllChannels(Client* bot)
 {
@@ -435,6 +436,7 @@ void Server::removeClient(int clientFd)
     // Remove client object
     if (_clients.find(clientFd) != _clients.end())
     {
+        if (_clients.find(clientFd)->second->isBot()) setBot(false);
         delete _clients[clientFd];
         _clients.erase(clientFd);
     }

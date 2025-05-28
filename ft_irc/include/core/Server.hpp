@@ -69,7 +69,8 @@ public:
     // utils for bot
     const std::string& getBotPassword() const;
     void addBotToAllChannels(Client* bot);
-    void haveBot();
+    void setBot(bool status);
+    bool getBot();
 };
 
 #endif
