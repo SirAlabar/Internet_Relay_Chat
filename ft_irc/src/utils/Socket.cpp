@@ -92,7 +92,7 @@ bool Socket::setNonBlocking()
         return (false);
     }
 
-    Print::Debug("DEBUG: Setting socket " + toString(_fd) + " to non-blocking mode");
+    Print::Debug("Setting socket " + toString(_fd) + " to non-blocking mode");
     // std::cout << "DEBUG: Setting socket " << _fd << " to non-blocking mode" <<
     // std::endl;
 

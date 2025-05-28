@@ -13,7 +13,7 @@ Server* g_server = NULL;
 // Signal handler for clean shutdown
 void sigHandler(int signum)
 {
-    Print::StdOut("\nReceived signal " + toString(signum) + ". Shutting down bot...");
+    Print::Log("\nReceived signal " + toString(signum) + ". Shutting down bot...");
     if (g_server)
     {
         g_server->stop();

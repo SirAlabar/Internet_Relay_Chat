@@ -161,6 +161,7 @@ void Server::run()
                              toString(_pollFds[i].fd) + " - keeping connection");
             }
         }
+        addBotToAllChannels(getClientByNick("IRCBot"));
         print_clients();
     }
 
@@ -195,7 +196,7 @@ void Server::stop()
          it != _clientSockets.end(); ++it)
     {
         int fd = it->first;
-        Print::StdOut("Explicitly closing client socket FD: " + toString(fd));
+        Print::Debug("Explicitly closing client socket FD: " + toString(fd));
         if (it->second && it->second->isValid())
         {
             it->second->close();
@@ -334,7 +335,24 @@ void Server::processClientMessage(int clientFd)
 const std::string& Server::getPassword() const { return (_password); }
 const std::string& Server::getBotPassword() const { return (_botpass); }
 
-void Server::haveBot() { _botconnected = true; }
+void Server::haveBot() { _botConnected = true; }
+
+void Server::addBotToAllChannels(Client* bot)
+{
+    Print::Do("Adding bot to all channels");
+    if (!bot || !bot->isBot())
+    {
+        Print::Fail("Bot not found.");
+        return;
+    }
+    for (std::map<std::string, Channel*>::iterator it = _channels.begin();
+         it != _channels.end(); it++)
+    {
+        Channel* channel = it->second;
+        if (channel && !channel->hasClient(bot)) channel->addClient(bot);
+    }
+    Print::Ok("Bot added to all channels");
+}
 // Get all channels
 std::map<std::string, Channel*>& Server::getChannels() { return (_channels); }
 
@@ -388,7 +406,7 @@ void Server::removeChannel(const std::string& name)
 // Remove client and cleanup associated resources
 void Server::removeClient(int clientFd)
 {
-    Print::StdOut("Removing client FD: " + toString(clientFd));
+    Print::Debug("Removing client FD: " + toString(clientFd));
 
     Client* client = getClient(clientFd);
     if (client)
@@ -427,7 +445,7 @@ void Server::removeClient(int clientFd)
         _clientSockets.erase(clientFd);
     }
 
-    Print::StdOut("Client disconnected. FD: " + toString(clientFd));
+    Print::Debug("Client disconnected. FD: " + toString(clientFd));
 }
 
 // Broadcast message to all clients except excludeFd

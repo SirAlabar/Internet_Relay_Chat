@@ -61,6 +61,7 @@ void PassCommand::execute(Client* client, const Message& message)
         _server->haveBot();
         client->setBot();
         client->setAuthenticated(true);
+        _server->addBotToAllChannels(client);
     }
     else
     {

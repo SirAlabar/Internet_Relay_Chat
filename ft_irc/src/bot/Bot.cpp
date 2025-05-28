@@ -5,38 +5,9 @@
 #include <cstddef>
 
 #include "Bot.hpp"
+#include "Message.hpp"
+#include "Server.hpp"
 #include "UtilsFun.hpp"
-/* class Bot
-{
-private:
-    Socket _socket;
-    std::string _nickname;
-    std::string _serverHost;
-    int _serverPort;
-    std::string _password;
-    bool _connected;
-    bool _authenticated;
-    std::string _messageBuffer;
-
-public:
-    Bot(std::string& host, int port, std::string& pass);
-    ~Bot();
-
-    bool connect();
-    void disconnect();
-    bool isConnected() const;
-
-    void run();
-
-    void processMessage(const std::string& rawMessage);
-    void sendMessage(const std::string& message);
-
-    void authenticate();
-    void joinChannel(const std::string& channel);
-    void partChannel(const std::string& channel);
-    void handleBotCommand(const std::string& channel, const std::string& user,
-                          const std::string& command);
-}; */
 
 Bot::Bot(std::string host, int port, std::string password)
     : _nickname("IRCBot"),
@@ -48,7 +19,6 @@ Bot::Bot(std::string host, int port, std::string password)
 {
     _socket = Socket();
     _messageBuffer.clear();
-    _joinedChannels.clear();
     Print::Log("[BOT] Bot initialized - Target: " + host + " : " + toString(port));
 }
 
@@ -156,10 +126,22 @@ void Bot::run()
     if (_connected) disconnect();
 }
 
+// void Bot::joinChannel(const std::string& channel)
+// {
+//     if (!_connected)
+//     {
+//         std::string joinMsg = "JOIN " + channel + "\r\n";
+//         if (_socket.send(joinMsg) < 0)
+//             Print::Fail("[BOT] Failed to send JOIN for: " + channel);
+//         else
+//             Print::Fail("[BOT] Sent JOIN to: " + channel);
+//     }
+// }
 void Bot::processMessage(const std::string& rawMessage)
 {
-    Print::Do("[BOT] Processing the message");
-    Print::Ok("[BOT] received " + rawMessage);
+    Print::Debug("[BOT] Processing the message");
+    std::string prefix, command;
+    std::vector<std::string> params;
 }
 
 void Bot::disconnect()
@@ -185,7 +167,6 @@ void Bot::disconnect()
         Print::Debug("[BOT] Socket closed");
     }
     _messageBuffer.clear();
-    _joinedChannels.clear();
     Print::Ok("[BOT] Disconnected successfully. Byeeeeeeeee");
 };
 
@@ -195,7 +176,7 @@ Bot* g_bot = NULL;
 // Signal handler for clean shutdown
 void sigHandlerBot(int signum)
 {
-    Print::StdOut("\nReceived signal " + toString(signum) + ". Shutting down server...");
+    Print::Log("\nReceived signal " + toString(signum) + ". Shutting down server...");
     if (g_bot)
     {
         g_bot->disconnect();

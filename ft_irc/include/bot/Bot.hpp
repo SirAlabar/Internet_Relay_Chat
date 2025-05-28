@@ -9,6 +9,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "Socket.hpp"
 
@@ -23,7 +24,6 @@ private:
     bool _connected;
     bool _authenticated;
     std::string _messageBuffer;
-    std::set<std::string> _joinedChannels;
 
 public:
     Bot(std::string host, int port, std::string pass);
@@ -39,9 +39,5 @@ public:
     void sendMessage(const std::string& message);
 
     bool authenticate();
-    void joinChannel(const std::string& channel);
-    void partChannel(const std::string& channel);
-    void handleBotCommand(const std::string& channel, const std::string& user,
-                          const std::string& command);
 };
 #endif  // !BOT
