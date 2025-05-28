@@ -5,7 +5,7 @@
 NAME = ircserv
 BOTNAME = ircbot
 CC = c++
-INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot \
+INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iinclude/bot/commands_bot \
 				  -Iinclude/dcc -Iinclude/utils -Iinclude/commands/connection \
 				  -Iinclude/commands/messaging -Iinclude/commands/channel \
 				  -Iinclude/commands/dcc
@@ -73,7 +73,12 @@ SRCS =  $(SRC_DIR)/main.cpp \
 		$(SRC_DIR)/commands/channel/TopicCommand.cpp
 
 SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
-		$(SRC_DIR)/bot/CommandBot.cpp \
+		$(SRC_DIR)/bot/ABotCommand.cpp \
+		$(SRC_DIR)/bot/CommandBotFactory.cpp \
+		$(SRC_DIR)/bot/commands_bot/DadJokesCommand.cpp \
+		$(SRC_DIR)/bot/commands_bot/WeatherCommand.cpp \
+		$(SRC_DIR)/bot/commands_bot/HelpCommand.cpp \
+		$(SRC_DIR)/utils/Socket.cpp \
 		$(SRC_DIR)/utils/Socket.cpp \
 		$(SRC_DIR)/utils/UtilsFun.cpp
 

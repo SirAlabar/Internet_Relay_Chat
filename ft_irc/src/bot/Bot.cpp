@@ -5,6 +5,7 @@
 #include <cstddef>
 
 #include "Bot.hpp"
+#include "CommandBotFactory.hpp"
 #include "Message.hpp"
 #include "Server.hpp"
 #include "UtilsFun.hpp"
@@ -126,22 +127,10 @@ void Bot::run()
     if (_connected) disconnect();
 }
 
-// void Bot::joinChannel(const std::string& channel)
-// {
-//     if (!_connected)
-//     {
-//         std::string joinMsg = "JOIN " + channel + "\r\n";
-//         if (_socket.send(joinMsg) < 0)
-//             Print::Fail("[BOT] Failed to send JOIN for: " + channel);
-//         else
-//             Print::Fail("[BOT] Sent JOIN to: " + channel);
-//     }
-// }
 void Bot::processMessage(const std::string& rawMessage)
 {
     Print::Debug("[BOT] Processing the message");
-    std::string prefix, command;
-    std::vector<std::string> params;
+    CommandBotFactory::executeCommand(const Message& message)
 }
 
 void Bot::disconnect()
