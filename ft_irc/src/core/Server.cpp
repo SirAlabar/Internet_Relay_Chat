@@ -320,7 +320,6 @@ void Server::processClientMessage(int clientFd)
         // Parse and execute the message
         Message message = Message(rawMessage);
         Print::Debug("Processing command: " + message.getCommand());
-
         CommandFactory::executeCommand(client, this, message);
     }
 

@@ -92,23 +92,9 @@ void PrivmsgCommand::execute(Client* client, const Message& message)
         }
         handlePrivateMessage(client, target, messageText);
     }
-
     Print::Ok("PRIVMSG command completed");
-    // forwardToBot(client, message);
 }
 
-void PrivmsgCommand::forwardToBot(Client* sender, const Message& message)
-{
-    (void)sender;
-    Client* bot = _server->getClientByNick("IRCBot");
-    if (!bot) return;
-    std::string target = message.getParams(0);
-    std::string messageText = message.getParams(1);
-    std::string forwardMessage = ":" + sender->getNickname() + "!" +
-                                 sender->getUsername() + "@localhost PRIVMSG " + target +
-                                 " :" + messageText + "\r\n";
-    bot->sendMessage(forwardMessage);
-}
 void PrivmsgCommand::handleChannelMessage(Client* sender, const std::string& channelName,
                                           const std::string& message)
 {

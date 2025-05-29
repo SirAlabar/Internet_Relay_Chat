@@ -20,10 +20,10 @@ private:
                               const std::string& message);
     std::string createMessage(Client* sender, const std::string& command,
                               const std::string& target, const std::string& message);
-    void forwardToBot(Client* sender, const Message& message);
 
-    bool    isDccMessage(const std::string& message);
-    void    sendDccNotify(Client* sender, const std::string& target, const std::string& message);
+    bool isDccMessage(const std::string& message);
+    void sendDccNotify(Client* sender, const std::string& target,
+                       const std::string& message);
 
 public:
     PrivmsgCommand(Server* server);
