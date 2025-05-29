@@ -30,6 +30,7 @@ void CommandBotFactory::initializeCommands()
     registerCommand("WEATHER", &WeatherCommand::create);
     registerCommand("HELP", &HelpCommand::create);
     registerCommand("DADJOKES", &DadJokesCommand::create);
+    registerCommand("GAME", &GameCommand::create);
 
     _initialized = true;
 }

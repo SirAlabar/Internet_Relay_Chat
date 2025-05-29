@@ -85,6 +85,7 @@ SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
 		$(SRC_DIR)/bot/commands_bot/DadJokesCommand.cpp \
 		$(SRC_DIR)/bot/commands_bot/WeatherCommand.cpp \
 		$(SRC_DIR)/bot/commands_bot/HelpCommand.cpp \
+		$(SRC_DIR)/bot/commands_bot/GameCommand.cpp \
 		$(SRC_DIR)/utils/Socket.cpp \
 		$(SRC_DIR)/commands/CommandFactory.cpp \
 		$(SRC_DIR)/commands/ACommand.cpp \

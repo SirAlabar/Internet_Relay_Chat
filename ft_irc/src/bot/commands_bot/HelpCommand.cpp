@@ -32,6 +32,5 @@ void HelpCommand::execute(BotContext* botctx, std::string& message)
     {
         return;
     }
-    (void)message;
     Print::Do("executing Help command");
 }

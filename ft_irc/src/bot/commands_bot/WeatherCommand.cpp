@@ -37,6 +37,5 @@ void WeatherCommand::execute(BotContext* botctx, std::string& message)
     {
         return;
     }
-    (void)message;
     botctx->reply("Hello " + message);
 }
