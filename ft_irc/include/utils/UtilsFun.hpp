@@ -14,7 +14,7 @@
 class Print
 {
 public:
-    static void Debug(const std::string& str);
+    static void Debug(const std::string& str, bool command = 0);
     static void Log(const std::string& str);
     static void StdOut(const std::string& str);
     static void StdErr(const std::string& str);
