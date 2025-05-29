@@ -1,0 +1,4 @@
+: NICK :sender
+:server 1 sender :Welcome to the IRC Network sender!sender@localhost
+:server 2 sender :Host is server, running version 1.0
+:sender JOIN :#msgtest

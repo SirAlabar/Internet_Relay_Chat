@@ -1,0 +1,5 @@
+: NICK :keyop
+:server 1 keyop :Welcome to the IRC Network keyop!keyop@localhost
+:server 2 keyop :Host is server, running version 1.0
+:keyop JOIN :#keychan
+:keyop MODE #keychan +k secretpass

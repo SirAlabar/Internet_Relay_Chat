@@ -1,0 +1,3 @@
+: NICK :testuser
+:server 1 testuser :Welcome to the IRC Network testuser!testuser@localhost
+:server 2 testuser :Host is server, running version 1.0

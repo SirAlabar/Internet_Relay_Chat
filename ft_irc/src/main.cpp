@@ -9,15 +9,13 @@
 
 // Global server instance for signal handling
 Server* g_server = NULL;
+volatile bool g_shutdown_requested = false;
 
 // Signal handler for clean shutdown
 void sigHandler(int signum)
 {
     Print::Log("\nReceived signal " + toString(signum) + ". Shutting down bot...");
-    if (g_server)
-    {
-        g_server->stop();
-    }
+    g_shutdown_requested = true;
 }
 
 int main(int argc, char* argv[])

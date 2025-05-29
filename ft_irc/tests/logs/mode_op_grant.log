@@ -1,0 +1,4 @@
+: NICK :grantor
+:server 1 grantor :Welcome to the IRC Network grantor!grantor@localhost
+:server 2 grantor :Host is server, running version 1.0
+:grantor JOIN :#optest

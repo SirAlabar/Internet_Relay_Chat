@@ -1,0 +1,4 @@
+: NICK :pinguser
+:server 1 pinguser :Welcome to the IRC Network pinguser!pinguser@localhost
+:server 2 pinguser :Host is server, running version 1.0
+:server PONG server :testserver

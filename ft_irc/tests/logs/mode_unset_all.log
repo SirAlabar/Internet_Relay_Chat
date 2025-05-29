@@ -1,0 +1,5 @@
+: NICK :unsetter
+:server 1 unsetter :Welcome to the IRC Network unsetter!unsetter@localhost
+:server 2 unsetter :Host is server, running version 1.0
+:unsetter JOIN :#unsettest
+:unsetter MODE #unsettest +ik secret

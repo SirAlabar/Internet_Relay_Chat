@@ -1,0 +1,4 @@
+: NICK :topicop
+:server 1 topicop :Welcome to the IRC Network topicop!topicop@localhost
+:server 2 topicop :Host is server, running version 1.0
+:topicop JOIN :#topicchan

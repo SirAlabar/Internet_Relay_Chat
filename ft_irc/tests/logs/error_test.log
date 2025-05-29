@@ -1,0 +1,6 @@
+: NICK :erroruser
+:server 1 erroruser :Welcome to the IRC Network erroruser!erroruser@localhost
+:server 2 erroruser :Host is server, running version 1.0
+:server 421 erroruser INVALIDCOMMAND :Unknown command
+:server 461 erroruser USER :Not enough parameters
+:server 411 erroruser :No recipient given (PRIVMSG)

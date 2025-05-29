@@ -1,0 +1,8 @@
+: NICK :channeluser
+:server 1 channeluser :Welcome to the IRC Network channeluser!channeluser@localhost
+:server 2 channeluser :Host is server, running version 1.0
+:channeluser JOIN :#testchannel
+:server 321 channeluser Channel :Users  Name
+:server 322 channeluser #testchannel 1 :No topic set
+:server 323 channeluser :End of /LIST
+:channeluser!channeluser@localhost PART #testchannel :Leaving test

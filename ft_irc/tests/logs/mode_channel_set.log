@@ -1,0 +1,5 @@
+: NICK :modetest1
+:server 1 modetest1 :Welcome to the IRC Network modetest1!modetest1@localhost
+:server 2 modetest1 :Host is server, running version 1.0
+:modetest1 JOIN :#modetest
+:modetest1 MODE #modetest +i

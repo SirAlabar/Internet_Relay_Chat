@@ -1,0 +1,5 @@
+: NICK :opuser
+:server 1 opuser :Welcome to the IRC Network opuser!opuser@localhost
+:server 2 opuser :Host is server, running version 1.0
+:opuser JOIN :#secret
+:opuser MODE #secret +i
