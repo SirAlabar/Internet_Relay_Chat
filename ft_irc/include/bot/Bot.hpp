@@ -34,8 +34,6 @@ public:
     bool isConnected() const;
 
     void run();
-
-    void processMessage(const std::string& rawMessage);
     void sendMessage(const std::string& message);
 
     bool authenticate();

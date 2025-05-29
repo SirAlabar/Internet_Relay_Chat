@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "Bot.hpp"
+#include "BotContext.hpp"
 #include "Channel.hpp"
 #include "Client.hpp"
 #include "General.hpp"
@@ -42,7 +44,7 @@ public:
     virtual ~ABotCommand();
 
     // The main execute method that all command implementations must override
-    virtual void execute(Client* client, const Message& message) = 0;
+    virtual void execute(BotContext* botctx, std::string& message) = 0;
 
     std::vector<std::string> splitArguments(const std::string& args,
                                             char delimiter = ' ');

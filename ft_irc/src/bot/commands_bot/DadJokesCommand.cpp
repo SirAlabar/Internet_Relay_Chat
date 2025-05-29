@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "BotContext.hpp"
 #include "Client.hpp"
 #include "DadJokesCommand.hpp"
 #include "Message.hpp"
@@ -31,7 +32,7 @@ ABotCommand* DadJokesCommand::create(Server* server)
 }
 
 // Execute the DadJokes command
-void DadJokesCommand::execute(Client* client, const Message& message)
+void DadJokesCommand::execute(BotContext* botctx, std::string& message)
 {
     Print::Do("executing DadJokes command");
 }

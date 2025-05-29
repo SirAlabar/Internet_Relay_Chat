@@ -1,8 +1,10 @@
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <cerrno>
 #include <csignal>
 #include <cstddef>
+#include <iostream>
 
 #include "Bot.hpp"
 #include "CommandBotFactory.hpp"
@@ -118,19 +120,13 @@ void Bot::run()
             {
                 completeMessage = _messageBuffer.substr(0, pos);
                 _messageBuffer.erase(0, pos + 2);
-                processMessage(completeMessage);
+                CommandBotFactory::executeCommand(completeMessage, this);
                 completeMessage.clear();
             }
         }
     }
     Print::Warn("[BOT] Exiting main loop...");
     if (_connected) disconnect();
-}
-
-void Bot::processMessage(const std::string& rawMessage)
-{
-    Print::Log("[BOT] Processing the message ----------->" + rawMessage);
-    CommandBotFactory::executeCommand(rawMessage);
 }
 
 void Bot::disconnect()
@@ -162,6 +158,17 @@ void Bot::disconnect()
 // Global server instance for signal handling
 Bot* g_bot = NULL;
 
+void Bot::sendMessage(const std::string& message)
+{
+    Print::Do("[BOT] Sending message...");
+    ssize_t sentBytes = _socket.send(message);
+    if (sentBytes < 0)
+        Print::Fail("[BOT] Failed to sent message: " + _socket.getLastError());
+    else if (sentBytes < (ssize_t)message.length())
+        Print::Warn("[BOT] Partially sent message");
+    else
+        Print::Ok("[BOT] Message successfully sent");
+}
 // Signal handler for clean shutdown
 void sigHandlerBot(int signum)
 {

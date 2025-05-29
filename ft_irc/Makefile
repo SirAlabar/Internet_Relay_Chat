@@ -78,6 +78,7 @@ SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
 		$(SRC_DIR)/core/Client.cpp \
 		$(SRC_DIR)/core/Message.cpp \
 		$(SRC_DIR)/core/Channel.cpp \
+		$(SRC_DIR)/bot/BotContext.cpp \
 		$(SRC_DIR)/bot/ABotCommand.cpp \
 		$(SRC_DIR)/bot/CommandBotFactory.cpp \
 		$(SRC_DIR)/bot/commands_bot/DadJokesCommand.cpp \
@@ -104,6 +105,7 @@ SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
 		$(SRC_DIR)/commands/messaging/WhoCommand.cpp \
 		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp \
 		$(SRC_DIR)/commands/channel/TopicCommand.cpp \
+		$(SRC_DIR)/commands/messaging/MotdCommand.cpp \
 		$(SRC_DIR)/utils/UtilsFun.cpp
 
 

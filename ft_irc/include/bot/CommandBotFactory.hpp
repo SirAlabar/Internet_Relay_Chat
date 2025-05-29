@@ -4,6 +4,8 @@
 #include <map>
 #include <string>
 
+#include "Bot.hpp"
+
 // Forward declarations
 class ABotCommand;
 class Client;
@@ -30,7 +32,7 @@ public:
     // Create a command based on the message
     static ABotCommand* createCommand(const std::string& commandName, Server* server);
     // Execute the appropriate command based on the message
-    static void executeCommand(const Message& message, Server* server = NULL);
+    static void executeCommand(const Message& message, Bot* bot);
     // Register a new command creator
     static void registerCommand(const std::string& commandName, CommandCreator creator);
     // Check if a command exists

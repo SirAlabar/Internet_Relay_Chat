@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "BotContext.hpp"
 #include "Client.hpp"
 #include "Message.hpp"
 #include "Server.hpp"
@@ -30,7 +31,7 @@ ABotCommand* WeatherCommand::create(Server* server)
 }
 
 // Execute the Weather command
-void WeatherCommand::execute(Client* client, const Message& message)
+void WeatherCommand::execute(BotContext* botctx, std::string& message)
 {
-    Print::Do("executing Weather command");
+    botctx->reply("Hello " + message);
 }

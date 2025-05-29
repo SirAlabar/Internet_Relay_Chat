@@ -2,6 +2,7 @@
 #define WEATHERCOMMAND_HPP
 
 #include "ABotCommand.hpp"
+#include "BotContext.hpp"
 
 class Client;
 class Server;
@@ -19,7 +20,7 @@ public:
     virtual ~WeatherCommand();
 
     // Execute the NICK command
-    virtual void execute(Client* client, const Message& message);
+    virtual void execute(BotContext* botctx, std::string& message);
 
     // Static creator for factory
     static ABotCommand* create(Server* server);

@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "BotContext.hpp"
 #include "Client.hpp"
 #include "HelpCommand.hpp"
 #include "Message.hpp"
@@ -25,7 +26,7 @@ HelpCommand& HelpCommand::operator=(const HelpCommand& other)
 ABotCommand* HelpCommand::create(Server* server) { return (new HelpCommand(server)); }
 
 // Execute the Help command
-void HelpCommand::execute(Client* client, const Message& message)
+void HelpCommand::execute(BotContext* botctx, std::string& message)
 {
     Print::Do("executing Help command");
 }

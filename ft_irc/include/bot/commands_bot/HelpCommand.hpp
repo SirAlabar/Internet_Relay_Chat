@@ -18,8 +18,8 @@ public:
     HelpCommand(Server* server);
     virtual ~HelpCommand();
 
-    // Execute the NICK command
-    virtual void execute(Client* client, const Message& message);
+    // Execute the HELP command
+    virtual void execute(BotContext* botctx, std::string& message);
 
     // Static creator for factory
     static ABotCommand* create(Server* server);

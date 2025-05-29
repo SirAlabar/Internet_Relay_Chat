@@ -1,4 +1,5 @@
 #include "ABotCommand.hpp"
+#include "BotContext.hpp"
 #include "General.hpp"
 
 // Constructor with server reference
