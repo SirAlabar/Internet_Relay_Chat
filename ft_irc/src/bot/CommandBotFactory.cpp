@@ -10,6 +10,7 @@
 #include "CommandBotFactory.hpp"
 #include "Message.hpp"
 #include "bot/commands_bot/DadJokesCommand.hpp"
+#include "bot/commands_bot/GameCommand.hpp"
 #include "bot/commands_bot/HelpCommand.hpp"
 #include "bot/commands_bot/WeatherCommand.hpp"
 
@@ -30,6 +31,7 @@ void CommandBotFactory::initializeCommands()
     registerCommand("WEATHER", &WeatherCommand::create);
     registerCommand("HELP", &HelpCommand::create);
     registerCommand("DADJOKES", &DadJokesCommand::create);
+    registerCommand("GAME", &GameCommand::create);
 
     _initialized = true;
 }
