@@ -102,6 +102,11 @@ void NickCommand::execute(Client* client, const Message& message)
                          ":Welcome to the IRC Network " + client->getNickname() + "!" +
                              client->getUsername() + "@localhost");
         sendNumericReply(client, 002, ":Host is server, running version 1.0");
+        {
+            Message motdMessage("MOTD");
+            MotdCommand motdCmd(_server);
+            motdCmd.execute(client, motdMessage);
+        }
 
         Print::Ok("Client registration done!");
     }

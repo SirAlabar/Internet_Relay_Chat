@@ -85,7 +85,8 @@ void JoinCommand::execute(Client* client, const Message& message)
                     return;
                 }
                 if (channel->hasUserLimit()
-                    && channel->getClients().size() >= channel->getUserLimit())
+                    && channel->getClients().size() >= channel->getUserLimit()
+				    && !client->isBot())
                 {
                     Print::Warn("Channel full");
                     sendErrorReply(client, IRC::ERR_CHANNELISFULL, channelName + " :Cannot join channel (+l)");

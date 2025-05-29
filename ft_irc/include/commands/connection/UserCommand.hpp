@@ -2,6 +2,7 @@
 #define USER_COMMAND_HPP
 
 #include "ACommand.hpp"
+#include "MotdCommand.hpp"
 
 class Client;
 class Server;
