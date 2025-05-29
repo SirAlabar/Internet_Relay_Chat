@@ -108,6 +108,7 @@ SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
 		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp \
 		$(SRC_DIR)/commands/channel/TopicCommand.cpp \
 		$(SRC_DIR)/commands/messaging/MotdCommand.cpp \
+		$(SRC_DIR)/commands/channel/PrintdataCommand.cpp \
 		$(SRC_DIR)/utils/UtilsFun.cpp
 
 
