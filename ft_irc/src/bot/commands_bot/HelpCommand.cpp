@@ -28,7 +28,10 @@ ABotCommand* HelpCommand::create(Server* server) { return (new HelpCommand(serve
 // Execute the Help command
 void HelpCommand::execute(BotContext* botctx, std::string& message)
 {
-    if (!botctx) return;
+    if (!botctx)
+    {
+        return;
+    }
     (void)message;
     Print::Do("executing Help command");
 }
