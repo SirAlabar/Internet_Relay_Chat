@@ -27,6 +27,7 @@ Bot::Bot(std::string host, int port, std::string password)
 }
 
 Bot::~Bot() {};
+
 bool Bot::connect()
 {
     Print::Do("[BOT] Attempting to connect to " + _serverHost + " : " +
@@ -170,6 +171,7 @@ void Bot::sendMessage(const std::string& message)
     else
         Print::Ok("[BOT] Message successfully sent");
 }
+
 // Signal handler for clean shutdown
 void sigHandlerBot(int signum)
 {

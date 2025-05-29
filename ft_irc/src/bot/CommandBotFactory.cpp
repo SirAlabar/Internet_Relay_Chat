@@ -9,10 +9,9 @@
 #include "Client.hpp"
 #include "CommandBotFactory.hpp"
 #include "Message.hpp"
-#include "bot/commands_bot/DadJokesCommand.hpp"
-#include "bot/commands_bot/GameCommand.hpp"
-#include "bot/commands_bot/HelpCommand.hpp"
-#include "bot/commands_bot/WeatherCommand.hpp"
+#include "DadJokesCommand.hpp"
+#include "HelpCommand.hpp"
+#include "WeatherCommand.hpp"
 
 // Initialize static members
 std::map<std::string, CommandBotFactory::CommandCreator>

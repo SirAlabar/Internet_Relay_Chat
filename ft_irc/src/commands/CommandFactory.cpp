@@ -24,6 +24,7 @@
 #include "WhoIsCommand.hpp"
 #include "TopicCommand.hpp"
 #include "MotdCommand.hpp"
+#include "PrintdataCommand.hpp"
 
 // Initialize static members
 std::map<std::string, CommandFactory::CommandCreator> CommandFactory::_commandCreators;
@@ -61,6 +62,7 @@ void CommandFactory::initializeCommands()
     registerCommand("WHO", &WhoCommand::create);
     registerCommand("WHOIS", &WhoIsCommand::create);
     registerCommand("MOTD", &MotdCommand::create);
+    registerCommand("PRINT_DATA", &PrintdataCommand::create);
 
     _initialized = true;
 }

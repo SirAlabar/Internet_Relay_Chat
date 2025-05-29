@@ -4,11 +4,11 @@
 #include "UtilsFun.hpp"
 #include "General.hpp"
 
-void Print::Debug(const std::string& str)
+void Print::Debug(const std::string& str, bool command)
 {
-    if (DEBUG)
+    if (DEBUG || command)
     {
-        Print::Timestamp(Color::RED);
+        Print::Timestamp(command ? Color::GREEN : Color::RED);
         std::cerr << str << std::endl;
     }
 }
