@@ -35,6 +35,7 @@ ABotCommand* DadJokesCommand::create(Server* server)
 void DadJokesCommand::execute(BotContext* botctx, std::string& message)
 {
     (void)message;
+    if (!botctx) return;
 
     const std::string dadJokes[] = {
         "Why don't scientists trust atoms? Because they make up everything!",
