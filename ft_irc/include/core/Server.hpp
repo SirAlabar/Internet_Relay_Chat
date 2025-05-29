@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "Bot.hpp"
 #include "Socket.hpp"
 
 // Forward declarations
@@ -34,7 +35,7 @@ private:
     void processNewConnection();
     void processClientMessage(int clientFd);
     void removeClient(int clientFd);
-    std::string	formatStr(const std::string& str);
+    std::string formatStr(const std::string& str);
 
     Server(const Server& other);  // private to prevent copies
     Server& operator=(const Server& other);
@@ -66,12 +67,13 @@ public:
     const std::string& getPassword() const;
 
     // utils for print data structures - only for understand what's in
-    void print_clients();
+    void print_clients(bool command = 0);
     // utils for bot
     const std::string& getBotPassword() const;
     void addBotToAllChannels(Client* bot);
     void setBot(bool status);
-    bool hasBot();
+    Client* getBot() const;
+    bool hasBot() const;
 };
 
 #endif

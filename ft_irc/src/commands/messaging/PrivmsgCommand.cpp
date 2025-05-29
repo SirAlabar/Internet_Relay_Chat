@@ -79,36 +79,22 @@ void PrivmsgCommand::execute(Client* client, const Message& message)
     Print::Debug("PRIVMSG: '" + client->getNickname() + "' -> '" + target + "': '" +
                  messageText + "'");
 
-	// Check if target is a channel (starts with # or &)
-	if (target[0] == '#' || target[0] == '&')
-	{
-		handleChannelMessage(client, target, messageText);
-	}
-	else
-	{
+    // Check if target is a channel (starts with # or &)
+    if (target[0] == '#' || target[0] == '&')
+    {
+        handleChannelMessage(client, target, messageText);
+    }
+    else
+    {
         if (isDccMessage(messageText))
         {
             sendDccNotify(client, target, messageText);
         }
-		handlePrivateMessage(client, target, messageText);
-	}
-
+        handlePrivateMessage(client, target, messageText);
+    }
     Print::Ok("PRIVMSG command completed");
-    forwardToBot(client, message);
 }
 
-void PrivmsgCommand::forwardToBot(Client* sender, const Message& message)
-{
-    (void)sender;
-    Client* bot = _server->getClientByNick("IRCBot");
-    if (!bot) return;
-    std::string target = message.getParams(0);
-    std::string messageText = message.getParams(1);
-    std::string forwardMessage = ":" + sender->getNickname() + "!" +
-                                 sender->getUsername() + "@localhost PRIVMSG " + target +
-                                 " :" + messageText + "\r\n";
-    bot->sendMessage(forwardMessage);
-}
 void PrivmsgCommand::handleChannelMessage(Client* sender, const std::string& channelName,
                                           const std::string& message)
 {
@@ -192,31 +178,31 @@ std::string PrivmsgCommand::createMessage(Client* sender, const std::string& com
                                           const std::string& target,
                                           const std::string& message)
 {
-	std::string result = ":" + sender->getNickname();
-	
-	std::string username = sender->getUsername();
-	if (!username.empty())
-	{
-		result += "!" + username + "@localhost";
-	}
-	
-	result += " " + command + " " + target + " :" + message + "\r\n";
-	
-	return result;
+    std::string result = ":" + sender->getNickname();
+
+    std::string username = sender->getUsername();
+    if (!username.empty())
+    {
+        result += "!" + username + "@localhost";
+    }
+
+    result += " " + command + " " + target + " :" + message + "\r\n";
+
+    return result;
 }
 
-bool    PrivmsgCommand::isDccMessage(const std::string& message)
+bool PrivmsgCommand::isDccMessage(const std::string& message)
 {
     return (message.size() >= 4 && message.substr(0, 4) == "\001DCC");
 }
 
-void    PrivmsgCommand::sendDccNotify(Client* sender, const std::string& target,
-                                      const std::string& message)
+void PrivmsgCommand::sendDccNotify(Client* sender, const std::string& target,
+                                   const std::string& message)
 {
     std::string dccContent = message;
-    if (dccContent[0] == '\001' && dccContent[dccContent.length()-1] == '\001')
+    if (dccContent[0] == '\001' && dccContent[dccContent.length() - 1] == '\001')
     {
-        dccContent = dccContent.substr(1, dccContent.length()-2);
+        dccContent = dccContent.substr(1, dccContent.length() - 2);
     }
 
     std::vector<std::string> parts = splitArguments(dccContent, ' ');
@@ -225,12 +211,10 @@ void    PrivmsgCommand::sendDccNotify(Client* sender, const std::string& target,
         Client* targetClient = _server->getClientByNick(target);
         if (targetClient)
         {
-            std::string notification = 
-                ":server NOTICE " + target + 
-                " :\002File Transfer Offer\002 - " + 
-                sender->getNickname() 
-                + " wants to send you: \002" + 
-                parts[2] + "\002\r\n";
+            std::string notification = ":server NOTICE " + target +
+                                       " :\002File Transfer Offer\002 - " +
+                                       sender->getNickname() +
+                                       " wants to send you: \002" + parts[2] + "\002\r\n";
 
             targetClient->sendMessage(notification);
         }

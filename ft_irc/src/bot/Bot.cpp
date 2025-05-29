@@ -1,10 +1,14 @@
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <cerrno>
 #include <csignal>
 #include <cstddef>
+#include <cstdlib>
+#include <iostream>
 
 #include "Bot.hpp"
+#include "CommandBotFactory.hpp"
 #include "Message.hpp"
 #include "Server.hpp"
 #include "UtilsFun.hpp"
@@ -23,6 +27,7 @@ Bot::Bot(std::string host, int port, std::string password)
 }
 
 Bot::~Bot() {};
+
 bool Bot::connect()
 {
     Print::Do("[BOT] Attempting to connect to " + _serverHost + " : " +
@@ -117,31 +122,13 @@ void Bot::run()
             {
                 completeMessage = _messageBuffer.substr(0, pos);
                 _messageBuffer.erase(0, pos + 2);
-                processMessage(completeMessage);
+                CommandBotFactory::executeCommand(completeMessage, this);
                 completeMessage.clear();
             }
         }
     }
     Print::Warn("[BOT] Exiting main loop...");
     if (_connected) disconnect();
-}
-
-// void Bot::joinChannel(const std::string& channel)
-// {
-//     if (!_connected)
-//     {
-//         std::string joinMsg = "JOIN " + channel + "\r\n";
-//         if (_socket.send(joinMsg) < 0)
-//             Print::Fail("[BOT] Failed to send JOIN for: " + channel);
-//         else
-//             Print::Fail("[BOT] Sent JOIN to: " + channel);
-//     }
-// }
-void Bot::processMessage(const std::string& rawMessage)
-{
-    Print::Debug("[BOT] Processing the message");
-    std::string prefix, command;
-    std::vector<std::string> params;
 }
 
 void Bot::disconnect()
@@ -173,6 +160,18 @@ void Bot::disconnect()
 // Global server instance for signal handling
 Bot* g_bot = NULL;
 
+void Bot::sendMessage(const std::string& message)
+{
+    Print::Do("[BOT] Sending message...");
+    ssize_t sentBytes = _socket.send(message);
+    if (sentBytes < 0)
+        Print::Fail("[BOT] Failed to sent message: " + _socket.getLastError());
+    else if (sentBytes < (ssize_t)message.length())
+        Print::Warn("[BOT] Partially sent message");
+    else
+        Print::Ok("[BOT] Message successfully sent");
+}
+
 // Signal handler for clean shutdown
 void sigHandlerBot(int signum)
 {
@@ -186,6 +185,7 @@ void sigHandlerBot(int signum)
 
 int main(int argc, char* argv[])
 {
+    srand(time(NULL));
     if (argc == 3)
     {
         signal(SIGINT, sigHandlerBot);   // Ctrl+C
