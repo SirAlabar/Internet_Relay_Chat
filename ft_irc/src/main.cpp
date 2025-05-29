@@ -61,6 +61,7 @@ int main(int argc, char* argv[])
 
     // If we exit the loop normally, clean up
     server.stop();
+    g_server = NULL;
 
     return 0;
 }

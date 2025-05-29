@@ -1,5 +1,0 @@
-: NICK :topicuser
-:server 1 topicuser :Welcome to the IRC Network topicuser!topicuser@localhost
-:server 2 topicuser :Host is server, running version 1.0
-:topicuser JOIN :#topicchan
-:topicuser!topicuser@localhost TOPIC #topicchan :New topic

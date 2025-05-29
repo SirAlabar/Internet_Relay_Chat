@@ -1,4 +1,0 @@
-: NICK :modetest4
-:server 1 modetest4 :Welcome to the IRC Network modetest4!modetest4@localhost
-:server 2 modetest4 :Host is server, running version 1.0
-:server 461 modetest4 MODE :Not enough parameters

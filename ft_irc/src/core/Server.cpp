@@ -92,7 +92,7 @@ void Server::run()
     {
         int ready = poll(_pollFds.data(), _pollFds.size(), 1000);
         // Execute poll() to check for events
-        if (!g_shutdown_requested)
+        if (g_shutdown_requested)
         {
             Print::Log("Gracefully shutting down from signal...");
             _running = false;

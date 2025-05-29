@@ -1,4 +1,0 @@
-: NICK :keyfail
-:server 1 keyfail :Welcome to the IRC Network keyfail!keyfail@localhost
-:server 2 keyfail :Host is server, running version 1.0
-:server 475 keyfail #keychan :Cannot join channel (+k)

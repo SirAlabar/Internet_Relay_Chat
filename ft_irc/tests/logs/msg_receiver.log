@@ -1,7 +1,0 @@
-: NICK :receiver
-:server 1 receiver :Welcome to the IRC Network receiver!receiver@localhost
-:server 2 receiver :Host is server, running version 1.0
-:receiver JOIN :#msgtest
-:sender JOIN :#msgtest
-:sender!sender@localhost PRIVMSG #msgtest :Hello channel!
-:sender!sender@localhost PRIVMSG receiver :Hello directly!

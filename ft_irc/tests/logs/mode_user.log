@@ -1,4 +1,0 @@
-: NICK :modetest3
-:server 1 modetest3 :Welcome to the IRC Network modetest3!modetest3@localhost
-:server 2 modetest3 :Host is server, running version 1.0
-:server 403 modetest3 modetest3 :No such channel

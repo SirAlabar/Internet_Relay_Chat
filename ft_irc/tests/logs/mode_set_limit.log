@@ -1,5 +1,0 @@
-: NICK :limitop
-:server 1 limitop :Welcome to the IRC Network limitop!limitop@localhost
-:server 2 limitop :Host is server, running version 1.0
-:limitop JOIN :#limitchan
-:limitop MODE #limitchan +l 1

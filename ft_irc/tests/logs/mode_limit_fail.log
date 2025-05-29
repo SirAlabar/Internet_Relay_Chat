@@ -1,4 +1,0 @@
-: NICK :lim2
-:server 1 lim2 :Welcome to the IRC Network lim2!lim2@localhost
-:server 2 lim2 :Host is server, running version 1.0
-:lim2 JOIN :#limitchan

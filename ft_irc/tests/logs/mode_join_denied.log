@@ -1,4 +1,0 @@
-: NICK :outsider
-:server 1 outsider :Welcome to the IRC Network outsider!outsider@localhost
-:server 2 outsider :Host is server, running version 1.0
-:server 473 outsider #secret :Cannot join channel (+i)

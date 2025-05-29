@@ -1,4 +1,0 @@
-: NICK :targetop
-:server 1 targetop :Welcome to the IRC Network targetop!targetop@localhost
-:server 2 targetop :Host is server, running version 1.0
-:targetop JOIN :#optest

@@ -1,4 +1,0 @@
-:server CAP * LS :
-: NICK :capuser
-:server 1 capuser :Welcome to the IRC Network capuser!capuser@localhost
-:server 2 capuser :Host is server, running version 1.0
