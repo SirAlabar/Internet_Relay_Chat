@@ -66,7 +66,7 @@ public:
     const std::string& getPassword() const;
 
     // utils for print data structures - only for understand what's in
-    void print_clients();
+    void print_clients(bool command = 0);
     // utils for bot
     const std::string& getBotPassword() const;
     void addBotToAllChannels(Client* bot);

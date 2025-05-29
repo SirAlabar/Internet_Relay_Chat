@@ -490,50 +490,54 @@ Channel* Server::createChannel(const std::string& name, Client* creator)
     return newChannel;
 }
 
-void Server::print_clients()
+void Server::print_clients(bool command)
 {
     std::stringstream ss;
     ss << std::right << Color::YELLOW << std::setw(10) << "FD" << "|" << std::setw(10)
        << "NICK" << "|" << std::setw(10) << "USER" << "|" << std::setw(10) << "AUTH?"
        << "|" << std::setw(10) << "BOT?" << "|";
-    Print::Debug(ss.str());
+    Print::Debug(ss.str(), command);
 
     std::map<int, Client*>::iterator it = _clients.begin();
     std::map<int, Client*>::iterator ite = _clients.end();
     for (; it != ite; it++)
     {
         std::stringstream ssa;
-        ssa << std::right << std::setw(10) << Server::formatStr(it->second->getFdString())
+        ssa << std::right << Color::YELLOW << std::setw(10) << Server::formatStr(it->second->getFdString())
             << "|" << std::setw(10) << Server::formatStr(it->second->getNickname()) << "|"
             << std::setw(10) << Server::formatStr(it->second->getUsername()) << "|"
             << std::setw(10)
             << Server::formatStr(it->second->isAuthenticated() ? "YES" : "") << "|"
             << std::setw(10) << Server::formatStr(it->second->isBot() ? "YES" : "")
             << "|";
-        Print::Debug(ssa.str());
+        Print::Debug(ssa.str(), command);
     }
-    std::map<std::string, Channel*>::iterator itch = _channels.begin();
-    for (; itch != _channels.end(); itch++)
+    std::map<std::string, Channel*>::iterator it_channel = _channels.begin();
+    for (; it_channel != _channels.end(); it_channel++)
     {
         std::stringstream ssa;
-        ssa << Color::GREEN + "======= Channel Name   :" + itch->second->getName() +
-                   "\t" + itch->second->getTopic() + Color::ORANGE;
-        Print::Debug(ssa.str());
+        ssa << Color::GREEN + "======= Channel: " + it_channel->second->getName()
+            + (it_channel->second->isInviteOnly() ? " | Invite_Only" : "")
+            + (it_channel->second->hasUserLimit() ? " | Has_User_limit: "
+                    + (toString(it_channel->second->getUserLimit())) : "" )
+            + (it_channel->second->hasKey() ? " | Has_Key" : "")
+            + (it_channel->second->isTopicRestricted() ? " | Topic_Restricted" : "");
+        Print::Debug(ssa.str(), command);
 
         std::stringstream ssb;
-        ssb << std::right << std::setw(10) << "FD" << "|" << std::setw(10) << "NICK"
+        ssb << std::right << Color::ORANGE << std::setw(10) << "FD" << "|" << std::setw(10) << "NICK"
             << "|" << std::setw(10) << "OPERATOR" << "|";
-        Print::Debug(ssb.str());
+        Print::Debug(ssb.str(), command);
 
-        std::map<int, Client*>::const_iterator itcli = itch->second->getClients().begin();
-        for (; itcli != itch->second->getClients().end(); itcli++)
+        std::map<int, Client*>::const_iterator it_client = it_channel->second->getClients().begin();
+        for (; it_client != it_channel->second->getClients().end(); it_client++)
         {
             std::stringstream ssb;
-            ssb << std::right << std::setw(10) << toString(itcli->first) << "|"
-                << std::setw(10) << toString(itcli->second->getNickname()) << "|"
-                << std::setw(10) << toString(itch->second->isOperator(itcli->second))
+            ssb << std::right << Color::ORANGE << std::setw(10) << toString(it_client->first) << "|"
+                << std::setw(10) << Server::formatStr(toString(it_client->second->getNickname())) << "|"
+                << std::setw(10) << (it_channel->second->isOperator(it_client->second) ? "YES" : "")
                 << "|";
-            Print::Debug(ssb.str());
+            Print::Debug(ssb.str(), command);
         }
         std::cerr << Color::RESET;
     }
