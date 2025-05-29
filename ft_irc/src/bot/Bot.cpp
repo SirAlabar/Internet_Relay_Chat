@@ -4,6 +4,7 @@
 #include <cerrno>
 #include <csignal>
 #include <cstddef>
+#include <cstdlib>
 #include <iostream>
 
 #include "Bot.hpp"
@@ -182,6 +183,7 @@ void sigHandlerBot(int signum)
 
 int main(int argc, char* argv[])
 {
+    srand(time(NULL));
     if (argc == 3)
     {
         signal(SIGINT, sigHandlerBot);   // Ctrl+C
