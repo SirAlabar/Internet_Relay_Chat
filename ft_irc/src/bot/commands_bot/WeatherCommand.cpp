@@ -33,5 +33,9 @@ ABotCommand* WeatherCommand::create(Server* server)
 // Execute the Weather command
 void WeatherCommand::execute(BotContext* botctx, std::string& message)
 {
+    if (!botctx)
+    {
+        return;
+    }
     botctx->reply("Hello " + message);
 }

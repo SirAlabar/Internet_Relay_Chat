@@ -28,6 +28,10 @@ ABotCommand* GameCommand::create(Server* server) { return (new GameCommand(serve
 // Execute the Game command
 void GameCommand::execute(BotContext* botctx, std::string& message)
 {
+    if (!botctx)
+    {
+        return;
+    }
     (void)message;
     botctx->reply("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
 }

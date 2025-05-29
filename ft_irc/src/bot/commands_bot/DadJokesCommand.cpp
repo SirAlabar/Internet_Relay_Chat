@@ -34,6 +34,10 @@ ABotCommand* DadJokesCommand::create(Server* server)
 // Execute the DadJokes command
 void DadJokesCommand::execute(BotContext* botctx, std::string& message)
 {
+    if (!botctx)
+    {
+        return;
+    }
     (void)message;
 
     const std::string dadJokes[] = {
