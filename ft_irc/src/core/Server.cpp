@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #include "Channel.hpp"
 #include "Client.hpp"
@@ -319,7 +320,6 @@ void Server::processClientMessage(int clientFd)
         // Parse and execute the message
         Message message = Message(rawMessage);
         Print::Debug("Processing command: " + message.getCommand());
-
         CommandFactory::executeCommand(client, this, message);
     }
 
@@ -336,7 +336,16 @@ const std::string& Server::getPassword() const { return (_password); }
 const std::string& Server::getBotPassword() const { return (_botpass); }
 
 void Server::setBot(bool status) { _botConnected = status; }
-bool Server::hasBot() { return _botConnected; }
+bool Server::hasBot() const { return _botConnected; }
+Client* Server::getBot() const
+{
+    Client* bot = NULL;
+    std::map<int, Client*>::const_iterator it = _clients.begin();
+    std::map<int, Client*>::const_iterator ite = _clients.end();
+    for (; it != ite; it++)
+        if (it->second->isBot()) bot = it->second;
+    return bot;
+}
 
 void Server::addBotToAllChannels(Client* bot)
 {
