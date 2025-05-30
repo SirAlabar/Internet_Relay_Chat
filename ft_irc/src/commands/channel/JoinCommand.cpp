@@ -3,6 +3,7 @@
 #include "Channel.hpp"
 #include "Client.hpp"
 #include "JoinCommand.hpp"
+#include "General.hpp"
 #include "Message.hpp"
 #include "Server.hpp"
 #include "UtilsFun.hpp"
@@ -26,7 +27,6 @@ JoinCommand& JoinCommand::operator=(const JoinCommand& other)
 // Static creator for factory
 ACommand* JoinCommand::create(Server* server) { return (new JoinCommand(server)); }
 
-// Execute the JOIN command
 void JoinCommand::execute(Client* client, const Message& message)
 {
     Print::Do("exec JOIN command to " + message.getParams(0));
@@ -42,7 +42,28 @@ void JoinCommand::execute(Client* client, const Message& message)
         sendErrorReply(client, 461, "USER :Not enough parameters");
         return;
     }
-    std::string channelName = message.getParams(0);
+    
+    if(message.getParams(0) == "0")
+    {
+        _server->removeClientFromChannels(client);
+        Print::Ok("client " + Color::YELLOW + client->getNickname()
+                  + Color::RESET + " left all channels");
+        return ;
+    }
+
+    std::vector<std::string> channels = splitArguments(message.getParams(0), ',');
+    std::vector<std::string> keys = (message.getSize() > 1 ?
+        splitArguments(message.getParams(1), ',') : std::vector<std::string>());
+
+    for (size_t i = 0; i < channels.size(); i++)
+    {
+        joinChannel(client, channels[i],
+                    (i >= keys.size() ? "" : keys[i]));
+    }
+}
+
+void    JoinCommand::joinChannel(Client* client, const std::string& channelName, const std::string& key)
+{
     if (!isValidChannelName(channelName))
     {
         Print::Fail("wrong channel name");
@@ -53,9 +74,14 @@ void JoinCommand::execute(Client* client, const Message& message)
     Channel* channel = _server->getChannel(channelName);
     std::string joinMessage =
                 ":" + client->getNickname() + " JOIN :" + channelName + "\r\n";
+
     if (!channel)
     {
         channel = _server->createChannel(channelName, client);
+        if(key != "")
+        {
+            channel->setKey(key);
+        }
         _server->getChannels()[channelName] = channel;
         client->sendMessage(joinMessage);
     }
@@ -78,7 +104,7 @@ void JoinCommand::execute(Client* client, const Message& message)
                     return;
                 }
                 if (channel->hasKey() 
-                    && (message.getParams(1).empty() || message.getParams(1) != channel->getKey()))
+                    && (key.empty() || key != channel->getKey()))
                 {
                     Print::Warn("Wrong or missing channel key");
                     sendErrorReply(client, IRC::ERR_BADCHANNELKEY, channelName + " :Cannot join channel (+k)");
