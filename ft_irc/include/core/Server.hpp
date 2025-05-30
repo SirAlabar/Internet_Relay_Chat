@@ -52,6 +52,7 @@ public:
     // Client management
     Client* getClient(int fd);
     Client* getClientByNick(const std::string& nickname);
+    void    removeClientFromChannels(Client* client);
     void broadcast(const std::string& message, int excludeFd = -1);
     void broadcastChannel(const std::string& message, const std::string& channel,
                           int excludeFd = -1);

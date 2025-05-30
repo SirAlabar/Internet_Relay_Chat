@@ -603,3 +603,36 @@ std::string Server::formatStr(const std::string& str)
     if (format.length() > 10) format = format.substr(0, 9) + ".";
     return (format);
 }
+
+void    Server::removeClientFromChannels(Client* client)
+{
+    if(!client)
+    {
+        return;
+    }
+    std::vector<std::string> channelNames;
+    {
+        std::map<std::string, Channel*>::const_iterator it = _channels.begin();
+        std::map<std::string, Channel*>::const_iterator ite = _channels.end();
+        for(; it != ite; it++)
+        {
+            if (it->second->hasClient(client))
+            {
+                channelNames.push_back(it->first);
+            }
+        }
+    }
+    for(size_t i = 0; i < channelNames.size(); i++)
+    {
+        Channel* channel = getChannel(channelNames[i]);
+        if(channel)
+        {
+            std::string partMsg = ":" + client->getNickname() + "!" +
+                client->getUsername() + "@" + "localhost" +
+                " PART " + channelNames[i] + "\r\n";
+            Server::broadcastChannel(partMsg, channelNames[i]);
+            channel->removeClient(client);
+        }
+    }
+    cleanupEmptyChannels();
+}
