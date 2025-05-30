@@ -16,6 +16,7 @@ private:
 
     void    joinChannel(Client* client,
                         const std::string& channelName, const std::string& key);
+    void    sendList(Client* client, Channel* Channel);
 
 public:
     JoinCommand(Server* server);

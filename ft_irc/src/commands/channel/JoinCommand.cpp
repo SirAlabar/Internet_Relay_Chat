@@ -124,9 +124,51 @@ void    JoinCommand::joinChannel(Client* client, const std::string& channelName,
             _server->broadcastChannel(joinMessage, channelName, client->getFd());
         }
         if (!channel->getTopic().empty())
+        {
             sendNumericReply(client, 332, channelName + " :" + channel->getTopic());
+        }
+        else
+        {
+            sendNumericReply(client, 331, channelName + " :No topic is set");
+        }
     }
+
+    sendList(client, channel);
+
     Print::Ok("Join " + Color::YELLOW +  client->getNickname() 
               + Color::RESET + " to " 
               + Color::YELLOW + channelName + Color::RESET);
+}
+
+void    JoinCommand::sendList(Client* client, Channel* channel)
+{
+    if(!channel || !client)
+    {
+        return;
+    }
+
+    std::string list = "";
+    const std::map<int, Client*>& clients = channel->getClients();
+
+    for(std::map<int, Client*>::const_iterator it = clients.begin();
+        it != clients.end(); it++)
+    {
+        if(it->second && !it->second->isBot())
+        {
+            if (!list.empty())
+            {
+                list += " ";
+            }
+            if (channel->isOperator(it->second))
+            {
+                list += "@";
+            }
+            list += it->second->getNickname();
+        }
+    }
+
+    sendNumericReply(client, IRC::RPL_NAMREPLY,
+                     "= " + channel->getName() + " :" + list);
+    sendNumericReply(client, IRC::RPL_ENDOFNAMES,
+                     channel->getName() + " :End of NAMES list");
 }
