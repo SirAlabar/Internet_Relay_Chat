@@ -125,7 +125,7 @@ OBJSBOT = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCSBOT))
 # Progress bar variables
 TOTAL_FILES := $(words $(SRCS))
 PROGRESS_FILE := .compilation_progress
-COUNTER_FILE := /tmp/.ircserv_compilation_counter
+COUNTER_FILE := .ircserv_compilation_counter
 
 # Progress bar function
 define progress_bar
