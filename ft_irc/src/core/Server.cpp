@@ -627,6 +627,10 @@ void    Server::removeClientFromChannels(Client* client)
         Channel* channel = getChannel(channelNames[i]);
         if(channel)
         {
+            if(channel->isOperator(client))
+            {
+                channel->removeOperator(client);
+            }
             std::string partMsg = ":" + client->getNickname() + "!" +
                 client->getUsername() + "@" + "localhost" +
                 " PART " + channelNames[i] + "\r\n";
