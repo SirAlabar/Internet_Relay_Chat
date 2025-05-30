@@ -75,7 +75,19 @@ bool Channel::hasClient(Client* client) const
     return (_clients.find(client->getFd()) != _clients.end());
 }
 
-bool Channel::isEmpty() const { return _clients.empty(); }
+bool Channel::isEmpty() const
+{
+    if (_clients.empty())
+    {
+        return true;
+    }
+    if (_clients.size() == 1)
+    {
+        Client* client = _clients.begin()->second;
+        return (client && client->isBot());
+    }
+    return false;
+}
 
 // Mode management methods
 bool Channel::isInviteOnly() const

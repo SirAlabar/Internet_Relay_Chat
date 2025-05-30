@@ -366,7 +366,7 @@ void Server::addBotToAllChannels(Client* bot)
     {
         return;
     }
-    Print::Do("Adding bot to all channels");
+    //Print::Do("Adding bot to all channels");
     for (std::map<std::string, Channel*>::iterator it = _channels.begin();
          it != _channels.end(); it++)
     {
@@ -376,7 +376,7 @@ void Server::addBotToAllChannels(Client* bot)
             channel->addClient(bot);
         }
     }
-    Print::Ok("Bot added to all channels");
+    //Print::Ok("Bot added to all channels");
 }
 // Get all channels
 std::map<std::string, Channel*>& Server::getChannels() { return (_channels); }
@@ -574,7 +574,10 @@ void Server::cleanupEmptyChannels()
     for (std::map<std::string, Channel*>::iterator it = _channels.begin();
          it != _channels.end(); it++)
     {
-        if (it->second->isEmpty()) channelsToRemove.push_back(it->first);
+        if (it->second->isEmpty())
+        {
+            channelsToRemove.push_back(it->first);
+        }
     }
     for (size_t i = 0; i < channelsToRemove.size(); i++)
         removeChannel(channelsToRemove[i]);
