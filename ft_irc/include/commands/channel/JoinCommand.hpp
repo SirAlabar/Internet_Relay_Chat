@@ -14,6 +14,9 @@ private:
     JoinCommand(const JoinCommand& other);
     JoinCommand& operator=(const JoinCommand& other);
 
+    void    joinChannel(Client* client,
+                        const std::string& channelName, const std::string& key);
+
 public:
     JoinCommand(Server* server);
     virtual ~JoinCommand();
