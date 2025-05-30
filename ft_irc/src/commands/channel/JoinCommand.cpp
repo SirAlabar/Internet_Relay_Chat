@@ -153,7 +153,7 @@ void    JoinCommand::sendList(Client* client, Channel* channel)
     for(std::map<int, Client*>::const_iterator it = clients.begin();
         it != clients.end(); it++)
     {
-        if(it->second)
+        if(it->second && !it->second->isBot())
         {
             if (!list.empty())
             {
