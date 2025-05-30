@@ -1,0 +1,74 @@
+[38;5;46m[12:10:22] [0mStarting IRC server on port 6667              
+[38;5;46m[12:10:22] [0mSetupServer...                     [38;5;46m[  OK  ] [0mIRC Server started on port 6667
+[38;5;46m[12:10:22] [0mServer started. Waiting connections...
+[38;5;46m[12:10:23] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:24] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:25] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:26] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:27] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:27] [0mProcessNewConnection               [38;5;46m[  OK  ] [0mSocket accepted successfully
+[38;5;46m[  OK  ] [0mNew connection accepted. FD: 4
+[38;5;46m[12:10:27] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:27] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:27] [0mProcessNewConnection               [38;5;46m[  OK  ] [0mSocket accepted successfully
+[38;5;46m[  OK  ] [0mNew connection accepted. FD: 4
+[38;5;46m[12:10:27] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:27] [0mexecute PASS command               [38;5;46m[  OK  ] [0m
+[38;5;46m[12:10:27] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:28] [0mexecuting NICK command             [38;5;46m[  OK  ] [0mSending response...
+[38;5;226m[ WARN ] [0mRegistration not complete. Nick: 'testuser', User: ''
+[38;5;46m[12:10:28] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:28] [0mexecuting USER command             [38;5;46m[12:10:28] [0mexecute MOTD command               [38;5;46m[  OK  ] [0mMOTD command completed
+[38;5;46m[  OK  ] [0mClient registration done!
+[38;5;46m[12:10:28] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:29] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:30] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:31] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:32] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:33] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:34] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:35] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:36] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:37] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:38] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:39] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:40] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:41] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:42] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:43] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:44] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:45] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:46] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:47] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:48] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:49] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:49] [0mProcessNewConnection               [38;5;46m[  OK  ] [0mSocket accepted successfully
+[38;5;46m[  OK  ] [0mNew connection accepted. FD: 4
+[38;5;46m[12:10:49] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:49] [0mexecute PASS command               [38;5;226m[ WARN ] [0mPassword incorrect
+[38;5;46m[12:10:49] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:49] [0mexecuting NICK command             [38;5;196m[ FAIL ] [0mClient is NULL, returning
+[38;5;46m[12:10:49] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:50] [0mexecuting USER command             [38;5;196m[ FAIL ] [0mClient NULL or not auth
+[38;5;46m[12:10:50] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:51] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;21m[12:10:52] [0m
+Received signal 2. Shutting down bot...
+[38;5;21m[12:10:52] [0mGracefully shutting down from signal...
+[38;5;46m[12:10:52] [0mAdding bot to all channels         [38;5;226m[ WARN ] [0mBot not found.
+[0m[38;5;46m[12:10:52] [0mStarting server shutdown process...		
+[38;5;46m[12:10:52] [0mCleaning up 1 client buffers...    [38;5;46m[  OK  ] [0mclient buffers cleared!
+[38;5;46m[12:10:52] [0mCleaning up 1 client sockets...		
+ [38;5;46m[  OK  ] [0mSockets cleared!
+[38;5;46m[12:10:52] [0mCleaning up 0 channels...          [38;5;46m[  OK  ] [0mchannels cleared!
+[38;5;46m[12:10:52] [0mCleaning up 1 clients...           [38;5;46m[  OK  ] [0mclients clear!
+[38;5;46m[12:10:52] [0mFreeing poll file descriptors data...[38;5;46m[  OK  ] [0m
+[38;5;46m[12:10:52] [0mClosing server socket...           [38;5;46m[  OK  ] [0mIRC Server shutdown complete.
+[38;5;46m[12:10:52] [0mStarting server shutdown process...		
+[38;5;46m[12:10:52] [0mCleaning up 0 client buffers...    [38;5;46m[  OK  ] [0mclient buffers cleared!
+[38;5;46m[12:10:52] [0mCleaning up 0 client sockets...		
+ [38;5;46m[  OK  ] [0mSockets cleared!
+[38;5;46m[12:10:52] [0mCleaning up 0 channels...          [38;5;46m[  OK  ] [0mchannels cleared!
+[38;5;46m[12:10:52] [0mCleaning up 0 clients...           [38;5;46m[  OK  ] [0mclients clear!
+[38;5;46m[12:10:52] [0mFreeing poll file descriptors data...[38;5;46m[  OK  ] [0m
+[38;5;46m[12:10:52] [0mClosing server socket...           [38;5;46m[  OK  ] [0mIRC Server shutdown complete.

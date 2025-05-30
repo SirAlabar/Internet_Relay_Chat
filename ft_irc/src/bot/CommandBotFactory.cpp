@@ -6,6 +6,7 @@
 #include "ABotCommand.hpp"
 #include "BotContext.hpp"
 #include "CapCommand.hpp"
+#include "GameCommand.hpp"
 #include "Client.hpp"
 #include "CommandBotFactory.hpp"
 #include "Message.hpp"
@@ -72,7 +73,9 @@ void CommandBotFactory::executeCommand(const Message &rawMessage, Bot *bot)
     // :joao!joao-pol@localhost PRIVMSG #penis :!hello
     if (rawMessage.getSize() < 3 || rawMessage.getParams(0) != "PRIVMSG" ||
         rawMessage.getParams(2)[0] != '!')
+    {
         return;
+    }
     std::string channel = rawMessage.getParams(1);
     std::string commandName = rawMessage.getParams(2).substr(1);
     size_t spacePos = commandName.find(' ');

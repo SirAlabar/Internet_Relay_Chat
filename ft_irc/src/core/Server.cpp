@@ -86,15 +86,20 @@ bool Server::start(int port, const std::string& password)
 // Main server loop - handles events using poll()
 void Server::run()
 {
+    extern volatile bool g_shutdown_requested;
     Print::Debug("Server entering main event loop");
 
-    while (_running)
+    while (_running && !g_shutdown_requested)
     {
+        int ready = poll(_pollFds.data(), _pollFds.size(), 1000);
         // Execute poll() to check for events
-
+        if (g_shutdown_requested)
+        {
+            Print::Log("Gracefully shutting down from signal...");
+            _running = false;
+        }
         Print::Debug("Calling poll() with " + toString(_pollFds.size()) +
                      " file descriptors");
-        int ready = poll(_pollFds.data(), _pollFds.size(), -1);
 
         Print::Debug("poll() returned with " + toString(ready) + " events");
 
@@ -180,16 +185,6 @@ void Server::stop()
     _clientBuffers.clear();
     Print::Ok("client buffers cleared!");
 
-    // Close Clients
-    Print::Do("Cleaning up " + toString(_clients.size()) + " clients...");
-    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();
-         ++it)
-    {
-        delete it->second;
-    }
-    _clients.clear();
-    Print::Ok("clients clear!");
-
     // Close client sockets
     Print::Do("Cleaning up " + toString(_clientSockets.size()) +
               " client sockets...\t\t\n");
@@ -216,6 +211,16 @@ void Server::stop()
     }
     _channels.clear();
     Print::Ok("channels cleared!");
+
+    // Close Clients
+    Print::Do("Cleaning up " + toString(_clients.size()) + " clients...");
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();
+         ++it)
+    {
+        delete it->second;
+    }
+    _clients.clear();
+    Print::Ok("clients clear!");
 
     // Clear poll
     Print::Do("Freeing poll file descriptors data...");
@@ -266,6 +271,14 @@ void Server::processNewConnection()
 
 void Server::processClientMessage(int clientFd)
 {
+    extern volatile bool g_shutdown_requested;
+
+    if (g_shutdown_requested)
+    {
+        Print::Debug("Shutdown requested, skipping message processing");
+        return;
+    }
+
     Print::Debug("Processing message from client FD: " + toString(clientFd));
 
     Client* client = getClient(clientFd);
@@ -349,17 +362,19 @@ Client* Server::getBot() const
 
 void Server::addBotToAllChannels(Client* bot)
 {
-    Print::Do("Adding bot to all channels");
     if (!bot || !bot->isBot())
     {
-        Print::Warn("Bot not found.");
         return;
     }
+    Print::Do("Adding bot to all channels");
     for (std::map<std::string, Channel*>::iterator it = _channels.begin();
          it != _channels.end(); it++)
     {
         Channel* channel = it->second;
-        if (channel && !channel->hasClient(bot)) channel->addClient(bot);
+        if (channel && !channel->hasClient(bot))
+        {
+            channel->addClient(bot);
+        }
     }
     Print::Ok("Bot added to all channels");
 }

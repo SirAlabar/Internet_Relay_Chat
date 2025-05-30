@@ -13,6 +13,8 @@
 #include "Server.hpp"
 #include "UtilsFun.hpp"
 
+volatile bool g_shutdown_requested = false;
+
 Bot::Bot(std::string host, int port, std::string password)
     : _nickname("IRCBot"),
       _serverHost(host),

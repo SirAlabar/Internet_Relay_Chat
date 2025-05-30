@@ -108,6 +108,7 @@ SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
 		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp \
 		$(SRC_DIR)/commands/channel/TopicCommand.cpp \
 		$(SRC_DIR)/commands/messaging/MotdCommand.cpp \
+		$(SRC_DIR)/commands/channel/PrintdataCommand.cpp \
 		$(SRC_DIR)/utils/UtilsFun.cpp
 
 
@@ -124,7 +125,7 @@ OBJSBOT = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCSBOT))
 # Progress bar variables
 TOTAL_FILES := $(words $(SRCS))
 PROGRESS_FILE := .compilation_progress
-COUNTER_FILE := /tmp/.ircserv_compilation_counter
+COUNTER_FILE := .ircserv_compilation_counter
 
 # Progress bar function
 define progress_bar
