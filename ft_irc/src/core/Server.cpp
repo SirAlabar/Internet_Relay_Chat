@@ -362,17 +362,19 @@ Client* Server::getBot() const
 
 void Server::addBotToAllChannels(Client* bot)
 {
-    Print::Do("Adding bot to all channels");
     if (!bot || !bot->isBot())
     {
-        Print::Warn("Bot not found.");
         return;
     }
+    Print::Do("Adding bot to all channels");
     for (std::map<std::string, Channel*>::iterator it = _channels.begin();
          it != _channels.end(); it++)
     {
         Channel* channel = it->second;
-        if (channel && !channel->hasClient(bot)) channel->addClient(bot);
+        if (channel && !channel->hasClient(bot))
+        {
+            channel->addClient(bot);
+        }
     }
     Print::Ok("Bot added to all channels");
 }
