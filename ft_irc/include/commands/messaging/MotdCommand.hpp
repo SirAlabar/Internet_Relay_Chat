@@ -13,6 +13,8 @@ private:
 	MotdCommand(const MotdCommand& other);
 	MotdCommand& operator=(const MotdCommand& other);
 
+    void    sendLocalMessage(Client* client) const;
+
 public:
 	MotdCommand(Server* server);
 	virtual ~MotdCommand();
