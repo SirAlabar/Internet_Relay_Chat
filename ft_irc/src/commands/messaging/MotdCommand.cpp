@@ -22,12 +22,49 @@ ACommand* MotdCommand::create(Server* server)
 
 void MotdCommand::execute(Client* client, const Message& message)
 {
-	Print::Do("execute MOTD command");
-	if (!validateClientRegist(client))
-	{
-		return;
-	}
-	(void)message;
+    Print::Do("execute MOTD command");
+    if (!validateClientRegist(client))
+    {
+        return;
+    }
+    (void)message;
+
+    const char* config_file = "motd.txt";
+    std::string source_file(config_file);
+    std::ifstream file(config_file);
+    if (!file.is_open())
+    {
+        sendLocalMessage(client);
+        Print::Warn("missing file \"motd.txt\", sent default motd msg");
+        return;
+    }
+
+    sendNumericReply(client, IRC::RPL_MOTDSTART, ":- server Message of the day -");
+    std::string line;
+    for (size_t i = 0; std::getline(file, line) && i < 500; i++)
+    {
+        if(line.length() >= 80)
+        {
+            sendNumericReply(client, IRC::RPL_MOTD, ":" + line.substr(0, 79));
+            continue;
+        }
+        else
+        {
+            sendNumericReply(client, IRC::RPL_MOTD, ":" + line);
+        }
+    }
+    sendNumericReply(client, IRC::RPL_ENDOFMOTD,
+                     ":End of MOTD command.");
+    file.close();
+    Print::Ok("motd.txt text sent!");
+}
+
+void MotdCommand::sendLocalMessage(Client* client) const
+{
+    if(!client)
+    {
+        return;
+    }
 	sendNumericReply(client, IRC::RPL_MOTDSTART, ":- server Message of the day -");
 	sendNumericReply(client, IRC::RPL_MOTD,
 					 ":+==============================================================+");
@@ -61,5 +98,4 @@ void MotdCommand::execute(Client* client, const Message& message)
 					 ":+============ Created by hluiz, isilva-t & joao-pol ===========+");
 	sendNumericReply(client, IRC::RPL_ENDOFMOTD,
 					 ":End of MOTD command.");	
-	Print::Ok("MOTD command completed");
 }

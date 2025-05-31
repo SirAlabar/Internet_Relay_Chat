@@ -1,0 +1,5 @@
+here will be the message of the day
+to be sent to the client that put /motd on command
+or
+when a user logins on this server.
+if this file is missing, server will sent a default /motd message.
