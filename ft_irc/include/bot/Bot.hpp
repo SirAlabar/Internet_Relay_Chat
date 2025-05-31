@@ -16,26 +16,26 @@
 class Bot
 {
 private:
-    Socket _socket;
-    std::string _nickname;
-    std::string _serverHost;
-    int _serverPort;
-    std::string _password;
-    bool _connected;
-    bool _authenticated;
-    std::string _messageBuffer;
+	Socket _socket;
+	std::string _nickname;
+	std::string _serverHost;
+	int _serverPort;
+	std::string _password;
+	bool _connected;
+	bool _authenticated;
+	std::string _messageBuffer;
 
 public:
-    Bot(std::string host, int port, std::string pass);
-    ~Bot();
+	Bot(std::string host, int port, std::string pass);
+	~Bot();
 
-    bool connect();
-    void disconnect();
-    bool isConnected() const;
+	bool connect();
+	void disconnect();
+	bool isConnected() const;
 
-    void run();
-    void sendMessage(const std::string& message);
+	void run();
+	void sendMessage(const std::string& message);
 
-    bool authenticate();
+	bool authenticate();
 };
 #endif  // !BOT

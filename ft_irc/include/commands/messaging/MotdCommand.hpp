@@ -10,16 +10,16 @@ class Message;
 class MotdCommand : public ACommand
 {
 private:
-    MotdCommand(const MotdCommand& other);
-    MotdCommand& operator=(const MotdCommand& other);
+	MotdCommand(const MotdCommand& other);
+	MotdCommand& operator=(const MotdCommand& other);
 
 public:
-    MotdCommand(Server* server);
-    virtual ~MotdCommand();
+	MotdCommand(Server* server);
+	virtual ~MotdCommand();
 
-    virtual void execute(Client* client, const Message& message);
+	virtual void execute(Client* client, const Message& message);
 
-    static ACommand* create(Server* server);
+	static ACommand* create(Server* server);
 };
 
 #endif

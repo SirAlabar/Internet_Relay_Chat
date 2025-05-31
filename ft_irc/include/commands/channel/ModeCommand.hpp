@@ -18,7 +18,7 @@ private:
 	// Helper methods for mode processing
 	void showChannelModes(Client* client, Channel* channel);
 	void processModeChanges(Client* client, Channel* channel, 
-						   const std::string& modeString, const Message& message);
+								const std::string& modeString, const Message& message);
 	
 	// Individual mode processors
 	bool processInviteOnlyMode(Channel* channel, bool adding);

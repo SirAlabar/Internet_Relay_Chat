@@ -10,29 +10,29 @@ class Print;
 class Client
 {
 private:
-    int _fd;
-    std::string _nickname;
-    std::string _username;
-    bool _authenticated;
-    bool _isBot;
+	int _fd;
+	std::string _nickname;
+	std::string _username;
+	bool _authenticated;
+	bool _isBot;
 
 public:
-    Client(int fd);
-    ~Client();
+	Client(int fd);
+	~Client();
 
-    int getFd() const;
-    std::string getFdString() const;
+	int getFd() const;
+	std::string getFdString() const;
 
-    const std::string& getNickname() const;
-    void setNickname(const std::string& nickname);
-    const std::string& getUsername() const;
-    void setUsername(const std::string& username);
-    bool isAuthenticated() const;
-    bool isBot();
-    void setAuthenticated(bool auth);
+	const std::string& getNickname() const;
+	void setNickname(const std::string& nickname);
+	const std::string& getUsername() const;
+	void setUsername(const std::string& username);
+	bool isAuthenticated() const;
+	bool isBot();
+	void setAuthenticated(bool auth);
 
-    bool sendMessage(const std::string& message);
-    void setBot(bool status);
+	bool sendMessage(const std::string& message);
+	void setBot(bool status);
 };
 
 #endif

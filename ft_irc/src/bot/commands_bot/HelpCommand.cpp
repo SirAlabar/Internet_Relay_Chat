@@ -15,11 +15,11 @@ HelpCommand::HelpCommand(const HelpCommand& other) : ABotCommand(other._server) 
 
 HelpCommand& HelpCommand::operator=(const HelpCommand& other)
 {
-    if (this != &other)
-    {
-        _server = other._server;
-    }
-    return (*this);
+	if (this != &other)
+	{
+		_server = other._server;
+	}
+	return (*this);
 }
 
 // Static create method for factory
@@ -28,9 +28,9 @@ ABotCommand* HelpCommand::create(Server* server) { return (new HelpCommand(serve
 // Execute the Help command
 void HelpCommand::execute(BotContext* botctx, std::string& message)
 {
-    if (!botctx)
-    {
-        return;
-    }
-    Print::Do("executing Help command");
+	if (!botctx)
+	{
+		return;
+	}
+	Print::Do("executing Help command");
 }
