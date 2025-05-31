@@ -72,7 +72,8 @@ SRCS =  $(SRC_DIR)/main.cpp \
 		$(SRC_DIR)/commands/messaging/WhoIsCommand.cpp \
 		$(SRC_DIR)/commands/channel/TopicCommand.cpp \
 		$(SRC_DIR)/commands/messaging/MotdCommand.cpp \
-		$(SRC_DIR)/commands/channel/PrintdataCommand.cpp 
+		$(SRC_DIR)/commands/channel/PrintdataCommand.cpp \
+		$(SRC_DIR)/utils/Config.cpp
 
 SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
 		$(SRC_DIR)/core/Server.cpp \
@@ -111,6 +112,7 @@ SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
 		$(SRC_DIR)/commands/channel/PrintdataCommand.cpp \
 		$(SRC_DIR)/utils/UtilsFun.cpp \
 		$(SRC_DIR)/utils/HTTPClient.cpp
+		$(SRC_DIR)/utils/Config.cpp
 
 
 

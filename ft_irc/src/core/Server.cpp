@@ -8,6 +8,7 @@
 
 #include "Channel.hpp"
 #include "Client.hpp"
+#include "Config.hpp"
 #include "CommandFactory.hpp"
 #include "General.hpp"
 #include "Message.hpp"
@@ -19,7 +20,6 @@ Server::Server() : _running(false) {}
 
 Server::~Server() { stop(); }
 
-std::string Server::_botpass = "botbot";
 // Setup server with port and password
 bool Server::setupServer(int port, const std::string& password)
 {
@@ -346,7 +346,17 @@ void Server::processClientMessage(int clientFd)
 
 // Get server password
 const std::string& Server::getPassword() const { return (_password); }
-const std::string& Server::getBotPassword() const { return (_botpass); }
+const std::string& Server::getBotPassword() const 
+{ 
+    static std::string botpass = Config::getConfig("botpass");
+    if (botpass.empty()) 
+    {
+        Print::Fail("botpass not found in config.txt - Bot authentication disabled");
+        static std::string empty = "";
+        return empty;
+    }
+    return botpass; 
+}
 
 void Server::setBot(bool status) { _botConnected = status; }
 bool Server::hasBot() const { return _botConnected; }
