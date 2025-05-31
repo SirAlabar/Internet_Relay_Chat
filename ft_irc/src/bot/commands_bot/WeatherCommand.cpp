@@ -52,33 +52,67 @@ void WeatherCommand::execute(BotContext* botctx, std::string& message)
         return;
     }
     
+    // Convert message to lowercase for case-insensitive comparison
+    std::string lowerMessage = message;
+    for (size_t i = 0; i < lowerMessage.length(); ++i)
+    {
+        lowerMessage[i] = tolower(lowerMessage[i]);
+    }
+    
+    Print::Debug("[Weather] Original message: '" + message + "'");
+    Print::Debug("[Weather] Lowercase message: '" + lowerMessage + "'");
+    
     // Parse command: "weather porto", "weather porto detailed", "weather porto forecast"
     std::string cityName;
     WeatherFormat format = FORMAT_SIMPLE;
     
-    if (message.length() > 8 && message.substr(0, 8) == "weather ") 
+    // Use case-insensitive comparison
+    if (lowerMessage.length() > 8 && lowerMessage.substr(0, 8) == "weather ") 
     {
+        // Use original message for extracting args to preserve city name casing
         std::string args = message.substr(8);
         
-        // Check for format modifiers
-        if (args.find(" detailed") != std::string::npos) 
+        Print::Debug("[Weather] Args extracted: '" + args + "'");
+        
+        // Convert args to lowercase for format detection
+        std::string lowerArgs = args;
+        for (size_t i = 0; i < lowerArgs.length(); ++i)
+        {
+            lowerArgs[i] = tolower(lowerArgs[i]);
+        }
+
+        if (lowerArgs.find(" detailed") != std::string::npos) 
         {
             format = FORMAT_DETAILED;
-            args = args.substr(0, args.find(" detailed"));
+            // Find " detailed" in lowercase, then remove it from original args
+            size_t detailedPos = lowerArgs.find(" detailed");
+            args = args.substr(0, detailedPos);  // Keep everything before " detailed"
+            Print::Debug("[Weather] Format: DETAILED, city args: '" + args + "'");
         }
-        else if (args.find(" forecast") != std::string::npos) 
+        else if (lowerArgs.find(" forecast") != std::string::npos) 
         {
             format = FORMAT_FORECAST;
-            args = args.substr(0, args.find(" forecast"));
+            // Find " forecast" in lowercase, then remove it from original args
+            size_t forecastPos = lowerArgs.find(" forecast");
+            args = args.substr(0, forecastPos);  // Keep everything before " forecast"
+            Print::Debug("[Weather] Format: FORECAST, city args: '" + args + "'");
         }
-        else if (args.find(" full") != std::string::npos) 
+        else if (lowerArgs.find(" full") != std::string::npos) 
         {
             format = FORMAT_FULL;
-            args = args.substr(0, args.find(" full"));
+            // Find " full" in lowercase, then remove it from original args
+            size_t fullPos = lowerArgs.find(" full");
+            args = args.substr(0, fullPos);  // Keep everything before " full"
+            Print::Debug("[Weather] Format: FULL, city args: '" + args + "'");
+        }
+        else
+        {
+            Print::Debug("[Weather] Format: SIMPLE (default)");
         }
         
         cityName = args;
-        // Clean whitespace
+        
+        // Clean whitespace from city name
         while (!cityName.empty() && cityName[0] == ' ') 
         {
             cityName.erase(0, 1);
@@ -87,18 +121,35 @@ void WeatherCommand::execute(BotContext* botctx, std::string& message)
         {
             cityName.erase(cityName.length()-1);
         }
+        
+        Print::Debug("[Weather] Final city name: '" + cityName + "'");
+    }
+    else
+    {
+        Print::Debug("[Weather] Message doesn't match 'weather ' pattern");
+        Print::Debug("[Weather] Message length: " + toString(lowerMessage.length()));
+        if (lowerMessage.length() >= 8)
+        {
+            Print::Debug("[Weather] First 8 chars: '" + lowerMessage.substr(0, 8) + "'");
+        }
+        else
+        {
+            Print::Debug("[Weather] First chars: '" + lowerMessage + "'");
+        }
     }
     
     if (cityName.empty()) 
     {
         botctx->reply("❌ Usage: !weather <city> [detailed|forecast|full]");
         botctx->reply("Examples: !weather porto, !weather london detailed, !weather paris forecast");
+        botctx->reply("Note: Commands are case-insensitive: !WEATHER, !Weather, !weather all work");
         return;
     }
     
     if (!isValidCity(cityName)) 
     {
-        botctx->reply("❌ Invalid city name");
+        botctx->reply("❌ Invalid city name: '" + cityName + "'");
+        Print::Debug("[Weather] City validation failed for: '" + cityName + "'");
         return;
     }
     
@@ -151,6 +202,15 @@ void WeatherCommand::execute(BotContext* botctx, std::string& message)
                         botctx->reply(lines[i]);
                     }
                 }
+                else
+                {
+                    // Fallback: send first few lines of full response
+                    std::vector<std::string> lines = splitIntoIrcMessages(response);
+                    for (size_t i = 0; i < lines.size() && i < 6; ++i)
+                    {
+                        botctx->reply(lines[i]);
+                    }
+                }
             }
             break;
     }
@@ -158,6 +218,7 @@ void WeatherCommand::execute(BotContext* botctx, std::string& message)
     if (response.empty()) 
     {
         botctx->reply("❌ Weather service unavailable. Please try again later.");
+        Print::Fail("[Weather] No response received for city: '" + cityName + "' format: " + toString(format));
     }
 }
 
@@ -165,18 +226,38 @@ void WeatherCommand::execute(BotContext* botctx, std::string& message)
 std::string WeatherCommand::getWeatherSimple(const std::string& city)
 {
     std::string formattedCity = formatCityForUrl(city);
-    std::string url = "http://wttr.in/" + formattedCity + "?format=4&m";
+    Print::Debug("[Weather] Getting simple weather for: " + city + " (formatted: " + formattedCity + ")");
+    
+    std::string url = "http://wttr.in/" + formattedCity + "?format=1&m";
+    
+    Print::Debug("[Weather] Simple URL: " + url);
     
     std::string response = _httpClient.get(url);
+    Print::Debug("[Weather] Response received: " + toString(response.length()) + " chars");
+    Print::Debug("[Weather] HTTPClient success: " + toString(_httpClient.isSuccess()));
+    
     if (_httpClient.isSuccess() && !response.empty()) 
     {
         std::string errorMsg = getErrorMessage(response);
         if (!errorMsg.empty()) 
         {
+            Print::Warn("[Weather] API error: " + errorMsg);
             return errorMsg;
         }
-        return cleanResponse(response);
+        
+        std::string cleaned = cleanResponse(response);
+        if (!cleaned.empty())
+        {
+            Print::Ok("[Weather] Simple weather retrieved successfully");
+            return cleaned;
+        }
     }
+    else
+    {
+        Print::Warn("[Weather] Request failed: " + _httpClient.getLastError());
+    }
+    
+    Print::Fail("[Weather] Simple format failed");
     return "";
 }
 
@@ -184,20 +265,37 @@ std::string WeatherCommand::getWeatherSimple(const std::string& city)
 std::string WeatherCommand::getWeatherDetailed(const std::string& city)
 {
     std::string formattedCity = formatCityForUrl(city);
-    // Custom format: location, temperature+feels, humidity+wind, condition, precipitation
-    std::string url = "http://wttr.in/" + formattedCity + 
-                     "?format=%l\\n🌡️%t+feels+%f\\n💧%h+🌬️%w\\n%C\\n☔%p+precip&m";
+    Print::Debug("[Weather] Getting detailed weather for: " + city);
+    
+    std::string url = "http://wttr.in/" + formattedCity + "?format=2&m";
+    
+    Print::Debug("[Weather] Detailed URL: " + url);
     
     std::string response = _httpClient.get(url);
+    Print::Debug("[Weather] Detailed response: " + toString(response.length()) + " chars");
+    
     if (_httpClient.isSuccess() && !response.empty()) 
     {
         std::string errorMsg = getErrorMessage(response);
         if (!errorMsg.empty()) 
         {
+            Print::Warn("[Weather] API error: " + errorMsg);
             return errorMsg;
         }
-        return cleanResponse(response);
+        
+        std::string cleaned = cleanResponse(response);
+        if (!cleaned.empty())
+        {
+            Print::Ok("[Weather] Detailed weather retrieved successfully");
+            return cleaned;
+        }
     }
+    else
+    {
+        Print::Warn("[Weather] Detailed request failed: " + _httpClient.getLastError());
+    }
+    
+    Print::Fail("[Weather] Detailed format failed");
     return "";
 }
 
@@ -205,19 +303,37 @@ std::string WeatherCommand::getWeatherDetailed(const std::string& city)
 std::string WeatherCommand::getWeatherForecast(const std::string& city)
 {
     std::string formattedCity = formatCityForUrl(city);
-    // Use format=v2 for structured forecast output
-    std::string url = "http://wttr.in/" + formattedCity + "?format=v2&narrow&T&m";
+    Print::Debug("[Weather] Getting forecast weather for: " + city);
+    
+    std::string url = "http://wttr.in/" + formattedCity + "?format=3&m";
+    
+    Print::Debug("[Weather] Forecast URL: " + url);
     
     std::string response = _httpClient.get(url);
+    Print::Debug("[Weather] Forecast response: " + toString(response.length()) + " chars");
+    
     if (_httpClient.isSuccess() && !response.empty()) 
     {
         std::string errorMsg = getErrorMessage(response);
         if (!errorMsg.empty()) 
         {
+            Print::Warn("[Weather] API error: " + errorMsg);
             return errorMsg;
         }
-        return cleanResponse(response);
+        
+        std::string cleaned = cleanResponse(response);
+        if (!cleaned.empty())
+        {
+            Print::Ok("[Weather] Forecast weather retrieved successfully");
+            return cleaned;
+        }
     }
+    else
+    {
+        Print::Warn("[Weather] Forecast request failed: " + _httpClient.getLastError());
+    }
+    
+    Print::Fail("[Weather] Forecast format failed");
     return "";
 }
 

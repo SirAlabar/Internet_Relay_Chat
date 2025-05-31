@@ -1,40 +1,46 @@
 #ifndef HTTPCLIENT_HPP
 #define HTTPCLIENT_HPP
 
+#include "Socket.hpp"
 #include <string>
 
-/**
- * HTTPClient - Simple HTTP client for making GET requests to weather APIs
- * 
- * This class provides a basic HTTP client implementation for making
- * requests to the wttr.in weather API. It handles URL parsing,
- * connection management, and response processing.
- */
 class HTTPClient
 {
 private:
-    int _timeout;        // Request timeout in seconds
-    bool _lastSuccess;   // Status of last request
-    std::string _lastError; // Last error message
+    Socket _socket;
+    bool _success;
+    int _timeout;
+    std::string _lastError;
 
-    // URL parsing helper methods
+    // Private to prevent copying
+    HTTPClient(const HTTPClient& other);
+    HTTPClient& operator=(const HTTPClient& other);
+
+    // Private helper methods
     bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path);
-    std::string sendHttpRequest(const std::string& host, int port, const std::string& path);
+    std::string buildHttpRequest(const std::string& path, const std::string& host);
+    std::string parseHttpResponse(const std::string& response);
+    bool connectToHost(const std::string& host, int port);
+    void cleanup();
+    std::string urlEncode(const std::string& str);
 
 public:
-    // Constructor and destructor
     HTTPClient();
+    HTTPClient(int timeoutSeconds);
     ~HTTPClient();
 
-    // Configuration methods
-    void setTimeout(int seconds);
-    
-    // HTTP request methods
+    // Main functionality
     std::string get(const std::string& url);
-    
-    // Status checking methods
+
+    // Status and configuration
     bool isSuccess() const;
     std::string getLastError() const;
+    void setTimeout(int seconds);
+    int getTimeout() const;
+
+    // Static utility methods
+    static std::string encodeUrl(const std::string& str);
+    static bool isValidUrl(const std::string& url);
 };
 
 #endif
