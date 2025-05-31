@@ -23,16 +23,16 @@ class ACommand
 {
 protected:
 	Server* _server;  // Reference to the IRC server
-    
-    //helpers, to make code less redudndant
-    bool    validateClient(Client* client) const;
-    bool    validateClientRegist(Client* client) const;
-    bool    validateParameterCount(Client* client, const Message& message,
-                                  size_t minParams, const std::string& commandName) const;
-    Channel* validateAndGetChannel(Client* client,
-                                   const::std::string& channelName);
-    bool    validateChannelMembership(Client* client, Channel* channel,
-                                      const std::string& channelName) const;
+	
+	//helpers, to make code less redudndant
+	bool    validateClient(Client* client) const;
+	bool    validateClientRegist(Client* client) const;
+	bool    validateParameterCount(Client* client, const Message& message,
+								size_t minParams, const std::string& commandName) const;
+	Channel* validateAndGetChannel(Client* client,
+								const::std::string& channelName);
+	bool    validateChannelMembership(Client* client, Channel* channel,
+									const std::string& channelName) const;
 
 private:
 	// Private to prevent copies

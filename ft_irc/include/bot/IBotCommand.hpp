@@ -9,10 +9,10 @@ class Bot;
 class BotCommand
 {
 public:
-    virtual ~BotCommand() {}
-    virtual void execute(const std::string& channel, const std::string& user,
-                         const std::string& args, Bot* bot) = 0;
-    virtual std::string getHelp() const = 0;
+	virtual ~BotCommand() {}
+	virtual void execute(const std::string& channel, const std::string& user,
+						const std::string& args, Bot* bot) = 0;
+	virtual std::string getHelp() const = 0;
 };
 
 // Specific commands

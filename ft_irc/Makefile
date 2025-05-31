@@ -35,8 +35,8 @@ RM	    = rm -rf
 LEAKS_LOG              = ./leaks.log
 READLINE_SUPP          = readline.supp
 VALGRINDFLAGS          = --tool=memcheck -q --leak-check=full \
-			 --show-leak-kinds=all --track-origins=yes \
-                         --track-fds=yes --show-below-main=no \
+						--show-leak-kinds=all --track-origins=yes \
+						--track-fds=yes --show-below-main=no \
 
 ################################################################################
 #                                 PROGRAM'S SRCS                               #
@@ -111,14 +111,19 @@ SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
 		$(SRC_DIR)/commands/messaging/MotdCommand.cpp \
 		$(SRC_DIR)/commands/channel/PrintdataCommand.cpp \
 		$(SRC_DIR)/utils/UtilsFun.cpp \
+		$(SRC_DIR)/utils/HTTPClient.cpp \
 		$(SRC_DIR)/utils/Config.cpp
 
-
+# Bot-specific sources (calculate difference automatically)
+SRCSBOT_UNIQUE = $(filter-out $(SRCS),$(SRCSBOT))
 
 # Object files
 OBJ_DIR = obj
 OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 OBJSBOT = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCSBOT))
+OBJSBOT_UNIQUE = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o.bot,$(SRCSBOT_UNIQUE))
+OBJS_NO_MAIN = $(filter-out $(OBJ_DIR)/main.o,$(OBJS))
+OBJSBOT_REAL = $(OBJS_NO_MAIN) $(OBJSBOT_UNIQUE)
 
 ################################################################################
 #                              PROGRESS BAR SETUP                              #
@@ -126,10 +131,13 @@ OBJSBOT = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCSBOT))
 
 # Progress bar variables
 TOTAL_FILES := $(words $(SRCS))
+TOTAL_BOT_FILES := $(words $(SRCSBOT))
+TOTAL_BOT_UNIQUE_FILES = $(words $(SRCSBOT_UNIQUE))
 PROGRESS_FILE := .compilation_progress
 COUNTER_FILE := .ircserv_compilation_counter
+BOT_COUNTER_FILE := .ircbot_compilation_counter
 
-# Progress bar function
+# Progress bar function for main server
 define progress_bar
 	@current=$$(cat $(COUNTER_FILE) 2>/dev/null || echo 0); \
 	current=$$((current + 1)); \
@@ -142,8 +150,27 @@ define progress_bar
 	for i in $$(seq 1 $$empty); do printf "░"; done; \
 	printf "] %d%% (%d/$(TOTAL_FILES)) $(YELLOW)%s$(CLR_RMV)" $$percent $$current "$(notdir $<)"; \
 	if [ $$current -eq $(TOTAL_FILES) ]; then \
-		printf "\n$(GREEN)✅ Compilation complete!$(CLR_RMV)\n"; \
-		rm -f $(COUNTER_FILE) init_progress; \
+		printf "\n$(GREEN)✅ Server compilation complete!$(CLR_RMV)\n"; \
+		rm -f $(COUNTER_FILE); \
+	fi
+endef
+
+# Progress bar function for bot (only unique files)
+define progress_bar_bot
+	@current=$$(cat $(BOT_COUNTER_FILE) 2>/dev/null || echo 0); \
+	current=$$((current + 1)); \
+	echo $$current > $(BOT_COUNTER_FILE); \
+	total_files=$(TOTAL_BOT_UNIQUE_FILES); \
+	percent=$$((current * 100 / total_files)); \
+	filled=$$((current * 50 / total_files)); \
+	empty=$$((50 - filled)); \
+	printf "\r\033[K$(CYAN)["; \
+	for i in $$(seq 1 $$filled); do printf "█"; done; \
+	for i in $$(seq 1 $$empty); do printf "░"; done; \
+	printf "] %d%% (%d/$$total_files) $(YELLOW)%s$(CLR_RMV)" $$percent $$current "$(notdir $<)"; \
+	if [ $$current -eq $$total_files ]; then \
+		printf "\n$(GREEN)✅ Bot compilation complete!$(CLR_RMV)\n"; \
+		rm -f $(BOT_COUNTER_FILE); \
 	fi
 endef
 
@@ -154,10 +181,9 @@ endef
 .PHONY: all
 all: $(NAME)
 
-$(NAME): $(OBJ_DIR) init_progress $(OBJS)
-	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
+$(NAME): $(OBJ_DIR) $(OBJS)
+	@printf "$(GREEN)Linking $(CLR_RMV)$(YELLOW)$(NAME)$(CLR_RMV)...\n"
 	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)
-
 	@printf "$(GREEN)$(NAME) binary created$(CLR_RMV) ✅\n"
 
 $(OBJ_DIR):
@@ -167,22 +193,42 @@ $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)/bot
 	@mkdir -p $(OBJ_DIR)/dcc
 
-init_progress: $(SRCS)
-	@printf "$(RED)░▒▓██████████████▓▒░  $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░   ░▒▓██████▓▒░  $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░  ░▒▓█▓▒░        $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"
-	@printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░  ░▒▓██████▓▒░  $(CLR_RMV)\n"
-	@printf "             $(YELLOW)(developed by hluiz, isilva-t & joao-pol)$(CLR_RMV)\n"
-	@echo "0" > $(COUNTER_FILE)
-	@printf "$(BLUE)Compiling $(TOTAL_FILES) source files...$(CLR_RMV)\n"
-
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@if [ ! -f .compilation_started ]; then \
+		printf "$(RED)░▒▓██████████████▓▒░  $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░   ░▒▓██████▓▒░  $(CLR_RMV)\n"; \
+		printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"; \
+		printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"; \
+		printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓███████▓▒░  ░▒▓█▓▒░        $(CLR_RMV)\n"; \
+		printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░        $(CLR_RMV)\n"; \
+		printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░ $(CLR_RMV)\n"; \
+		printf "$(RED)░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░ $(BLUE)░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░  ░▒▓██████▓▒░  $(CLR_RMV)\n"; \
+		printf "             $(YELLOW)(developed by hluiz, isilva-t & joao-pol)$(CLR_RMV)\n"; \
+		echo "0" > $(COUNTER_FILE); \
+		printf "$(BLUE)Compiling $(TOTAL_FILES) source files for $(NAME)...$(CLR_RMV)\n"; \
+		touch .compilation_started; \
+	fi
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -c $< -o $@
 	$(call progress_bar)
+
+# Regra especial para objetos únicos do bot
+$(OBJSBOT_UNIQUE): $(OBJ_DIR)/%.o.bot: $(SRC_DIR)/%.cpp
+	@if [ ! -f .bot_compilation_started ]; then \
+		printf "$(GREEN)░▒▓██████▓▒░   ░▒▓██████▓▒░  ░▒▓████████▓▒░$(CLR_RMV)\n"; \
+		printf "$(GREEN)░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░   ░▒▓█▓▒░   $(CLR_RMV)\n"; \
+		printf "$(GREEN)░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░   ░▒▓█▓▒░   $(CLR_RMV)\n"; \
+		printf "$(GREEN)░▒▓███████▓▒░  ░▒▓█▓▒░░▒▓█▓▒░   ░▒▓█▓▒░   $(CLR_RMV)\n"; \
+		printf "$(GREEN)░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░   ░▒▓█▓▒░   $(CLR_RMV)\n"; \
+		printf "$(GREEN)░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░░▒▓█▓▒░   ░▒▓█▓▒░   $(CLR_RMV)\n"; \
+		printf "$(GREEN)░▒▓███████▓▒░   ░▒▓██████▓▒░    ░▒▓█▓▒░   $(CLR_RMV)\n"; \
+		printf "             $(YELLOW)(IRC Bot by the same awesome team)$(CLR_RMV)\n"; \
+		echo "0" > $(BOT_COUNTER_FILE); \
+		printf "$(BLUE)Compiling $(TOTAL_BOT_UNIQUE_FILES) bot-specific files for $(BOTNAME)...$(CLR_RMV)\n"; \
+		touch .bot_compilation_started; \
+	fi
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -c $< -o $@
+	$(call progress_bar_bot)
 
 .PHONY: va
 va: fclean $(OBJS)
@@ -192,34 +238,42 @@ va: fclean $(OBJS)
 
 .PHONY: clean
 clean:
-	@$(RM) $(OBJ_DIR)
-	@$(RM) $(COUNTER_FILE) $(PROGRESS_FILE) init_progress
-	@printf "$(RED)Deleting $(CYAN)$(NAME) $(CLR_RMV)objs ✅\n"
+	@if [ -d $(OBJ_DIR) ] || [ -f $(COUNTER_FILE) ] || [ -f $(BOT_COUNTER_FILE) ] || [ -f .compilation_started ] || [ -f .bot_compilation_started ]; then \
+		$(RM) $(OBJ_DIR); \
+		$(RM) $(COUNTER_FILE) $(BOT_COUNTER_FILE) $(PROGRESS_FILE) .compilation_started .bot_compilation_started; \
+		printf "$(RED)Deleting $(CYAN)$(NAME) $(CLR_RMV)objs ✅\n"; \
+	else \
+		printf "$(YELLOW)Nothing to clean$(CLR_RMV) 🧹\n"; \
+	fi
 
 .PHONY: fclean
 fclean: clean
-	@$(RM) $(NAME) $(BOTNAME)
-	@printf "$(RED)Deleting $(CYAN)$(NAME) $(CLR_RMV)binary ✅\n"
+	@if [ -f $(NAME) ] || [ -f $(BOTNAME) ]; then \
+		$(RM) $(NAME) $(BOTNAME); \
+		printf "$(RED)Deleting $(CYAN)$(NAME) $(CLR_RMV)binary ✅\n"; \
+	else \
+		printf "$(YELLOW)Nothing to delete$(CLR_RMV) 🗑️\n"; \
+	fi
 
 .PHONY: re
 re: fclean all
 
+.PHONY: bonus
 bonus: $(NAME) $(BOTNAME)
 
-$(BOTNAME):
-	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW) $(BOTNAME) $(CLR_RMV)...\n"
-	@$(CC) $(CFLAGS) $(SRCSBOT) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(BOTNAME)
+$(BOTNAME): $(OBJ_DIR) $(OBJS) $(OBJSBOT_UNIQUE)
+	@printf "$(GREEN)Linking $(CLR_RMV)$(YELLOW)$(BOTNAME)$(CLR_RMV)...\n"
+	@$(CC) $(CFLAGS) $(OBJSBOT_REAL) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(BOTNAME)
 	@printf "$(GREEN)$(BOTNAME) binary created$(CLR_RMV) ✅\n"
+
 .PHONY: debug
 debug: CFLAGS += $(DEBUG_FLAGS)
 debug: re
 
 .PHONY: asan
 asan: $(OBJ_DIR) $(OBJS)
-
 	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
 	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)
-
 	@printf "$(GREEN)$(NAME) binary created$(CLR_RMV) ✅\n"
 
 

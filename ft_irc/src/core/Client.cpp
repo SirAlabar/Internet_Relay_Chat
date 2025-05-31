@@ -17,9 +17,9 @@ int Client::getFd() const { return _fd; }
 
 std::string Client::getFdString() const
 {
-    std::stringstream ss;
-    ss << _fd;
-    return ss.str();
+	std::stringstream ss;
+	ss << _fd;
+	return ss.str();
 }
 
 const std::string& Client::getNickname() const { return _nickname; }
@@ -38,26 +38,26 @@ bool Client::isBot() { return _isBot; }
 void Client::setBot(bool status) { _isBot = status; }
 bool Client::sendMessage(const std::string& message)
 {
-    Print::Debug("Attempting to send to client FD: " + getFdString());
-    Print::Debug(message);
+	Print::Debug("Attempting to send to client FD: " + getFdString());
+	Print::Debug(message);
 
-    ssize_t sentBytes = send(_fd, message.c_str(), message.length(), MSG_NOSIGNAL);
+	ssize_t sentBytes = send(_fd, message.c_str(), message.length(), MSG_NOSIGNAL);
 
-    if (sentBytes < 0)
-    {
-        Print::StdErr("sending message: " + toString(strerror(errno)) +
-                      " (errno: " + toString(errno));
-        return false;
-    }
-    else if (sentBytes < (ssize_t)message.length())
-    {
-        Print::Log("WARNING: Partial send - only " + toString(sentBytes) + " of " +
-                   toString(message.length()) + " bytes sent");
-        return false;
-    }
-    else
-    {
-        Print::Debug("Successfully sent " + toString(sentBytes) + " bytes");
-        return true;
-    }
+	if (sentBytes < 0)
+	{
+		Print::StdErr("sending message: " + toString(strerror(errno)) +
+					  " (errno: " + toString(errno));
+		return false;
+	}
+	else if (sentBytes < (ssize_t)message.length())
+	{
+		Print::Log("WARNING: Partial send - only " + toString(sentBytes) + " of " +
+				   toString(message.length()) + " bytes sent");
+		return false;
+	}
+	else
+	{
+		Print::Debug("Successfully sent " + toString(sentBytes) + " bytes");
+		return true;
+	}
 }

@@ -28,7 +28,7 @@ public:
 	// Execute the LIST command
 	virtual void execute(Client* client, const Message& message);
 
-    // Static creator method for CommandFactory
+	// Static creator method for CommandFactory
 	static ACommand* create(Server* server);
 };
 

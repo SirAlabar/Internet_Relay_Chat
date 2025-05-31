@@ -15,9 +15,9 @@ private:
 	WhoCommand(const WhoCommand& other);
 	WhoCommand& operator=(const WhoCommand& other);
 
-    void listChannelUsers(Client* client, const std::string& channelName);
-    void listSpecificUser(Client* client, const std::string& nickname);
-    void sendWhoReply(Client* client, Client* targetClient, const std::string& channel);
+	void listChannelUsers(Client* client, const std::string& channelName);
+	void listSpecificUser(Client* client, const std::string& nickname);
+	void sendWhoReply(Client* client, Client* targetClient, const std::string& channel);
 	
 public:
 	WhoCommand(Server* server);

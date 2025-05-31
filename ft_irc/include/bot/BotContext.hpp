@@ -5,13 +5,13 @@
 class BotContext
 {
 private:
-    Bot* _bot;
-    std::string _channel;
-    std::string _originalMessage;
+	Bot* _bot;
+	std::string _channel;
+	std::string _originalMessage;
 
 public:
-    BotContext(Bot* bot, std::string& channel, std::string& originalMessage);
-    ~BotContext();
-    void reply(const std::string& message) const;
+	BotContext(Bot* bot, std::string& channel, std::string& originalMessage);
+	~BotContext();
+	void reply(const std::string& message) const;
 };
 #endif  // !BOTCONTEXT_HPP

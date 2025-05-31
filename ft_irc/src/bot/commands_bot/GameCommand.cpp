@@ -15,11 +15,11 @@ GameCommand::GameCommand(const GameCommand& other) : ABotCommand(other._server) 
 
 GameCommand& GameCommand::operator=(const GameCommand& other)
 {
-    if (this != &other)
-    {
-        _server = other._server;
-    }
-    return (*this);
+	if (this != &other)
+	{
+		_server = other._server;
+	}
+	return (*this);
 }
 
 // Static create method for factory
@@ -28,10 +28,10 @@ ABotCommand* GameCommand::create(Server* server) { return (new GameCommand(serve
 // Execute the Game command
 void GameCommand::execute(BotContext* botctx, std::string& message)
 {
-    if (!botctx)
-    {
-        return;
-    }
-    (void)message;
-    botctx->reply("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+	if (!botctx)
+	{
+		return;
+	}
+	(void)message;
+	botctx->reply("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
 }

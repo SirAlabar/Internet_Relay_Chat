@@ -139,19 +139,19 @@ void NoticeCommand::sendNoticeToUser(Client* sender, const std::string& targetNi
 void NoticeCommand::broadcastToChannel(Channel* channel, const std::string& message, int excludeFd)
 {
 	Print::Debug("Broadcasting message to channel members");
-	    
-    if (!channel)
+		
+	if (!channel)
 	{
 		return;
 	}
-    
-    std::map<int, Client*> clients = channel->getClients();
-    for (std::map<int, Client*>::iterator it = clients.begin();
-         it != clients.end(); ++it)
-    {
-        if (it->first != excludeFd && it->second)
-        {
-            it->second->sendMessage(message);
-        }
-    }
+	
+	std::map<int, Client*> clients = channel->getClients();
+	for (std::map<int, Client*>::iterator it = clients.begin();
+		 it != clients.end(); ++it)
+	{
+		if (it->first != excludeFd && it->second)
+		{
+			it->second->sendMessage(message);
+		}
+	}
 }
