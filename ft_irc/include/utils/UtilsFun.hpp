@@ -25,9 +25,6 @@ public:
     static void Ok(const std::string& str);
     static void Warn(const std::string& str);
     static void Fail(const std::string& str);
-    // config on file getterstic
-    static bool hasConfig(const std::string& wanted);
-    static std::string  getConfig(const std::string& wanted);
 
 private:
     Print();

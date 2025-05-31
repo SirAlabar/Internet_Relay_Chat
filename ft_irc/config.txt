@@ -1,1 +1,27 @@
-botpass=123456
+################################################################
+# example config file
+# to use some of this variables on your program
+# use <variableName>=<content>
+# only first instance of your variable will be used! be aware of this!
+# if you have a first instance like "example=" without value set, this will be used
+
+# unfortunately, comments will not be processed at midle of line. Only at beggining
+
+# you can put spaces at beggining or at the end of the line
+
+# here some examples that what happens. 
+# "right" value will be catched
+
+example = wrong
+example= wrong
+example =wrong
+# example=will_not_considered
+
+example=right    
+
+example=ignored_because_right_is_catched   
+
+#################################################################
+
+botpass=botbot
+
