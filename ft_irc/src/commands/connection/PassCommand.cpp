@@ -51,21 +51,21 @@ void PassCommand::execute(Client* client, const Message& message)
 		return;
 	}
 
-    if (password == _server->getPassword())
-    {
-        Print::Ok("");
-        client->setAuthenticated(true);
-    }
+	if (password == _server->getPassword())
+	{
+		Print::Ok("");
+		client->setAuthenticated(true);
+	}
 	else if (!_server->getBotPassword().empty() && password == _server->getBotPassword())
-    {
-        _server->setBot(true);
-        client->setBot(true);
-        client->setAuthenticated(true);
-        _server->addBotToAllChannels(client);
-    }
-    else
-    {
-        Print::Warn("Password incorrect");
-        sendErrorReply(client, 464, ":Password incorrect!");
-    }
+	{
+		_server->setBot(true);
+		client->setBot(true);
+		client->setAuthenticated(true);
+		_server->addBotToAllChannels(client);
+	}
+	else
+	{
+		Print::Warn("Password incorrect");
+		sendErrorReply(client, 464, ":Password incorrect!");
+	}
 }

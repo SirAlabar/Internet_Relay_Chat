@@ -99,14 +99,14 @@ void Server::run()
 			_running = false;
 		}
 		Print::Debug("Calling poll() with " + toString(_pollFds.size()) +
-					 " file descriptors");
+					" file descriptors");
 
 		Print::Debug("poll() returned with " + toString(ready) + " events");
 
 		if (ready < 0)
 		{
 			Print::StdErr("Error in Poll(): " + toString(strerror(errno)) +
-						  " (errno: " + toString(errno));
+						" (errno: " + toString(errno));
 			if (errno == EINTR)
 			{
 				Print::Debug("poll() interrupted by signal, continuing");
@@ -120,16 +120,16 @@ void Server::run()
 		{
 			std::stringstream ss;
 			ss << "Checking FD: " << _pollFds[i].fd
-			   << " events: " << (_pollFds[i].revents & POLLIN ? "POLLIN " : "")
-			   << (_pollFds[i].revents & POLLOUT ? "POLLOUT " : "")
-			   << (_pollFds[i].revents & POLLHUP ? "POLLHUP " : "")
-			   << (_pollFds[i].revents & POLLERR ? "POLLERR " : "")
-			   << (_pollFds[i].revents & POLLNVAL ? "POLLNVAL " : "");
+				<< " events: " << (_pollFds[i].revents & POLLIN ? "POLLIN " : "")
+				<< (_pollFds[i].revents & POLLOUT ? "POLLOUT " : "")
+				<< (_pollFds[i].revents & POLLHUP ? "POLLHUP " : "")
+				<< (_pollFds[i].revents & POLLERR ? "POLLERR " : "")
+				<< (_pollFds[i].revents & POLLNVAL ? "POLLNVAL " : "");
 			Print::Debug(ss.str());
 			if (_pollFds[i].revents == 0)
 			{
 				Print::Debug("No events for FD: " + toString(_pollFds[i].fd) +
-							 ", skipping");
+							", skipping");
 				continue;
 			}
 
@@ -157,14 +157,14 @@ void Server::run()
 			else if ((_pollFds[i].revents & POLLHUP) && (_pollFds[i].revents & POLLIN))
 			{
 				Print::Debug("POLLHUP+POLLIN received for FD: " +
-							 toString(_pollFds[i].fd) + " - processing remaining data");
+							toString(_pollFds[i].fd) + " - processing remaining data");
 				processClientMessage(_pollFds[i].fd);
 			}
 			// Handle hangup WITHOUT data available - DON'T disconnect yet
 			else if (_pollFds[i].revents & POLLHUP)
 			{
 				Print::Debug("POLLHUP (only) received for FD: " +
-							 toString(_pollFds[i].fd) + " - keeping connection");
+							toString(_pollFds[i].fd) + " - keeping connection");
 			}
 		}
 		addBotToAllChannels(getClientByNick("IRCBot"));
@@ -187,9 +187,9 @@ void Server::stop()
 
 	// Close client sockets
 	Print::Do("Cleaning up " + toString(_clientSockets.size()) +
-			  " client sockets...\t\t\n");
+				" client sockets...\t\t\n");
 	for (std::map<int, Socket*>::iterator it = _clientSockets.begin();
-		 it != _clientSockets.end(); ++it)
+		it != _clientSockets.end(); ++it)
 	{
 		int fd = it->first;
 		Print::Debug("Explicitly closing client socket FD: " + toString(fd));
@@ -205,7 +205,7 @@ void Server::stop()
 	// Close channels
 	Print::Do("Cleaning up " + toString(_channels.size()) + " channels...");
 	for (std::map<std::string, Channel*>::iterator it = _channels.begin();
-		 it != _channels.end(); ++it)
+		it != _channels.end(); ++it)
 	{
 		delete it->second;
 	}
@@ -215,7 +215,7 @@ void Server::stop()
 	// Close Clients
 	Print::Do("Cleaning up " + toString(_clients.size()) + " clients...");
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();
-		 ++it)
+		++it)
 	{
 		delete it->second;
 	}
@@ -294,7 +294,7 @@ void Server::processClientMessage(int clientFd)
 	ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 
 	Print::Debug("Received " + toString(bytesRead) +
-				 " bytes from client FD: " + toString(clientFd));
+				" bytes from client FD: " + toString(clientFd));
 
 	if (bytesRead < 0)
 	{
@@ -348,14 +348,14 @@ void Server::processClientMessage(int clientFd)
 const std::string& Server::getPassword() const { return (_password); }
 const std::string& Server::getBotPassword() const 
 { 
-    static std::string botpass = Config::getConfig("botpass");
-    if (botpass.empty()) 
-    {
-        Print::Fail("botpass not found in config.txt - Bot authentication disabled");
-        static std::string empty = "";
-        return empty;
-    }
-    return botpass; 
+	static std::string botpass = Config::getConfig("botpass");
+	if (botpass.empty()) 
+	{
+		Print::Fail("botpass not found in config.txt - Bot authentication disabled");
+		static std::string empty = "";
+		return empty;
+	}
+	return botpass; 
 }
 
 void Server::setBot(bool status) { _botConnected = status; }
@@ -378,7 +378,7 @@ void Server::addBotToAllChannels(Client* bot)
 	}
 	//Print::Do("Adding bot to all channels");
 	for (std::map<std::string, Channel*>::iterator it = _channels.begin();
-		 it != _channels.end(); it++)
+		it != _channels.end(); it++)
 	{
 		Channel* channel = it->second;
 		if (channel && !channel->hasClient(bot))
@@ -417,7 +417,7 @@ Client* Server::getClient(int fd)
 Client* Server::getClientByNick(const std::string& nickname)
 {
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();
-		 ++it)
+		++it)
 	{
 		if (it->second->getNickname() == nickname)
 		{
@@ -447,7 +447,7 @@ void Server::removeClient(int clientFd)
 	if (client)
 	{
 		for (std::map<std::string, Channel*>::iterator it = _channels.begin();
-			 it != _channels.end(); it++)
+			it != _channels.end(); it++)
 		{
 			it->second->removeClient(client);
 		}
@@ -488,7 +488,7 @@ void Server::removeClient(int clientFd)
 void Server::broadcast(const std::string& message, int excludeFd)
 {
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end();
-		 ++it)
+		++it)
 	{
 		if (it->first != excludeFd)
 		{
@@ -528,8 +528,8 @@ void Server::print_clients(bool command)
 {
 	std::stringstream ss;
 	ss << std::right << Color::YELLOW << std::setw(10) << "FD" << "|" << std::setw(10)
-	   << "NICK" << "|" << std::setw(10) << "USER" << "|" << std::setw(10) << "AUTH?"
-	   << "|" << std::setw(10) << "BOT?" << "|";
+		<< "NICK" << "|" << std::setw(10) << "USER" << "|" << std::setw(10) << "AUTH?"
+		<< "|" << std::setw(10) << "BOT?" << "|";
 	Print::Debug(ss.str(), command);
 
 	std::map<int, Client*>::iterator it = _clients.begin();
@@ -582,7 +582,7 @@ void Server::cleanupEmptyChannels()
 {
 	std::vector<std::string> channelsToRemove;
 	for (std::map<std::string, Channel*>::iterator it = _channels.begin();
-		 it != _channels.end(); it++)
+		it != _channels.end(); it++)
 	{
 		if (it->second->isEmpty())
 		{
@@ -594,7 +594,7 @@ void Server::cleanupEmptyChannels()
 }
 
 void Server::broadcastChannel(const std::string& message, const std::string& chName,
-							  int excludeFd)
+								int excludeFd)
 {
 	Channel* channel = getChannel(chName);
 	if (!channel) return;

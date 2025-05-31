@@ -36,7 +36,7 @@ LEAKS_LOG              = ./leaks.log
 READLINE_SUPP          = readline.supp
 VALGRINDFLAGS          = --tool=memcheck -q --leak-check=full \
 			 --show-leak-kinds=all --track-origins=yes \
-                         --track-fds=yes --show-below-main=no \
+						 --track-fds=yes --show-below-main=no \
 
 ################################################################################
 #                                 PROGRAM'S SRCS                               #
@@ -111,7 +111,7 @@ SRCSBOT =  $(SRC_DIR)/bot/Bot.cpp \
 		$(SRC_DIR)/commands/messaging/MotdCommand.cpp \
 		$(SRC_DIR)/commands/channel/PrintdataCommand.cpp \
 		$(SRC_DIR)/utils/UtilsFun.cpp \
-		$(SRC_DIR)/utils/HTTPClient.cpp
+		$(SRC_DIR)/utils/HTTPClient.cpp \
 		$(SRC_DIR)/utils/Config.cpp
 
 
