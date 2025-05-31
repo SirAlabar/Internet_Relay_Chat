@@ -56,7 +56,7 @@ void PassCommand::execute(Client* client, const Message& message)
         Print::Ok("");
         client->setAuthenticated(true);
     }
-    else if (password == _server->getBotPassword())
+	else if (!_server->getBotPassword().empty() && password == _server->getBotPassword())
     {
         _server->setBot(true);
         client->setBot(true);

@@ -10,14 +10,13 @@
 
 class Config
 {
-public:
-
-    static bool hasConfig(const std::string& wanted);
-    static std::string  getConfig(const std::string& wanted);
-
 private:
     Config();
     
+public:
+    static bool hasConfig(const std::string& wanted);
+    static std::string  getConfig(const std::string& wanted);
+
 };
 
 #endif

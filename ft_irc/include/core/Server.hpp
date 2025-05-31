@@ -27,7 +27,6 @@ private:
     std::string _password;                      // Server password
     bool _running;
     bool _botConnected;
-    static std::string _botpass;
 
     std::map<int, std::string> _clientBuffers;  // Buffer to store partial messagens by fd
 
