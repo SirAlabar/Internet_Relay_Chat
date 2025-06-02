@@ -289,5 +289,3 @@ out:
 .PHONY: vi
 vi:
 	@find . -type f -name "*.cpp" -o -name "*.hpp" -o -name "Makefile" | xargs nvim
-
-
