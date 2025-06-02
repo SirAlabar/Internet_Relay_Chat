@@ -35,6 +35,7 @@ private:
 	void processClientMessage(int clientFd);
 	void removeClient(int clientFd);
 	std::string formatStr(const std::string& str);
+    bool caseInsensitiveCompare(const std::string& str1, const std::string& str2);
 
 	Server(const Server& other);  // private to prevent copies
 	Server& operator=(const Server& other);
