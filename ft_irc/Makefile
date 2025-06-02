@@ -9,8 +9,7 @@ INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iin
 				  -Iinclude/dcc -Iinclude/utils -Iinclude/commands/connection \
 				  -Iinclude/commands/messaging -Iinclude/commands/channel \
 				  -Iinclude/commands/dcc
-CFLAGS = -Wall -Wextra -Werror -std=c++98 -Wno-delete-incomplete -Wno-unused-parameter
-ASANFLAGS = -fsanitize=undefined,memory -fno-omit-frame-pointer
+CFLAGS = -Wall -Wextra -Werror -std=c++98
 DEBUG_FLAGS = -g
 
 ifeq ($(DEBUG), 1)
@@ -269,12 +268,6 @@ $(BOTNAME): $(OBJ_DIR) $(OBJS) $(OBJSBOT_UNIQUE)
 .PHONY: debug
 debug: CFLAGS += $(DEBUG_FLAGS)
 debug: re
-
-.PHONY: asan
-asan: $(OBJ_DIR) $(OBJS)
-	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
-	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)
-	@printf "$(GREEN)$(NAME) binary created$(CLR_RMV) ✅\n"
 
 
 ################################################################################
