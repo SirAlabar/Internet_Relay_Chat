@@ -97,7 +97,6 @@ This project is a complete IRC (Internet Relay Chat) server implementation in C+
 - **Observer Pattern**: Channel broadcasting system notifying all subscribed clients
 - **Strategy Pattern**: Different command execution strategies via polymorphic `ACommand`
 - **Template Method Pattern**: `ACommand` base class defining execution template
-- **Singleton Pattern**: Static command factories ensuring single instance
 - **Facade Pattern**: `Server` class as unified interface to IRC subsystems
 - **Adapter Pattern**: `Socket` wrapper adapting system calls to C++ interface
 
