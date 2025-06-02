@@ -32,7 +32,6 @@ RM	    = rm -rf
 #                                    VALGRIND                                  #
 ################################################################################
 LEAKS_LOG              = ./leaks.log
-READLINE_SUPP          = readline.supp
 VALGRINDFLAGS          = --tool=memcheck -q --leak-check=full \
 						--show-leak-kinds=all --track-origins=yes \
 						--track-fds=yes --show-below-main=no \
