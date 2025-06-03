@@ -289,3 +289,25 @@ out:
 .PHONY: vi
 vi:
 	@find . -type f -name "*.cpp" -o -name "*.hpp" -o -name "Makefile" | xargs nvim
+
+################################################################################
+#                              DELETE BEFORE DELIVER                           #
+################################################################################
+
+ASANFLAGS = -fsanitize=address -fno-omit-frame-pointer -g
+MSANFLAGS = -fsanitize=memory -fno-omit-frame-pointer -fsanitize-memory-track-origins -g
+
+.PHONY: asan
+asan: CFLAGS += $(ASANFLAGS)
+asan: $(OBJ_DIR) $(OBJS)
+	@printf "$(GREEN)Compilation with Address Sanitizer $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
+	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)
+	@printf "$(GREEN)$(NAME) binary with AddressSanitizer created$(CLR_RMV) ✅\n"
+
+.PHONY: msan
+msan: CC = c++
+msan: CFLAGS += $(MSANFLAGS)
+msan: $(OBJ_DIR) $(OBJS)
+	@printf "$(GREEN)Compilation with Memory Sanitizer $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
+	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)
+	@printf "$(GREEN)$(NAME) binary with MemorySanitizer created$(CLR_RMV) ✅\n"
