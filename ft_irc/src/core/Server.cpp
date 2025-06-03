@@ -74,6 +74,7 @@ bool Server::start(int port, const std::string& password)
 	}
 
 	pollfd serverPollFd;
+	memset(&serverPollFd, 0, sizeof(serverPollFd));
 	serverPollFd.fd = _serverSocket.getFd();
 	serverPollFd.events = POLLIN;
 	serverPollFd.revents = 0;
@@ -258,6 +259,7 @@ void Server::processNewConnection()
 
 	// Add to poll
 	pollfd clientPollFd;
+	memset(&clientPollFd, 0, sizeof(clientPollFd));
 	clientPollFd.fd = clientFd;
 	clientPollFd.events = POLLIN;  // Monitor for read
 	clientPollFd.revents = 0;
