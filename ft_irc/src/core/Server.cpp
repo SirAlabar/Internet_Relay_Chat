@@ -397,12 +397,7 @@ std::map<std::string, Channel*>& Server::getChannels() { return (_channels); }
 // Get channel by name
 Channel* Server::getChannel(const std::string& name)
 {
-	// std::map<std::string, Channel*>::iterator it = _channels.find(name);
-	// if (it != _channels.end())
-	// {
-	// 	return (it->second);
-	// }
-	std::map<std::string, Channel*>::iterator it = _channels.begin();
+    std::map<std::string, Channel*>::iterator it = _channels.begin();
     std::map<std::string, Channel*>::iterator ite = _channels.end();
     for(; it != ite; it++)
     {
