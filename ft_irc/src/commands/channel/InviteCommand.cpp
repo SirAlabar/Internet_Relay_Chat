@@ -41,7 +41,7 @@ void InviteCommand::execute(Client* client, const Message& message)
 	if (!client->isAuthenticated() || client->getNickname().empty())
 	{
 		Print::Fail("Client not properly registered");
-		sendErrorReply(client, 451, ":You have not registered");
+		sendErrorReply(client, IRC::ERR_NOTREGISTERED, ":You have not registered");
 		return;
 	}
 
@@ -49,7 +49,7 @@ void InviteCommand::execute(Client* client, const Message& message)
 	if (message.getSize() < 2 || message.getParams(0).empty() || message.getParams(1).empty())
 	{
 		Print::Fail("Not enough parameters for INVITE");
-		sendErrorReply(client, 461, "INVITE :Not enough parameters");
+		sendErrorReply(client, IRC::ERR_NEEDMOREPARAMS, "INVITE :Not enough parameters");
 		return;
 	}
 
@@ -61,7 +61,7 @@ void InviteCommand::execute(Client* client, const Message& message)
 	if (!isValidChannelName(channelName))
 	{
 		Print::Warn("Invalid channel name: " + channelName);
-		sendErrorReply(client, 403, channelName + " :No such channel");
+		sendErrorReply(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel");
 		return;
 	}
 
@@ -69,14 +69,14 @@ void InviteCommand::execute(Client* client, const Message& message)
 	if (!channel)
 	{
 		Print::Warn("Channel does not exist: " + channelName);
-		sendErrorReply(client, 403, channelName + " :No such channel");
+		sendErrorReply(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel");
 		return;
 	}
 
 	if (!channel->hasClient(client))
 	{
 		Print::Warn("Inviter not in channel: " + channelName);
-		sendErrorReply(client, 442, channelName + " :You're not on that channel");
+		sendErrorReply(client, IRC::ERR_NOTONCHANNEL, channelName + " :You're not on that channel");
 		return;
 	}
 
@@ -92,14 +92,14 @@ void InviteCommand::execute(Client* client, const Message& message)
 	if (!targetClient)
 	{
 		Print::Warn("Target user not found: " + targetNick);
-		sendErrorReply(client, 401, targetNick + " :No such nick/channel");
+		sendErrorReply(client, IRC::ERR_NOSUCHNICK, targetNick + " :No such nick/channel");
 		return;
 	}
 
 	if (channel->hasClient(targetClient))
 	{
 		Print::Warn("Target already in channel: " + targetNick + " in " + channelName);
-		sendErrorReply(client, 443, targetNick + " " + channelName + " :is already on channel");
+		sendErrorReply(client, IRC::ERR_USERONCHANNEL, targetNick + " " + channelName + " :is already on channel");
 		return;
 	}
 
@@ -117,8 +117,9 @@ void InviteCommand::executeInvite(Client* inviter, Client* target, Channel* chan
 
 	Print::Debug("Executing invite: " + inviterNick + " invites " + targetNick + " to " + channelName);
 
+	channel->addInvitedUser(targetNick);
 	// Send RPL_INVITING (341) to the inviter
-	sendNumericReply(inviter, 341, targetNick + " " + channelName);
+	sendNumericReply(inviter, IRC::RPL_INVITING, targetNick + " " + channelName);
 
 	// Send INVITE message to the target user
 	std::string inviteMsg = ":" + inviterNick;

@@ -165,3 +165,28 @@ void Channel::broadcast(const std::string& message, int excludeFd)
 		}
 	}
 }
+
+void Channel::addInvitedUser(const std::string& nickname)
+{
+    _invitedUsers.insert(nickname);
+}
+
+void Channel::removeInvitedUser(const std::string& nickname)
+{
+    _invitedUsers.erase(nickname);
+}
+
+bool Channel::isUserInvited(const std::string& nickname) const
+{
+    return _invitedUsers.find(nickname) != _invitedUsers.end();
+}
+
+void Channel::clearInvitedUser(const std::string& nickname)
+{
+    _invitedUsers.erase(nickname);
+}
+
+const std::set<std::string>& Channel::getInvitedUsers() const
+{
+    return _invitedUsers;
+}
