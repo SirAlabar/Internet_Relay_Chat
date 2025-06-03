@@ -67,7 +67,7 @@ void    JoinCommand::joinChannel(Client* client, const std::string& channelName,
 	if (!isValidChannelName(channelName))
 	{
 		Print::Fail("wrong channel name");
-		sendErrorReply(client, 403, channelName + " :No such channel");
+		sendErrorReply(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel");
 		return;
 	}
 
@@ -87,11 +87,13 @@ void    JoinCommand::joinChannel(Client* client, const std::string& channelName,
 	}
 	else
 	{
+        joinMessage =
+				":" + client->getNickname() + " JOIN :" + channel->getName() + "\r\n";
 		Print::Debug(channel->getName());
 		if (channel->getClients().find(client->getFd()) != channel->getClients().end())
 		{
 			Print::Fail("User already in channel");
-			sendErrorReply(client, 403, channelName + " :No such channel");
+			sendErrorReply(client, IRC::ERR_NOSUCHCHANNEL, channel->getName() + " :No such channel");
 			return;
 		}
 		else
@@ -100,14 +102,14 @@ void    JoinCommand::joinChannel(Client* client, const std::string& channelName,
 				if (channel->isInviteOnly())
 				{
 					Print::Warn("Channel is invite-only");
-					sendErrorReply(client, IRC::ERR_INVITEONLYCHAN, channelName + " :Cannot join channel (+i)");
+					sendErrorReply(client, IRC::ERR_INVITEONLYCHAN, channel->getName() + " :Cannot join channel (+i)");
 					return;
 				}
 				if (channel->hasKey() 
 					&& (key.empty() || key != channel->getKey()))
 				{
 					Print::Warn("Wrong or missing channel key");
-					sendErrorReply(client, IRC::ERR_BADCHANNELKEY, channelName + " :Cannot join channel (+k)");
+					sendErrorReply(client, IRC::ERR_BADCHANNELKEY, channel->getName() + " :Cannot join channel (+k)");
 					return;
 				}
 				if (channel->hasUserLimit()
@@ -115,21 +117,21 @@ void    JoinCommand::joinChannel(Client* client, const std::string& channelName,
 					&& !client->isBot())
 				{
 					Print::Warn("Channel full");
-					sendErrorReply(client, IRC::ERR_CHANNELISFULL, channelName + " :Cannot join channel (+l)");
+					sendErrorReply(client, IRC::ERR_CHANNELISFULL, channel->getName() + " :Cannot join channel (+l)");
 					return;
 				}
 			}
 			channel->addClient(client);
 			client->sendMessage(joinMessage);
-			_server->broadcastChannel(joinMessage, channelName, client->getFd());
+			_server->broadcastChannel(joinMessage, channel->getName(), client->getFd());
 		}
 		if (!channel->getTopic().empty())
 		{
-			sendNumericReply(client, 332, channelName + " :" + channel->getTopic());
+			sendNumericReply(client, IRC::RPL_TOPIC, channel->getName() + " :" + channel->getTopic());
 		}
 		else
 		{
-			sendNumericReply(client, 331, channelName + " :No topic is set");
+			sendNumericReply(client, IRC::RPL_NOTOPIC, channel->getName() + " :No topic is set");
 		}
 	}
 
