@@ -9,8 +9,7 @@ INCLUDE_HEADERS = -Iinclude -Iinclude/core -Iinclude/commands -Iinclude/bot -Iin
 				  -Iinclude/dcc -Iinclude/utils -Iinclude/commands/connection \
 				  -Iinclude/commands/messaging -Iinclude/commands/channel \
 				  -Iinclude/commands/dcc
-CFLAGS = -Wall -Wextra -Werror -std=c++98 -Wno-delete-incomplete -Wno-unused-parameter
-ASANFLAGS = -fsanitize=undefined,memory -fno-omit-frame-pointer
+CFLAGS = -Wall -Wextra -Werror -std=c++98
 DEBUG_FLAGS = -g
 
 ifeq ($(DEBUG), 1)
@@ -33,7 +32,6 @@ RM	    = rm -rf
 #                                    VALGRIND                                  #
 ################################################################################
 LEAKS_LOG              = ./leaks.log
-READLINE_SUPP          = readline.supp
 VALGRINDFLAGS          = --tool=memcheck -q --leak-check=full \
 						--show-leak-kinds=all --track-origins=yes \
 						--track-fds=yes --show-below-main=no \
@@ -270,11 +268,6 @@ $(BOTNAME): $(OBJ_DIR) $(OBJS) $(OBJSBOT_UNIQUE)
 debug: CFLAGS += $(DEBUG_FLAGS)
 debug: re
 
-.PHONY: asan
-asan: $(OBJ_DIR) $(OBJS)
-	@printf "$(GREEN)Compilation $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
-	@$(CC) $(CFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)
-	@printf "$(GREEN)$(NAME) binary created$(CLR_RMV) ✅\n"
 
 
 ################################################################################
@@ -385,3 +378,12 @@ test-help:
 	@printf "  make && make test-quick    # Quick verification\n"
 	@printf "  make test-channels         # Test channel commands\n"
 	@printf "  make test-all             # Full test suite\n"
+
+ASANFLAGS = -fsanitize=address -fno-omit-frame-pointer -g
+# ASANFLAGS = -fsanitize=memory -fno-omit-frame-pointer -fsanitize-memory-track-origins -g
+
+.PHONY: asan
+asan: $(OBJ_DIR) $(OBJS)
+	@printf "$(GREEN)Compilation with Address Sanitizer $(CLR_RMV)of $(YELLOW)$(NAME) $(CLR_RMV)...\n"
+	@$(CC) $(CFLAGS) $(ASANFLAGS) $(OBJS) $(INCLUDE_HEADERS) $(DEBUG_DEFINE) -o $(NAME)
+	@printf "$(GREEN)$(NAME) binary with AddressSanitizer created$(CLR_RMV) ✅\n"

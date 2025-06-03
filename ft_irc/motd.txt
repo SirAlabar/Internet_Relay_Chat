@@ -1,5 +1,16 @@
-here will be the message of the day
-to be sent to the client that put /motd on command
-or
-when a user logins on this server.
-if this file is missing, server will sent a default /motd message.
+===============================================
+    Welcome to ft_irc Server
+===============================================
+
+"The best code is written under pressure"
+    - Ancient 42 wisdom
+
+✨ Features:
+- RFC 1459 & 2812 compliant
+- Non-blocking I/O with poll()
+- Multi-client support
+- Channel operators & modes
+
+May your evaluation be as smooth as our sockets!
+
+===============================================

@@ -1,3 +1,4 @@
+#include <cctype>
 #include <unistd.h>
 
 #include <cerrno>
@@ -73,6 +74,7 @@ bool Server::start(int port, const std::string& password)
 	}
 
 	pollfd serverPollFd;
+	memset(&serverPollFd, 0, sizeof(serverPollFd));
 	serverPollFd.fd = _serverSocket.getFd();
 	serverPollFd.events = POLLIN;
 	serverPollFd.revents = 0;
@@ -257,6 +259,7 @@ void Server::processNewConnection()
 
 	// Add to poll
 	pollfd clientPollFd;
+	memset(&clientPollFd, 0, sizeof(clientPollFd));
 	clientPollFd.fd = clientFd;
 	clientPollFd.events = POLLIN;  // Monitor for read
 	clientPollFd.revents = 0;
@@ -394,11 +397,15 @@ std::map<std::string, Channel*>& Server::getChannels() { return (_channels); }
 // Get channel by name
 Channel* Server::getChannel(const std::string& name)
 {
-	std::map<std::string, Channel*>::iterator it = _channels.find(name);
-	if (it != _channels.end())
-	{
-		return (it->second);
-	}
+    std::map<std::string, Channel*>::iterator it = _channels.begin();
+    std::map<std::string, Channel*>::iterator ite = _channels.end();
+    for(; it != ite; it++)
+    {
+        if(caseInsensitiveCompare(it->first, name))
+        {
+            return(it->second);
+        }
+    }
 	return (NULL);
 }
 
@@ -652,4 +659,17 @@ void    Server::removeClientFromChannels(Client* client)
 		}
 	}
 	cleanupEmptyChannels();
+}
+
+bool Server::caseInsensitiveCompare(const std::string& str1, const std::string& str2)
+{
+    if (str1.length() != str2.length())
+        return false;
+    
+    for (size_t i = 0; i < str1.length(); ++i)
+    {
+        if (std::toupper(str1[i]) != std::toupper(str2[i]))
+            return false;
+    }
+    return true;
 }
