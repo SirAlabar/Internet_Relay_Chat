@@ -67,7 +67,7 @@ void    JoinCommand::joinChannel(Client* client, const std::string& channelName,
 	if (!isValidChannelName(channelName))
 	{
 		Print::Fail("wrong channel name");
-		sendErrorReply(client, 403, channelName + " :No such channel");
+		sendErrorReply(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel");
 		return;
 	}
 
@@ -93,7 +93,7 @@ void    JoinCommand::joinChannel(Client* client, const std::string& channelName,
 		if (channel->getClients().find(client->getFd()) != channel->getClients().end())
 		{
 			Print::Fail("User already in channel");
-			sendErrorReply(client, 403, channel->getName() + " :No such channel");
+			sendErrorReply(client, IRC::ERR_NOSUCHCHANNEL, channel->getName() + " :No such channel");
 			return;
 		}
 		else
@@ -127,11 +127,11 @@ void    JoinCommand::joinChannel(Client* client, const std::string& channelName,
 		}
 		if (!channel->getTopic().empty())
 		{
-			sendNumericReply(client, 332, channel->getName() + " :" + channel->getTopic());
+			sendNumericReply(client, IRC::RPL_TOPIC, channel->getName() + " :" + channel->getTopic());
 		}
 		else
 		{
-			sendNumericReply(client, 331, channel->getName() + " :No topic is set");
+			sendNumericReply(client, IRC::RPL_NOTOPIC, channel->getName() + " :No topic is set");
 		}
 	}
 
