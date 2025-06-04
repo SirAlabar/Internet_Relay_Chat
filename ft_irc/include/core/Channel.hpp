@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <set>
 
 class Client;
 
@@ -20,6 +21,7 @@ private:
 	std::string _key;
 	bool _hasUserLimit;
 	size_t _userLimit;
+	std::set<std::string> _invitedUsers;
 
 public:
 	Channel(const std::string& name);
@@ -66,6 +68,12 @@ public:
 
 	// Utility
 	bool isEmpty() const;
+
+	void addInvitedUser(const std::string& nickname);
+	void removeInvitedUser(const std::string& nickname);
+	bool isUserInvited(const std::string& nickname) const;
+	void clearInvitedUser(const std::string& nickname);
+	const std::set<std::string>& getInvitedUsers() const;
 };
 
 #endif

@@ -99,7 +99,7 @@ void    JoinCommand::joinChannel(Client* client, const std::string& channelName,
 		else
 		{
 			{
-				if (channel->isInviteOnly())
+				if (channel->isInviteOnly() && !channel->isUserInvited(client->getNickname()))
 				{
 					Print::Warn("Channel is invite-only");
 					sendErrorReply(client, IRC::ERR_INVITEONLYCHAN, channel->getName() + " :Cannot join channel (+i)");
@@ -122,6 +122,7 @@ void    JoinCommand::joinChannel(Client* client, const std::string& channelName,
 				}
 			}
 			channel->addClient(client);
+			channel->removeInvitedUser(client->getNickname());
 			client->sendMessage(joinMessage);
 			_server->broadcastChannel(joinMessage, channel->getName(), client->getFd());
 		}

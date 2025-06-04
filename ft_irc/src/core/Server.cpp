@@ -565,6 +565,21 @@ void Server::print_clients(bool command)
 			+ (it_channel->second->isTopicRestricted() ? " | Topic_Restricted" : "");
 		Print::Debug(ssa.str(), command);
 
+		const std::set<std::string>& invitedUsers = it_channel->second->getInvitedUsers();
+		if (!invitedUsers.empty())
+		{
+			std::stringstream inviteStream;
+			inviteStream << Color::VIOLET << "Invited nicknames: ";
+			for (std::set<std::string>::const_iterator invIt = invitedUsers.begin();
+			invIt != invitedUsers.end(); ++invIt)
+			{
+				if (invIt != invitedUsers.begin())
+					inviteStream << ", ";
+				inviteStream << *invIt;
+			}
+			Print::Debug(inviteStream.str(), command);
+		}
+
 		std::stringstream ssb;
 		ssb << std::right << Color::ORANGE << std::setw(10) << "FD" << "|" << std::setw(10) << "NICK"
 			<< "|" << std::setw(10) << "OPERATOR" << "|";
