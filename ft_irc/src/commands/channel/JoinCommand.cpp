@@ -113,7 +113,7 @@ void    JoinCommand::joinChannel(Client* client, const std::string& channelName,
 					return;
 				}
 				if (channel->hasUserLimit()
-					&& channel->getClients().size() >= channel->getUserLimit()
+					&& (channel->getClients().size() - _server->hasBot()) >= channel->getUserLimit()
 					&& !client->isBot())
 				{
 					Print::Warn("Channel full");
