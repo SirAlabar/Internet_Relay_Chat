@@ -55,10 +55,16 @@ void UserCommand::execute(Client* client, const Message& message)
 
 	if (!client->getNickname().empty() && !client->getUsername().empty())
 	{
-		sendNumericReply(client, 001,
+		sendNumericReply(client, IRC::RPL_WELCOME,
 						 ":Welcome to the IRC Network " + client->getNickname() + "!" +
 							 client->getUsername() + "@localhost");
-		sendNumericReply(client, 002, ":Host is server, running version 1.0");
+		sendNumericReply(client, IRC::RPL_YOURHOST, ":Host is server, running version 1.0");
+		sendNumericReply(client, IRC::RPL_CREATED,
+		   ":This server was created " + _server->getStartupTime());
+		sendNumericReply(client, IRC::RPL_MYINFO,
+		   "server ft_irc-1.0 o itkol");
+		sendNumericReply(client, IRC::RPL_ISUPPORT,
+		   "CHANTYPES=#& CHANMODES=itkol PREFIX=(o)@ :are supported by this server");
 		{
 			Message motdMessage("MOTD");
 			MotdCommand motdCmd(_server);

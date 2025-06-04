@@ -6,6 +6,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <ctime>
+#include <iomanip>
 
 #include "Bot.hpp"
 #include "Socket.hpp"
@@ -39,6 +41,7 @@ private:
 
 	Server(const Server& other);  // private to prevent copies
 	Server& operator=(const Server& other);
+	std::string _startupTime;
 
 public:
 	Server();
@@ -75,6 +78,7 @@ public:
 	void setBot(bool status);
 	Client* getBot() const;
 	bool hasBot() const;
+	const std::string& getStartupTime() const;
 };
 
 #endif
