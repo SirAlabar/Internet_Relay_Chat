@@ -453,11 +453,7 @@ void Server::removeClient(int clientFd)
 	Client* client = getClient(clientFd);
 	if (client)
 	{
-		for (std::map<std::string, Channel*>::iterator it = _channels.begin();
-			it != _channels.end(); it++)
-		{
-			it->second->removeClient(client);
-		}
+		removeClientFromChannels(client);
 	}
 
 	// Remove from poll
