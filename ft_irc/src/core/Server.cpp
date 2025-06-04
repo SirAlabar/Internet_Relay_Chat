@@ -17,7 +17,26 @@
 #include "Socket.hpp"
 #include "UtilsFun.hpp"
 
-Server::Server() : _running(false) {}
+Server::Server() : _running(false)
+{
+	std::time_t now = std::time(0);
+	std::tm* timeinfo = std::localtime(&now);
+
+	const char* months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+	const char* days[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+
+	std::ostringstream oss;
+	oss << days[timeinfo->tm_wday] << " "
+		<< months[timeinfo->tm_mon] << " "
+		<< timeinfo->tm_mday << " "
+		<< (timeinfo->tm_year + 1900) << " at "
+		<< std::setfill('0') << std::setw(2) << timeinfo->tm_hour << ":"
+		<< std::setfill('0') << std::setw(2) << timeinfo->tm_min << ":"
+		<< std::setfill('0') << std::setw(2) << timeinfo->tm_sec;
+
+	_startupTime = oss.str();
+}
 
 Server::~Server() { stop(); }
 
@@ -684,3 +703,5 @@ bool Server::caseInsensitiveCompare(const std::string& str1, const std::string& 
     }
     return true;
 }
+
+const std::string& Server::getStartupTime() const { return (_startupTime); }

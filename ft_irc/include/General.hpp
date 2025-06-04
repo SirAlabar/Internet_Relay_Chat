@@ -28,6 +28,7 @@ namespace IRC
 	const int RPL_YOURHOST          = 002;
 	const int RPL_CREATED           = 003;
 	const int RPL_MYINFO            = 004;
+	const int RPL_ISUPPORT          = 005;
 
 	// Channel information replies
 	const int RPL_CHANNELMODEIS     = 324;
