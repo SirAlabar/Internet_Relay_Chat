@@ -291,38 +291,52 @@ bool ModeCommand::processChannelKeyMode(Client* client, Channel* channel, bool a
 									   const Message& message, size_t& paramIndex,
 									   std::string& appliedParams)
 {
+	std::string key = "";
+	if(paramIndex < message.getSize() && !message.getParams(paramIndex).empty())
+	{
+		key += message.getParams(paramIndex);
+		paramIndex++;
+	}
+	else
+	{
+		std::string strMode = (adding ? "+k" : "-k");
+		Print::Warn("MODE " + strMode + " requires a parameter");
+		sendErrorReply(client, IRC::ERR_NEEDMOREPARAMS, "MODE " + strMode + " :Not enough parameters");
+		return false;
+	}
+
 	if (adding)
 	{
-		if (paramIndex < message.getSize() && !message.getParams(paramIndex).empty())
+		channel->setKey(key);
+		if (!appliedParams.empty())
 		{
-			std::string key = message.getParams(paramIndex);
-			channel->setKey(key);
-			if (!appliedParams.empty()) 
-			{
-				appliedParams += " ";
-			}
-			appliedParams += key;
-			paramIndex++;
-			Print::Debug("Channel key set to: " + key);
+			appliedParams += " ";
+		}
+		appliedParams += key;
+		Print::Ok("Channel key set to: " + key);
+		return true;
+	}
+	else
+	{
+		if (!channel->hasKey())
+		{
+			Print::Warn("Channel has no key to remove");
+			return false;
+		}
+		else if (key == channel->getKey())
+		{
+			channel->removeKey();
+			Print::Ok("Channel key removed");
 			return true;
 		}
 		else
 		{
-			Print::Warn("MODE +k requires a parameter");
-			sendErrorReply(client, IRC::ERR_NEEDMOREPARAMS, "MODE +k :Not enough parameters");
+			Print::Warn("Wrong key for -k");
+			sendErrorReply(client, IRC::ERR_KEYSET,
+				channel->getName() + " :Key incorrect");
+			return false;
 		}
 	}
-	else
-	{
-		if (channel->hasKey())
-		{
-			channel->removeKey();
-			Print::Debug("Channel key removed");
-			return true;
-		}
-		Print::Debug("Channel key already not set");
-	}
-	return false;
 }
 
 bool ModeCommand::processOperatorMode(Client* client, Channel* channel, bool adding,
