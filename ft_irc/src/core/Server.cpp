@@ -17,7 +17,7 @@
 #include "Socket.hpp"
 #include "UtilsFun.hpp"
 
-Server::Server() : _running(false)
+Server::Server() : _running(false), _botConnected(false)
 {
 	std::time_t now = std::time(0);
 	std::tm* timeinfo = std::localtime(&now);
